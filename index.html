@@ -1,818 +1,803 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="en">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.7">
-  <style type="text/css">
-    p.p1 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica}
-    p.p2 {margin: 0.0px 0.0px 0.0px 0.0px; font: 12.0px Helvetica; min-height: 14.0px}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Shift Schedule Viewer</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+        
+        .header {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .header h1 {
+            color: #667eea;
+            margin-bottom: 10px;
+        }
+        
+        .file-input-container {
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
+            text-align: center;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .file-input-container input[type="file"] {
+            display: none;
+        }
+        
+        .file-label {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        
+        .file-label:hover {
+            background: #5568d3;
+        }
+        
+        .tabs {
+            display: flex;
+            gap: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            flex-wrap: wrap;
+        }
+        
+        .tab {
+            padding: 10px 20px;
+            background: #f3f4f6;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 500;
+        }
+        
+        .tab:hover {
+            background: #e5e7eb;
+        }
+        
+        .tab.active {
+            background: #667eea;
+            color: white;
+        }
+        
+        .search-container {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        
+        .search-input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
+        }
+        
+        .search-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .search-help {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #6b7280;
+        }
+        
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+            flex-wrap: wrap;
+        }
+        
+        .filter-select {
+            padding: 8px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+            cursor: pointer;
+        }
+        
+        .person-select-container {
+            position: relative;
+            flex: 1;
+            min-width: 200px;
+        }
+        
+        .person-input {
+            width: 100%;
+            padding: 8px 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 14px;
+        }
+        
+        .person-input:focus {
+            outline: none;
+            border-color: #667eea;
+        }
+        
+        .person-dropdown {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 0;
+            background: white;
+            border: 2px solid #e5e7eb;
+            border-top: none;
+            border-radius: 0 0 8px 8px;
+            max-height: 300px;
+            overflow-y: auto;
+            z-index: 1000;
+            display: none;
+        }
+        
+        .person-dropdown.show {
+            display: block;
+        }
+        
+        .person-option {
+            padding: 10px 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        
+        .person-option:hover {
+            background: #f3f4f6;
+        }
+        
+        .person-option.selected {
+            background: #e0e7ff;
+            color: #667eea;
+            font-weight: 500;
+        }
+        
+        .content {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            min-height: 400px;
+        }
+        
+        .shift-card {
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
+        }
+        
+        .shift-card:hover {
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
+        }
+        
+        .shift-card.unassigned {
+            border-color: #fbbf24;
+            background: #fef3c7;
+        }
+        
+        .shift-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .shift-name {
+            font-size: 18px;
+            font-weight: 600;
+            color: #1f2937;
+        }
+        
+        .shift-badge {
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-assigned {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .badge-unassigned {
+            background: #fef3c7;
+            color: #92400e;
+        }
+        
+        .shift-details {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .shift-detail {
+            font-size: 14px;
+            color: #4b5563;
+        }
+        
+        .shift-detail strong {
+            color: #1f2937;
+        }
+        
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+        
+        .no-results {
+            text-align: center;
+            padding: 40px;
+            color: #6b7280;
+        }
+        
+        .stats {
+            display: flex;
+            gap: 20px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+        }
+        
+        .stat-card {
+            background: #f3f4f6;
+            padding: 15px 20px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 150px;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 700;
+            color: #667eea;
+        }
+        
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
+        @media (max-width: 768px) {
+            .shift-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .tabs {
+                flex-direction: column;
+            }
+            
+            .tab {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-<p class="p1">&lt;!DOCTYPE html&gt;</p>
-<p class="p1">&lt;html lang="en"&gt;</p>
-<p class="p1">&lt;head&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta charset="UTF-8"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;meta name="viewport" content="width=device-width, initial-scale=1.0"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;title&gt;Shift Schedule Viewer&lt;/title&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"&gt;&lt;/script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;style&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>* {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-sizing: border-box;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>body {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-height: 100vh;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-width: 1200px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin: 0 auto;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 6px rgba(0,0,0,0.1);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.header h1 {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #667eea;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.file-input-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 30px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 6px rgba(0,0,0,0.1);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.file-input-container input[type="file"] {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.file-label {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: inline-block;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px 24px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #667eea;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: background 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.file-label:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #5568d3;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tabs {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 6px rgba(0,0,0,0.1);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tab {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #f3f4f6;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 500;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tab:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #e5e7eb;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.tab.active {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #667eea;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: white;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.search-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 6px rgba(0,0,0,0.1);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.search-input {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #e5e7eb;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: border-color 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.search-input:focus {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>outline: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #667eea;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.search-help {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #6b7280;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.filters {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 15px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.filter-select {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 8px 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #e5e7eb;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.person-select-container {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: relative;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-width: 200px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.person-input {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 8px 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #e5e7eb;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.person-input:focus {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>outline: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #667eea;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.person-dropdown {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>position: absolute;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>top: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>left: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>right: 0;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #e5e7eb;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-top: none;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 0 0 8px 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>max-height: 300px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>overflow-y: auto;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>z-index: 1000;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: none;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.person-dropdown.show {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: block;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.person-option {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 10px 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>cursor: pointer;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: background 0.2s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.person-option:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #f3f4f6;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.person-option.selected {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #e0e7ff;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #667eea;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 500;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.content {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: white;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 4px 6px rgba(0,0,0,0.1);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-height: 400px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.shift-card {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border: 2px solid #e5e7eb;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 16px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>transition: all 0.3s;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.shift-card:hover {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #667eea;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.shift-card.unassigned {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-color: #fbbf24;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #fef3c7;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.shift-header {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>justify-content: space-between;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>align-items: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.shift-name {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 18px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 600;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #1f2937;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.shift-badge {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 4px 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 12px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 500;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.badge-assigned {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #d1fae5;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #065f46;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.badge-unassigned {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #fef3c7;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #92400e;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.shift-details {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: grid;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.shift-detail {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #4b5563;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.shift-detail strong {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #1f2937;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.loading {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 40px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #6b7280;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.no-results {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>text-align: center;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 40px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #6b7280;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.stats {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>display: flex;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>gap: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-bottom: 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex-wrap: wrap;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.stat-card {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>background: #f3f4f6;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>padding: 15px 20px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>border-radius: 8px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>flex: 1;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>min-width: 150px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.stat-number {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 24px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-weight: 700;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #667eea;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>.stat-label {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>font-size: 14px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>color: #6b7280;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>margin-top: 5px;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>@media (max-width: 768px) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>.shift-header {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>align-items: flex-start;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>gap: 10px;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>.tabs {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>flex-direction: column;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>.tab {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>width: 100%;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/style&gt;</p>
-<p class="p1">&lt;/head&gt;</p>
-<p class="p1">&lt;body&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;div class="container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h1&gt;📅 Shift Schedule Viewer&lt;/h1&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p&gt;Easy access to shift schedules without spreadsheet hassle&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div class="file-input-container" id="fileInputContainer"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;h2&gt;Select your shift schedule file&lt;/h2&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p style="color: #6b7280; margin: 10px 0;"&gt;Choose the COLE - Published Shifts.xlsx file&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;label for="fileInput" class="file-label"&gt;Choose File&lt;/label&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;input type="file" id="fileInput" accept=".xlsx,.xls"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;p id="fileName" style="margin-top: 10px; color: #667eea;"&gt;&lt;/p&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;div id="appContainer" style="display: none;"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="tabs"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="tab active" data-tab="current"&gt;🔴 Current Shifts&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="tab" data-tab="today"&gt;📆 Today&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="tab" data-tab="tomorrow"&gt;📅 Tomorrow&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="tab" data-tab="upcoming"&gt;📋 Upcoming&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;button class="tab" data-tab="search"&gt;🔍 ALL (incl. past)&lt;/button&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="search-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;input type="text" class="search-input" id="searchInput" placeholder="Search shifts..."&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="search-help"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>💡 Try: &lt;code&gt;name:John&lt;/code&gt;, &lt;code&gt;venue:MSK&lt;/code&gt;, &lt;code&gt;date:today&lt;/code&gt;, or combine them!</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="filters"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;select class="filter-select" id="venueFilter"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="all"&gt;All Venues&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/select&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;select class="filter-select" id="statusFilter"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="all"&gt;All Shifts&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="assigned"&gt;Assigned Only&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;option value="unassigned"&gt;Unassigned Only&lt;/option&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/select&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="person-select-container"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;input<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                            </span>type="text"<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                            </span>class="person-input"<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                            </span>id="personInput"<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                            </span>placeholder="Filter by person..."</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>autocomplete="off"</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="person-dropdown" id="personDropdown"&gt;&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="stats" id="stats"&gt;&lt;/div&gt;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;div class="content" id="content"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="loading"&gt;Loading shifts...&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/div&gt;</p>
-<p class="p2"><br></p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;script&gt;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let allShifts = [];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let currentTab = 'current';</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let allPeople = [];</p>
-<p class="p1"><span class="Apple-converted-space">        </span>let selectedPerson = '';</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>const fileInput = document.getElementById('fileInput');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const fileInputContainer = document.getElementById('fileInputContainer');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const appContainer = document.getElementById('appContainer');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const fileName = document.getElementById('fileName');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const content = document.getElementById('content');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const searchInput = document.getElementById('searchInput');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const venueFilter = document.getElementById('venueFilter');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const statusFilter = document.getElementById('statusFilter');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const personInput = document.getElementById('personInput');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const personDropdown = document.getElementById('personDropdown');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>const stats = document.getElementById('stats');</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>fileInput.addEventListener('change', handleFileSelect);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>searchInput.addEventListener('input', renderShifts);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>venueFilter.addEventListener('change', renderShifts);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>statusFilter.addEventListener('change', renderShifts);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>personInput.addEventListener('input', handlePersonInput);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>personInput.addEventListener('focus', showPersonDropdown);</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>// Close dropdown when clicking outside</p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.addEventListener('click', (e) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!personInput.contains(e.target) &amp;&amp; !personDropdown.contains(e.target)) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>personDropdown.classList.remove('show');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>document.querySelectorAll('.tab').forEach(tab =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>tab.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>document.querySelectorAll('.tab').forEach(t =&gt; t.classList.remove('active'));</p>
-<p class="p1"><span class="Apple-converted-space">                </span>tab.classList.add('active');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>currentTab = tab.dataset.tab;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>renderShifts();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>});</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function handleFileSelect(e) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const file = e.target.files[0];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!file) return;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>fileName.textContent = `Loading: ${file.name}`;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>const reader = new FileReader();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>reader.onload = function(e) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>try {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const data = new Uint8Array(e.target.result);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const workbook = XLSX.read(data, { type: 'array', cellDates: true });</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const firstSheet = workbook.Sheets[workbook.SheetNames[0]];</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const jsonData = XLSX.utils.sheet_to_json(firstSheet, { raw: false, defval: '' });</p>
-<p class="p2"><span class="Apple-converted-space">                    </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>processData(jsonData);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>fileInputContainer.style.display = 'none';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>appContainer.style.display = 'block';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>} catch (error) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>console.error('Error reading file:', error);</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>fileName.textContent = `Error: ${error.message}`;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">            </span>};</p>
-<p class="p1"><span class="Apple-converted-space">            </span>reader.readAsArrayBuffer(file);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function processData(data) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Skip header row and process actual data</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const dataRows = data.slice(1);</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>allShifts = dataRows.map(row =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const keys = Object.keys(row);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const namePart = row[keys[8]] || '';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const isUnassignedPlaceholder = namePart.includes('Unassigned') || namePart.includes('unassigned');</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>return {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>date: parseDate(row[keys[0]]),</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>shiftTimeCET: row[keys[1]] || '',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>shiftTimeIST: row[keys[2]] || '',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>venue: row[keys[3]] || '',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>location: row[keys[4]] || '',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>meetingRoom: row[keys[5]] || '',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>role: row[keys[6]] || '',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>shiftType: row[keys[7]] || '',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>name: namePart,</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>email: row[keys[9]] || '',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>professionalPhone: row[keys[10]] || '',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>rolePhone: row[keys[11]] || '',</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>isAssigned: !!(namePart &amp;&amp; namePart.toString().trim() !== '' &amp;&amp; !isUnassignedPlaceholder),</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>rawDate: row[keys[0]]</p>
-<p class="p1"><span class="Apple-converted-space">                </span>};</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}).filter(shift =&gt; shift.date !== null &amp;&amp; shift.venue &amp;&amp; shift.role);</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Populate venue filter</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const venues = [...new Set(allShifts.map(s =&gt; s.venue))].filter(Boolean).sort();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>venueFilter.innerHTML = '&lt;option value="all"&gt;All Venues&lt;/option&gt;';</p>
-<p class="p1"><span class="Apple-converted-space">            </span>venues.forEach(venue =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const option = document.createElement('option');</p>
-<p class="p1"><span class="Apple-converted-space">                </span>option.value = venue;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>option.textContent = venue;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>venueFilter.appendChild(option);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Populate person list</p>
-<p class="p1"><span class="Apple-converted-space">            </span>allPeople = [...new Set(allShifts.map(s =&gt; s.name))].filter(Boolean).sort();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>updatePersonDropdown('');</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>renderShifts();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function handlePersonInput(e) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const searchTerm = e.target.value;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// If the input is cleared, reset to all people</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (searchTerm === '') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>selectedPerson = '';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>renderShifts();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>updatePersonDropdown(searchTerm);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>showPersonDropdown();</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function showPersonDropdown() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (personInput.value || allPeople.length &gt; 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>personDropdown.classList.add('show');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function updatePersonDropdown(searchTerm) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const filtered = searchTerm<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>? allPeople.filter(name =&gt; name.toLowerCase().includes(searchTerm.toLowerCase()))</p>
-<p class="p1"><span class="Apple-converted-space">                </span>: allPeople;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (filtered.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>personDropdown.innerHTML = '&lt;div class="person-option" style="color: #9ca3af;"&gt;No matches found&lt;/div&gt;';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>personDropdown.innerHTML = `</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="person-option ${selectedPerson === '' ? 'selected' : ''}" data-person=""&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>All People</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>` + filtered.map(name =&gt; `</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="person-option ${selectedPerson === name ? 'selected' : ''}" data-person="${name}"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>${name}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>`).join('');</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Add click handlers to options</p>
-<p class="p1"><span class="Apple-converted-space">            </span>personDropdown.querySelectorAll('.person-option').forEach(option =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>option.addEventListener('click', () =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const person = option.dataset.person;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>selectedPerson = person;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>personInput.value = person || '';</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>personDropdown.classList.remove('show');</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>renderShifts();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>});</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function parseDate(dateStr) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!dateStr) return null;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Handle DD/MM/YY format (e.g., "23/10/25")</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const ddmmyyMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (ddmmyyMatch) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const day = parseInt(ddmmyyMatch[1]);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const month = parseInt(ddmmyyMatch[2]) - 1;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let year = parseInt(ddmmyyMatch[3]);</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (year &lt; 100) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>year += 2000;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p2"><span class="Apple-converted-space">                </span></p>
-<p class="p1"><span class="Apple-converted-space">                </span>return new Date(year, month, day);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Try parsing as a date object</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let date = new Date(dateStr);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!isNaN(date.getTime())) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return date;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>return null;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function getFilteredShifts() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const now = new Date();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const tomorrow = new Date(today);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>tomorrow.setDate(tomorrow.getDate() + 1);</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>let filtered = [...allShifts];</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Tab filter</p>
-<p class="p1"><span class="Apple-converted-space">            </span>switch(currentTab) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>case 'current':</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>const currentHour = now.getHours();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>filtered = filtered.filter(shift =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>if (!shift.date) return false;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>const shiftDate = new Date(shift.date);</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>const isToday = shiftDate.toDateString() === today.toDateString();</p>
-<p class="p2"><span class="Apple-converted-space">                        </span></p>
-<p class="p1"><span class="Apple-converted-space">                        </span>const timeMatch = shift.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>if (isToday &amp;&amp; timeMatch) {</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>const startHour = parseInt(timeMatch[1]);</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>const endHour = parseInt(timeMatch[3]);</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>return currentHour &gt;= startHour &amp;&amp; currentHour &lt; endHour;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>return false;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>case 'today':</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>filtered = filtered.filter(shift =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>if (!shift.date) return false;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>const shiftDate = new Date(shift.date);</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>return shiftDate.toDateString() === today.toDateString();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>case 'tomorrow':</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>filtered = filtered.filter(shift =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>if (!shift.date) return false;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>const shiftDate = new Date(shift.date);</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>return shiftDate.toDateString() === tomorrow.toDateString();</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>case 'upcoming':</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>filtered = filtered.filter(shift =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>if (!shift.date) return false;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>return shift.date &gt;= today;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>});</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Search filter</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const searchTerm = searchInput.value.toLowerCase().trim();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (searchTerm) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>filtered = applySearch(filtered, searchTerm);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Venue filter</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (venueFilter.value !== 'all') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>filtered = filtered.filter(shift =&gt; shift.venue === venueFilter.value);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Status filter</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (statusFilter.value === 'assigned') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>filtered = filtered.filter(shift =&gt; shift.isAssigned);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>} else if (statusFilter.value === 'unassigned') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>filtered = filtered.filter(shift =&gt; !shift.isAssigned);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Person filter</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (selectedPerson) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>filtered = filtered.filter(shift =&gt; shift.name === selectedPerson);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Sort by date and time</p>
-<p class="p1"><span class="Apple-converted-space">            </span>filtered.sort((a, b) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (!a.date || !b.date) return 0;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return a.date - b.date;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>return filtered;</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function applySearch(shifts, searchTerm) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Parse search parameters</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const params = {};</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const paramPattern = /(\w+):([^\s]+|"[^"]+")/g;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let match;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>let hasParams = false;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>while ((match = paramPattern.exec(searchTerm)) !== null) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>hasParams = true;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const key = match[1].toLowerCase();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const value = match[2].replace(/"/g, '').toLowerCase();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>params[key] = value;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (!hasParams) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>// Simple text search</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return shifts.filter(shift =&gt;<span class="Apple-converted-space"> </span></p>
-<p class="p1"><span class="Apple-converted-space">                    </span>shift.name.toLowerCase().includes(searchTerm) ||</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>shift.role.toLowerCase().includes(searchTerm) ||</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>shift.venue.toLowerCase().includes(searchTerm)</p>
-<p class="p1"><span class="Apple-converted-space">                </span>);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Parameter-based search</p>
-<p class="p1"><span class="Apple-converted-space">            </span>return shifts.filter(shift =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>for (const [key, value] of Object.entries(params)) {</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>switch(key) {</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>case 'name':</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>if (!shift.name.toLowerCase().includes(value)) return false;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>case 'venue':</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>if (!shift.venue.toLowerCase().includes(value)) return false;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>case 'role':</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>if (!shift.role.toLowerCase().includes(value)) return false;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>case 'date':</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>const targetDate = parseSearchDate(value);</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>if (targetDate &amp;&amp; shift.date) {</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>const shiftDate = new Date(shift.date);</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>if (shiftDate.toDateString() !== targetDate.toDateString()) {</p>
-<p class="p1"><span class="Apple-converted-space">                                    </span>return false;</p>
-<p class="p1"><span class="Apple-converted-space">                                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>break;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>}</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return true;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function parseSearchDate(dateStr) {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const now = new Date();</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Handle relative dates</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (dateStr === 'today') return today;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (dateStr === 'tomorrow') {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const tomorrow = new Date(today);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>tomorrow.setDate(tomorrow.getDate() + 1);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return tomorrow;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Handle day names</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const dayIndex = days.indexOf(dateStr.toLowerCase());</p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (dayIndex !== -1) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const targetDay = new Date(today);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>const currentDay = today.getDay();</p>
-<p class="p1"><span class="Apple-converted-space">                </span>let daysToAdd = dayIndex - currentDay;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>if (daysToAdd &lt;= 0) daysToAdd += 7;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>targetDay.setDate(targetDay.getDate() + daysToAdd);</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return targetDay;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Try parsing as date</p>
-<p class="p1"><span class="Apple-converted-space">            </span>return parseDate(dateStr);</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p2"><span class="Apple-converted-space">        </span></p>
-<p class="p1"><span class="Apple-converted-space">        </span>function renderShifts() {</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const filtered = getFilteredShifts();</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Update stats</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const totalShifts = filtered.length;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const assignedShifts = filtered.filter(s =&gt; s.isAssigned).length;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const unassignedShifts = filtered.filter(s =&gt; !s.isAssigned).length;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Debug logging</p>
-<p class="p1"><span class="Apple-converted-space">            </span>console.log('Render stats:');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>console.log('<span class="Apple-converted-space">  </span>Tab:', currentTab);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>console.log('<span class="Apple-converted-space">  </span>Total in view:', totalShifts);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>console.log('<span class="Apple-converted-space">  </span>Assigned:', assignedShifts);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>console.log('<span class="Apple-converted-space">  </span>Unassigned:', unassignedShifts);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>console.log('<span class="Apple-converted-space">  </span>Status filter:', statusFilter.value);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>console.log('<span class="Apple-converted-space">  </span>Venue filter:', venueFilter.value);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>console.log('<span class="Apple-converted-space">  </span>Selected person:', selectedPerson);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>console.log('<span class="Apple-converted-space">  </span>Total shifts loaded:', allShifts.length);</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Sample first few unassigned shifts</p>
-<p class="p1"><span class="Apple-converted-space">            </span>const unassignedSample = allShifts.filter(s =&gt; !s.isAssigned).slice(0, 3);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>console.log('<span class="Apple-converted-space">  </span>Sample unassigned shifts:', unassignedSample);</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>// Check raw name values from first 10 shifts</p>
-<p class="p1"><span class="Apple-converted-space">            </span>console.log('<span class="Apple-converted-space">  </span>First 10 shifts name check:');</p>
-<p class="p1"><span class="Apple-converted-space">            </span>allShifts.slice(0, 10).forEach((shift, idx) =&gt; {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>console.log(`<span class="Apple-converted-space">    </span>[${idx}] name="${shift.name}" isAssigned=${shift.isAssigned} nameLength=${shift.name.length}`);</p>
-<p class="p1"><span class="Apple-converted-space">            </span>});</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>stats.innerHTML = `</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="stat-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="stat-number"&gt;${totalShifts}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="stat-label"&gt;Total Shifts&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="stat-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="stat-number"&gt;${assignedShifts}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="stat-label"&gt;Assigned&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="stat-card"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="stat-number"&gt;${unassignedShifts}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="stat-label"&gt;Unassigned&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>`;</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>if (filtered.length === 0) {</p>
-<p class="p1"><span class="Apple-converted-space">                </span>content.innerHTML = '&lt;div class="no-results"&gt;No shifts found matching your criteria.&lt;/div&gt;';</p>
-<p class="p1"><span class="Apple-converted-space">                </span>return;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>}</p>
-<p class="p2"><span class="Apple-converted-space">            </span></p>
-<p class="p1"><span class="Apple-converted-space">            </span>content.innerHTML = filtered.map(shift =&gt; `</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;div class="shift-card ${shift.isAssigned ? '' : 'unassigned'}"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="shift-header"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="shift-name"&gt;${shift.isAssigned ? shift.name : 'UNASSIGNED'}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;span class="shift-badge ${shift.isAssigned ? 'badge-assigned' : 'badge-unassigned'}"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                            </span>${shift.isAssigned ? 'Assigned' : 'Unassigned'}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;/span&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;div class="shift-details"&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="shift-detail"&gt;&lt;strong&gt;Role:&lt;/strong&gt; ${shift.role}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="shift-detail"&gt;&lt;strong&gt;Venue:&lt;/strong&gt; ${shift.venue}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="shift-detail"&gt;&lt;strong&gt;Location:&lt;/strong&gt; ${shift.location}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="shift-detail"&gt;&lt;strong&gt;Date:&lt;/strong&gt; ${shift.date ? shift.date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="shift-detail"&gt;&lt;strong&gt;Time (CET):&lt;/strong&gt; ${shift.shiftTimeCET}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>${shift.shiftTimeIST ? `&lt;div class="shift-detail"&gt;&lt;strong&gt;Time (IST):&lt;/strong&gt; ${shift.shiftTimeIST}&lt;/div&gt;` : ''}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>&lt;div class="shift-detail"&gt;&lt;strong&gt;Shift Type:&lt;/strong&gt; ${shift.shiftType}&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>${shift.meetingRoom ? `&lt;div class="shift-detail"&gt;&lt;strong&gt;Meeting Room:&lt;/strong&gt; ${shift.meetingRoom}&lt;/div&gt;` : ''}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>${shift.email ? `&lt;div class="shift-detail"&gt;&lt;strong&gt;Email:&lt;/strong&gt; &lt;a href="mailto:${shift.email}"&gt;${shift.email}&lt;/a&gt; | &lt;a href="https://teams.microsoft.com/l/chat/0/0?users=${shift.email}" target="_blank" style="color: #667eea;"&gt;Teams IM&lt;/a&gt;&lt;/div&gt;` : ''}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>${shift.professionalPhone ? `&lt;div class="shift-detail"&gt;&lt;strong&gt;Professional Phone:&lt;/strong&gt; ${shift.professionalPhone}&lt;/div&gt;` : ''}</p>
-<p class="p1"><span class="Apple-converted-space">                        </span>${shift.rolePhone ? `&lt;div class="shift-detail"&gt;&lt;strong&gt;Role Phone:&lt;/strong&gt; ${shift.rolePhone}&lt;/div&gt;` : ''}</p>
-<p class="p1"><span class="Apple-converted-space">                    </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">                </span>&lt;/div&gt;</p>
-<p class="p1"><span class="Apple-converted-space">            </span>`).join('');</p>
-<p class="p1"><span class="Apple-converted-space">        </span>}</p>
-<p class="p1"><span class="Apple-converted-space">    </span>&lt;/script&gt;</p>
-<p class="p1">&lt;/body&gt;</p>
-<p class="p1">&lt;/html&gt;</p>
+    <div class="container">
+        <div class="header">
+            <h1>📅 Shift Schedule Viewer</h1>
+            <p>Easy access to shift schedules without spreadsheet hassle</p>
+        </div>
+        
+        <div class="file-input-container" id="fileInputContainer">
+            <h2>Select your shift schedule file</h2>
+            <p style="color: #6b7280; margin: 10px 0;">Choose the COLE - Published Shifts.xlsx file</p>
+            <label for="fileInput" class="file-label">Choose File</label>
+            <input type="file" id="fileInput" accept=".xlsx,.xls">
+            <p id="fileName" style="margin-top: 10px; color: #667eea;"></p>
+        </div>
+        
+        <div id="appContainer" style="display: none;">
+            <div class="tabs">
+                <button class="tab active" data-tab="current">🔴 Current Shifts</button>
+                <button class="tab" data-tab="today">📆 Today</button>
+                <button class="tab" data-tab="tomorrow">📅 Tomorrow</button>
+                <button class="tab" data-tab="upcoming">📋 Upcoming</button>
+                <button class="tab" data-tab="search">🔍 ALL (incl. past)</button>
+            </div>
+            
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="Search shifts...">
+                <div class="search-help">
+                    💡 Try: <code>name:John</code>, <code>venue:MSK</code>, <code>date:today</code>, or combine them!
+                </div>
+                <div class="filters">
+                    <select class="filter-select" id="venueFilter">
+                        <option value="all">All Venues</option>
+                    </select>
+                    <select class="filter-select" id="statusFilter">
+                        <option value="all">All Shifts</option>
+                        <option value="assigned">Assigned Only</option>
+                        <option value="unassigned">Unassigned Only</option>
+                    </select>
+                    <div class="person-select-container">
+                        <input 
+                            type="text" 
+                            class="person-input" 
+                            id="personInput" 
+                            placeholder="Filter by person..."
+                            autocomplete="off"
+                        >
+                        <div class="person-dropdown" id="personDropdown"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="stats" id="stats"></div>
+            
+            <div class="content" id="content">
+                <div class="loading">Loading shifts...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let allShifts = [];
+        let currentTab = 'current';
+        let allPeople = [];
+        let selectedPerson = '';
+        
+        const fileInput = document.getElementById('fileInput');
+        const fileInputContainer = document.getElementById('fileInputContainer');
+        const appContainer = document.getElementById('appContainer');
+        const fileName = document.getElementById('fileName');
+        const content = document.getElementById('content');
+        const searchInput = document.getElementById('searchInput');
+        const venueFilter = document.getElementById('venueFilter');
+        const statusFilter = document.getElementById('statusFilter');
+        const personInput = document.getElementById('personInput');
+        const personDropdown = document.getElementById('personDropdown');
+        const stats = document.getElementById('stats');
+        
+        fileInput.addEventListener('change', handleFileSelect);
+        searchInput.addEventListener('input', renderShifts);
+        venueFilter.addEventListener('change', renderShifts);
+        statusFilter.addEventListener('change', renderShifts);
+        personInput.addEventListener('input', handlePersonInput);
+        personInput.addEventListener('focus', showPersonDropdown);
+        
+        // Close dropdown when clicking outside
+        document.addEventListener('click', (e) => {
+            if (!personInput.contains(e.target) && !personDropdown.contains(e.target)) {
+                personDropdown.classList.remove('show');
+            }
+        });
+        
+        document.querySelectorAll('.tab').forEach(tab => {
+            tab.addEventListener('click', () => {
+                document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+                tab.classList.add('active');
+                currentTab = tab.dataset.tab;
+                renderShifts();
+            });
+        });
+        
+        function handleFileSelect(e) {
+            const file = e.target.files[0];
+            if (!file) return;
+            
+            fileName.textContent = `Loading: ${file.name}`;
+            
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { raw: false, defval: '' });
+                    
+                    processData(jsonData);
+                    fileInputContainer.style.display = 'none';
+                    appContainer.style.display = 'block';
+                } catch (error) {
+                    console.error('Error reading file:', error);
+                    fileName.textContent = `Error: ${error.message}`;
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+        
+        function processData(data) {
+            // Skip header row and process actual data
+            const dataRows = data.slice(1);
+            
+            allShifts = dataRows.map(row => {
+                const keys = Object.keys(row);
+                
+                const namePart = row[keys[8]] || '';
+                const isUnassignedPlaceholder = namePart.includes('Unassigned') || namePart.includes('unassigned');
+                
+                return {
+                    date: parseDate(row[keys[0]]),
+                    shiftTimeCET: row[keys[1]] || '',
+                    shiftTimeIST: row[keys[2]] || '',
+                    venue: row[keys[3]] || '',
+                    location: row[keys[4]] || '',
+                    meetingRoom: row[keys[5]] || '',
+                    role: row[keys[6]] || '',
+                    shiftType: row[keys[7]] || '',
+                    name: namePart,
+                    email: row[keys[9]] || '',
+                    professionalPhone: row[keys[10]] || '',
+                    rolePhone: row[keys[11]] || '',
+                    isAssigned: !!(namePart && namePart.toString().trim() !== '' && !isUnassignedPlaceholder),
+                    rawDate: row[keys[0]]
+                };
+            }).filter(shift => shift.date !== null && shift.venue && shift.role);
+            
+            // Populate venue filter
+            const venues = [...new Set(allShifts.map(s => s.venue))].filter(Boolean).sort();
+            venueFilter.innerHTML = '<option value="all">All Venues</option>';
+            venues.forEach(venue => {
+                const option = document.createElement('option');
+                option.value = venue;
+                option.textContent = venue;
+                venueFilter.appendChild(option);
+            });
+            
+            // Populate person list
+            allPeople = [...new Set(allShifts.map(s => s.name))].filter(Boolean).sort();
+            updatePersonDropdown('');
+            
+            renderShifts();
+        }
+        
+        function handlePersonInput(e) {
+            const searchTerm = e.target.value;
+            
+            // If the input is cleared, reset to all people
+            if (searchTerm === '') {
+                selectedPerson = '';
+                renderShifts();
+            }
+            
+            updatePersonDropdown(searchTerm);
+            showPersonDropdown();
+        }
+        
+        function showPersonDropdown() {
+            if (personInput.value || allPeople.length > 0) {
+                personDropdown.classList.add('show');
+            }
+        }
+        
+        function updatePersonDropdown(searchTerm) {
+            const filtered = searchTerm 
+                ? allPeople.filter(name => name.toLowerCase().includes(searchTerm.toLowerCase()))
+                : allPeople;
+            
+            if (filtered.length === 0) {
+                personDropdown.innerHTML = '<div class="person-option" style="color: #9ca3af;">No matches found</div>';
+                return;
+            }
+            
+            personDropdown.innerHTML = `
+                <div class="person-option ${selectedPerson === '' ? 'selected' : ''}" data-person="">
+                    All People
+                </div>
+            ` + filtered.map(name => `
+                <div class="person-option ${selectedPerson === name ? 'selected' : ''}" data-person="${name}">
+                    ${name}
+                </div>
+            `).join('');
+            
+            // Add click handlers to options
+            personDropdown.querySelectorAll('.person-option').forEach(option => {
+                option.addEventListener('click', () => {
+                    const person = option.dataset.person;
+                    selectedPerson = person;
+                    personInput.value = person || '';
+                    personDropdown.classList.remove('show');
+                    renderShifts();
+                });
+            });
+        }
+        
+        function parseDate(dateStr) {
+            if (!dateStr) return null;
+            
+            // Handle DD/MM/YY format (e.g., "23/10/25")
+            const ddmmyyMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
+            if (ddmmyyMatch) {
+                const day = parseInt(ddmmyyMatch[1]);
+                const month = parseInt(ddmmyyMatch[2]) - 1;
+                let year = parseInt(ddmmyyMatch[3]);
+                
+                if (year < 100) {
+                    year += 2000;
+                }
+                
+                return new Date(year, month, day);
+            }
+            
+            // Try parsing as a date object
+            let date = new Date(dateStr);
+            if (!isNaN(date.getTime())) {
+                return date;
+            }
+            
+            return null;
+        }
+        
+        function getFilteredShifts() {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            let filtered = [...allShifts];
+            
+            // Tab filter
+            switch(currentTab) {
+                case 'current':
+                    const currentHour = now.getHours();
+                    filtered = filtered.filter(shift => {
+                        if (!shift.date) return false;
+                        const shiftDate = new Date(shift.date);
+                        const isToday = shiftDate.toDateString() === today.toDateString();
+                        
+                        const timeMatch = shift.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+                        if (isToday && timeMatch) {
+                            const startHour = parseInt(timeMatch[1]);
+                            const endHour = parseInt(timeMatch[3]);
+                            return currentHour >= startHour && currentHour < endHour;
+                        }
+                        return false;
+                    });
+                    break;
+                case 'today':
+                    filtered = filtered.filter(shift => {
+                        if (!shift.date) return false;
+                        const shiftDate = new Date(shift.date);
+                        return shiftDate.toDateString() === today.toDateString();
+                    });
+                    break;
+                case 'tomorrow':
+                    filtered = filtered.filter(shift => {
+                        if (!shift.date) return false;
+                        const shiftDate = new Date(shift.date);
+                        return shiftDate.toDateString() === tomorrow.toDateString();
+                    });
+                    break;
+                case 'upcoming':
+                    filtered = filtered.filter(shift => {
+                        if (!shift.date) return false;
+                        return shift.date >= today;
+                    });
+                    break;
+            }
+            
+            // Search filter
+            const searchTerm = searchInput.value.toLowerCase().trim();
+            if (searchTerm) {
+                filtered = applySearch(filtered, searchTerm);
+            }
+            
+            // Venue filter
+            if (venueFilter.value !== 'all') {
+                filtered = filtered.filter(shift => shift.venue === venueFilter.value);
+            }
+            
+            // Status filter
+            if (statusFilter.value === 'assigned') {
+                filtered = filtered.filter(shift => shift.isAssigned);
+            } else if (statusFilter.value === 'unassigned') {
+                filtered = filtered.filter(shift => !shift.isAssigned);
+            }
+            
+            // Person filter
+            if (selectedPerson) {
+                filtered = filtered.filter(shift => shift.name === selectedPerson);
+            }
+            
+            // Sort by date and time
+            filtered.sort((a, b) => {
+                if (!a.date || !b.date) return 0;
+                return a.date - b.date;
+            });
+            
+            return filtered;
+        }
+        
+        function applySearch(shifts, searchTerm) {
+            // Parse search parameters
+            const params = {};
+            const paramPattern = /(\w+):([^\s]+|"[^"]+")/g;
+            let match;
+            let hasParams = false;
+            
+            while ((match = paramPattern.exec(searchTerm)) !== null) {
+                hasParams = true;
+                const key = match[1].toLowerCase();
+                const value = match[2].replace(/"/g, '').toLowerCase();
+                params[key] = value;
+            }
+            
+            if (!hasParams) {
+                // Simple text search
+                return shifts.filter(shift => 
+                    shift.name.toLowerCase().includes(searchTerm) ||
+                    shift.role.toLowerCase().includes(searchTerm) ||
+                    shift.venue.toLowerCase().includes(searchTerm)
+                );
+            }
+            
+            // Parameter-based search
+            return shifts.filter(shift => {
+                for (const [key, value] of Object.entries(params)) {
+                    switch(key) {
+                        case 'name':
+                            if (!shift.name.toLowerCase().includes(value)) return false;
+                            break;
+                        case 'venue':
+                            if (!shift.venue.toLowerCase().includes(value)) return false;
+                            break;
+                        case 'role':
+                            if (!shift.role.toLowerCase().includes(value)) return false;
+                            break;
+                        case 'date':
+                            const targetDate = parseSearchDate(value);
+                            if (targetDate && shift.date) {
+                                const shiftDate = new Date(shift.date);
+                                if (shiftDate.toDateString() !== targetDate.toDateString()) {
+                                    return false;
+                                }
+                            }
+                            break;
+                    }
+                }
+                return true;
+            });
+        }
+        
+        function parseSearchDate(dateStr) {
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            
+            // Handle relative dates
+            if (dateStr === 'today') return today;
+            if (dateStr === 'tomorrow') {
+                const tomorrow = new Date(today);
+                tomorrow.setDate(tomorrow.getDate() + 1);
+                return tomorrow;
+            }
+            
+            // Handle day names
+            const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
+            const dayIndex = days.indexOf(dateStr.toLowerCase());
+            if (dayIndex !== -1) {
+                const targetDay = new Date(today);
+                const currentDay = today.getDay();
+                let daysToAdd = dayIndex - currentDay;
+                if (daysToAdd <= 0) daysToAdd += 7;
+                targetDay.setDate(targetDay.getDate() + daysToAdd);
+                return targetDay;
+            }
+            
+            // Try parsing as date
+            return parseDate(dateStr);
+        }
+        
+        function renderShifts() {
+            const filtered = getFilteredShifts();
+            
+            // Update stats
+            const totalShifts = filtered.length;
+            const assignedShifts = filtered.filter(s => s.isAssigned).length;
+            const unassignedShifts = filtered.filter(s => !s.isAssigned).length;
+            
+            // Debug logging
+            console.log('Render stats:');
+            console.log('  Tab:', currentTab);
+            console.log('  Total in view:', totalShifts);
+            console.log('  Assigned:', assignedShifts);
+            console.log('  Unassigned:', unassignedShifts);
+            console.log('  Status filter:', statusFilter.value);
+            console.log('  Venue filter:', venueFilter.value);
+            console.log('  Selected person:', selectedPerson);
+            console.log('  Total shifts loaded:', allShifts.length);
+            
+            // Sample first few unassigned shifts
+            const unassignedSample = allShifts.filter(s => !s.isAssigned).slice(0, 3);
+            console.log('  Sample unassigned shifts:', unassignedSample);
+            
+            // Check raw name values from first 10 shifts
+            console.log('  First 10 shifts name check:');
+            allShifts.slice(0, 10).forEach((shift, idx) => {
+                console.log(`    [${idx}] name="${shift.name}" isAssigned=${shift.isAssigned} nameLength=${shift.name.length}`);
+            });
+            
+            stats.innerHTML = `
+                <div class="stat-card">
+                    <div class="stat-number">${totalShifts}</div>
+                    <div class="stat-label">Total Shifts</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${assignedShifts}</div>
+                    <div class="stat-label">Assigned</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${unassignedShifts}</div>
+                    <div class="stat-label">Unassigned</div>
+                </div>
+            `;
+            
+            if (filtered.length === 0) {
+                content.innerHTML = '<div class="no-results">No shifts found matching your criteria.</div>';
+                return;
+            }
+            
+            content.innerHTML = filtered.map(shift => `
+                <div class="shift-card ${shift.isAssigned ? '' : 'unassigned'}">
+                    <div class="shift-header">
+                        <div class="shift-name">${shift.isAssigned ? shift.name : 'UNASSIGNED'}</div>
+                        <span class="shift-badge ${shift.isAssigned ? 'badge-assigned' : 'badge-unassigned'}">
+                            ${shift.isAssigned ? 'Assigned' : 'Unassigned'}
+                        </span>
+                    </div>
+                    <div class="shift-details">
+                        <div class="shift-detail"><strong>Role:</strong> ${shift.role}</div>
+                        <div class="shift-detail"><strong>Venue:</strong> ${shift.venue}</div>
+                        <div class="shift-detail"><strong>Location:</strong> ${shift.location}</div>
+                        <div class="shift-detail"><strong>Date:</strong> ${shift.date ? shift.date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}</div>
+                        <div class="shift-detail"><strong>Time (CET):</strong> ${shift.shiftTimeCET}</div>
+                        ${shift.shiftTimeIST ? `<div class="shift-detail"><strong>Time (IST):</strong> ${shift.shiftTimeIST}</div>` : ''}
+                        <div class="shift-detail"><strong>Shift Type:</strong> ${shift.shiftType}</div>
+                        ${shift.meetingRoom ? `<div class="shift-detail"><strong>Meeting Room:</strong> ${shift.meetingRoom}</div>` : ''}
+                        ${shift.email ? `<div class="shift-detail"><strong>Email:</strong> <a href="mailto:${shift.email}">${shift.email}</a> | <a href="https://teams.microsoft.com/l/chat/0/0?users=${shift.email}" target="_blank" style="color: #667eea;">Teams IM</a></div>` : ''}
+                        ${shift.professionalPhone ? `<div class="shift-detail"><strong>Professional Phone:</strong> ${shift.professionalPhone}</div>` : ''}
+                        ${shift.rolePhone ? `<div class="shift-detail"><strong>Role Phone:</strong> ${shift.rolePhone}</div>` : ''}
+                    </div>
+                </div>
+            `).join('');
+        }
+    </script>
 </body>
 </html>
