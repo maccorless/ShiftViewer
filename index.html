@@ -385,12 +385,13 @@
                     <div id="searchTooltip" style="display: none; position: absolute; background: #1f2937; color: white; padding: 12px; border-radius: 8px; font-size: 12px; z-index: 1000; max-width: 420px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); top: 35px; right: 0; line-height: 1.6;">
                         <strong>Search Tips:</strong><br>
                         • <strong>General:</strong> John (searches all fields)<br>
+                        • <strong>Multiple terms (AND):</strong> wmr olena<br>
+                        • <strong>Quoted phrase:</strong> "duty manager"<br>
                         • <strong>Specific field:</strong> role:WMR<br>
                         • <strong>Multiple fields:</strong> name:Olena venue:RTOC<br>
                         • <strong>Date search:</strong> date:15/11 or date:11/15<br>
                         &nbsp;&nbsp;(tries both EU and US formats)<br>
                         • <strong>Date with year:</strong> date:15/11/2025<br>
-                        • <strong>Mixed search:</strong> role:WMR date:15/11<br>
                         • Year inference: Nov-Dec→2025, Jan-Mar→2026<br>
                         • All searches are case insensitive<br>
                         • Supported fields: name, role, venue, date
@@ -1423,13 +1424,25 @@
                             }
                         }
                         
-                        // Check general terms (must match at least one field)
+                        // Check general terms (space-separated terms are AND conditions, quoted strings are single terms)
                         if (generalTerms) {
-                            const matchesGeneral = 
-                                (shift.name && shift.name.toLowerCase().includes(generalTerms)) ||
-                                (shift.role && shift.role.toLowerCase().includes(generalTerms)) ||
-                                (shift.venue && shift.venue.toLowerCase().includes(generalTerms));
-                            if (!matchesGeneral) return false;
+                            // Parse terms, respecting quoted strings
+                            const terms = [];
+                            const regex = /"([^"]+)"|([^\s]+)/g;
+                            let match;
+                            while ((match = regex.exec(generalTerms)) !== null) {
+                                // match[1] is quoted content, match[2] is unquoted word
+                                terms.push((match[1] || match[2]).toLowerCase());
+                            }
+                            
+                            // Each term must match at least one field (AND across terms)
+                            for (const term of terms) {
+                                const matchesTerm = 
+                                    (shift.name && shift.name.toLowerCase().includes(term)) ||
+                                    (shift.role && shift.role.toLowerCase().includes(term)) ||
+                                    (shift.venue && shift.venue.toLowerCase().includes(term));
+                                if (!matchesTerm) return false; // If any term doesn't match, exclude this shift
+                            }
                         }
                         
                         return true;
