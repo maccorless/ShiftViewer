@@ -322,50 +322,90 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>📅 Shift Schedule Viewer</h1>
+            <h1>📅 Shift Schedule Viewer <span id="lastUpdateDisplay" style="font-size: 0.6em; font-weight: normal;"></span></h1>
             <p>Easy access to shift schedules without spreadsheet hassle</p>
         </div>
         
         <div class="file-input-container" id="fileInputContainer">
-            <h2>Select your shift schedule file</h2>
-            <p style="color: #6b7280; margin: 10px 0;">Choose the COLE - Published Shifts.xlsx file</p>
-            <label for="fileInput" class="file-label">Choose File</label>
-            <input type="file" id="fileInput" accept=".xlsx,.xls">
-            <p id="fileName" style="margin-top: 10px; color: #667eea;"></p>
+            <h2>Shift Schedule Viewer</h2>
+            <p style="color: #6b7280; margin: 10px 0;">Load your shift schedule data</p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+                <button id="loadSavedDataBtn" class="file-label" style="padding: 12px 24px; cursor: pointer; display: none;">
+                    📂 Load Saved Data
+                </button>
+                <label for="fileInput" class="file-label" style="padding: 12px 24px; cursor: pointer;">
+                    📁 Load New File
+                </label>
+            </div>
+            <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
+            <p id="fileName" style="margin-top: 15px; color: #667eea; font-size: 14px;"></p>
+            <p id="savedDataInfo" style="margin-top: 10px; color: #10b981; font-size: 13px;"></p>
         </div>
         
         <div id="appContainer" style="display: none;">
-            <div class="tabs">
-                <button class="tab active" data-tab="current">🔴 Current Shifts</button>
-                <button class="tab" data-tab="today">📆 Today</button>
-                <button class="tab" data-tab="tomorrow">📅 Tomorrow</button>
-                <button class="tab" data-tab="upcoming">📋 Upcoming</button>
-                <button class="tab" data-tab="search">🔍 ALL (incl. past)</button>
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
+                <div class="tabs" style="flex: 1; min-width: 300px;">
+                    <button class="tab active" data-tab="upcoming">📋 Upcoming</button>
+                    <button class="tab" data-tab="current">🔴 Current Shifts</button>
+                    <button class="tab" data-tab="today">📆 Today</button>
+                    <button class="tab" data-tab="tomorrow">📅 Tomorrow</button>
+                    <button class="tab" data-tab="search">🔍 ALL (incl. past)</button>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input 
+                        type="text" 
+                        id="myNameInput" 
+                        placeholder="My name"
+                        style="padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 14px; width: 150px; color: #9ca3af;"
+                    >
+                    <button 
+                        id="myShiftsBtn" 
+                        class="file-label" 
+                        style="padding: 8px 16px; cursor: not-allowed; opacity: 0.5; background: #f3f4f6; color: #000000;"
+                        disabled
+                    >
+                        👤 My Shifts
+                    </button>
+                    <button id="myNameInfoBtn" style="background: #3b82f6; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: help; font-weight: bold; font-size: 11px; position: relative;" title="My Name Filter Help">
+                        i
+                    </button>
+                    <div id="myNameTooltip" style="display: none; position: absolute; background: #1f2937; color: white; padding: 10px; border-radius: 6px; font-size: 12px; z-index: 1000; max-width: 300px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); margin-top: 120px; margin-left: -250px;">
+                        <strong>My Name Filter:</strong><br>
+                        Enter your name and click "My Shifts" to filter shifts assigned to you. Works with the tab filters (e.g., "Upcoming" + "My Shifts" = your upcoming shifts).
+                    </div>
+                </div>
             </div>
             
             <div class="search-container">
-                <input type="text" class="search-input" id="searchInput" placeholder="Search shifts...">
-                <div class="search-help">
-                    💡 Try: <code>name:John</code>, <code>venue:MSK</code>, <code>date:today</code>, or combine them!
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search shifts... (hover over blue i for more info)" style="flex: 1;">
+                    <button id="searchInfoBtn" style="background: #3b82f6; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: help; font-weight: bold; position: relative;" title="Search Help">
+                        i
+                    </button>
+                    <div id="searchTooltip" style="display: none; position: absolute; background: #1f2937; color: white; padding: 12px; border-radius: 8px; font-size: 12px; z-index: 1000; max-width: 420px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); top: 35px; right: 0; line-height: 1.6;">
+                        <strong>Search Tips:</strong><br>
+                        • <strong>General:</strong> John (searches all fields)<br>
+                        • <strong>Specific field:</strong> role:WMR<br>
+                        • <strong>Multiple fields:</strong> name:Olena venue:RTOC<br>
+                        • <strong>Date search:</strong> date:15/11 or date:11/15<br>
+                        &nbsp;&nbsp;(tries both EU and US formats)<br>
+                        • <strong>Date with year:</strong> date:15/11/2025<br>
+                        • <strong>Mixed search:</strong> role:WMR date:15/11<br>
+                        • Year inference: Nov-Dec→2025, Jan-Mar→2026<br>
+                        • All searches are case insensitive<br>
+                        • Supported fields: name, role, venue, date
+                    </div>
                 </div>
                 <div class="filters">
-                    <select class="filter-select" id="venueFilter">
-                        <option value="all">All Venues</option>
-                    </select>
-                    <select class="filter-select" id="statusFilter">
-                        <option value="all">All Shifts</option>
-                        <option value="assigned">Assigned Only</option>
-                        <option value="unassigned">Unassigned Only</option>
-                    </select>
-                    <div class="person-select-container">
+                    <div style="display: flex; gap: 10px; align-items: center;">
                         <input 
                             type="text" 
-                            class="person-input" 
-                            id="personInput" 
-                            placeholder="Filter by person..."
-                            autocomplete="off"
+                            class="search-input" 
+                            id="savedSearchInput" 
+                            placeholder="This search will be saved"
+                            style="flex: 1; min-width: 250px;"
                         >
-                        <div class="person-dropdown" id="personDropdown"></div>
+                        <button class="file-label" id="executeSavedSearch" style="padding: 8px 16px; cursor: pointer; background: #f3f4f6; color: #000000;">Execute Saved Search</button>
                     </div>
                 </div>
             </div>
@@ -380,35 +420,379 @@
 
     <script>
         let allShifts = [];
-        let currentTab = 'current';
+        let currentTab = 'upcoming';
         let allPeople = [];
         let selectedPerson = '';
+        let lastUpdateTime = null;
+        let myShiftsFilter = ''; // Name filter for "My Shifts"
         
         const fileInput = document.getElementById('fileInput');
         const fileInputContainer = document.getElementById('fileInputContainer');
         const appContainer = document.getElementById('appContainer');
         const fileName = document.getElementById('fileName');
+        const savedDataInfo = document.getElementById('savedDataInfo');
+        const loadSavedDataBtn = document.getElementById('loadSavedDataBtn');
         const content = document.getElementById('content');
         const searchInput = document.getElementById('searchInput');
-        const venueFilter = document.getElementById('venueFilter');
-        const statusFilter = document.getElementById('statusFilter');
-        const personInput = document.getElementById('personInput');
-        const personDropdown = document.getElementById('personDropdown');
+        const savedSearchInput = document.getElementById('savedSearchInput');
+        const executeSavedSearchBtn = document.getElementById('executeSavedSearch');
+        const searchInfoBtn = document.getElementById('searchInfoBtn');
+        const searchTooltip = document.getElementById('searchTooltip');
+        const myNameInput = document.getElementById('myNameInput');
+        const myShiftsBtn = document.getElementById('myShiftsBtn');
         const stats = document.getElementById('stats');
         
-        fileInput.addEventListener('change', handleFileSelect);
-        searchInput.addEventListener('input', renderShifts);
-        venueFilter.addEventListener('change', renderShifts);
-        statusFilter.addEventListener('change', renderShifts);
-        personInput.addEventListener('input', handlePersonInput);
-        personInput.addEventListener('focus', showPersonDropdown);
+        // LocalStorage functions (works with file:// protocol unlike cookies)
+        function saveToStorage(key, value) {
+            try {
+                localStorage.setItem(key, value);
+                console.log('Saved to localStorage:', key, '=', value);
+            } catch (e) {
+                console.error('Error saving to localStorage:', e);
+            }
+        }
         
-        // Close dropdown when clicking outside
-        document.addEventListener('click', (e) => {
-            if (!personInput.contains(e.target) && !personDropdown.contains(e.target)) {
-                personDropdown.classList.remove('show');
+        function getFromStorage(key) {
+            try {
+                const value = localStorage.getItem(key);
+                console.log('Retrieved from localStorage:', key, '=', value);
+                return value;
+            } catch (e) {
+                console.error('Error reading from localStorage:', e);
+                return null;
+            }
+        }
+        
+        // Load saved search from localStorage on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedSearch = getFromStorage('savedSearch');
+            if (savedSearch && savedSearchInput) {
+                savedSearchInput.value = savedSearch;
             }
         });
+        
+        // Also load immediately in case DOMContentLoaded already fired
+        const savedSearchImmediate = getFromStorage('savedSearch');
+        if (savedSearchImmediate && savedSearchInput) {
+            savedSearchInput.value = savedSearchImmediate;
+        }
+        
+        // Functions to save and load shift data
+        function saveShiftData() {
+            try {
+                const dataToSave = {
+                    shifts: allShifts,
+                    lastUpdate: lastUpdateTime,
+                    savedAt: new Date().toISOString()
+                };
+                saveToStorage('shiftData', JSON.stringify(dataToSave));
+                console.log('Shift data saved:', allShifts.length, 'shifts');
+            } catch (e) {
+                console.error('Error saving shift data:', e);
+            }
+        }
+        
+        function loadShiftData() {
+            try {
+                const savedData = getFromStorage('shiftData');
+                if (!savedData) return false;
+                
+                const data = JSON.parse(savedData);
+                allShifts = data.shifts || [];
+                lastUpdateTime = data.lastUpdate || null;
+                
+                // Convert date strings back to Date objects
+                allShifts.forEach(shift => {
+                    if (shift.date && typeof shift.date === 'string') {
+                        shift.date = new Date(shift.date);
+                    }
+                });
+                
+                console.log('Shift data loaded:', allShifts.length, 'shifts');
+                
+                // Update UI
+                updateLastUpdateDisplay();
+                updateFilters();
+                renderShifts();
+                
+                // Show the app
+                fileInputContainer.style.display = 'none';
+                appContainer.style.display = 'block';
+                
+                return true;
+            } catch (e) {
+                console.error('Error loading shift data:', e);
+                return false;
+            }
+        }
+        
+        // Check for saved data on page load
+        function checkSavedData() {
+            const savedData = getFromStorage('shiftData');
+            if (savedData) {
+                try {
+                    const data = JSON.parse(savedData);
+                    const shiftCount = data.shifts ? data.shifts.length : 0;
+                    
+                    // Show the Excel file's last update time, not when we saved to localStorage
+                    let displayText = `Saved data available: ${shiftCount} shifts`;
+                    if (data.lastUpdate) {
+                        displayText += ` (file updated: ${data.lastUpdate})`;
+                    } else {
+                        // Fallback to savedAt if lastUpdate not available
+                        const savedAt = new Date(data.savedAt);
+                        displayText += ` (saved ${savedAt.toLocaleString()})`;
+                    }
+                    
+                    savedDataInfo.textContent = displayText;
+                    loadSavedDataBtn.style.display = 'inline-block';
+                } catch (e) {
+                    console.error('Error checking saved data:', e);
+                }
+            }
+        }
+        
+        checkSavedData();
+        
+        function parseSearchDate(dateStr) {
+            console.log('=== parseSearchDate called with:', dateStr);
+            // Parse date from search with smart EU/US format detection
+            // Supports: dd/mm, mm/dd, dd/mm/yy, mm/dd/yy, dd/mm/yyyy, mm/dd/yyyy
+            const parts = dateStr.split('/');
+            if (parts.length < 2 || parts.length > 3) {
+                console.log('Invalid date format:', dateStr, '- need 2 or 3 parts');
+                return null;
+            }
+            
+            const num1 = parseInt(parts[0]);
+            const num2 = parseInt(parts[1]);
+            let year = parts.length === 3 ? parseInt(parts[2]) : null;
+            
+            if (isNaN(num1) || isNaN(num2)) {
+                console.log('Invalid numbers in date:', dateStr);
+                return null;
+            }
+            
+            console.log('Parsing date:', dateStr, '-> num1:', num1, 'num2:', num2, 'year:', year);
+            
+            // Handle year
+            let yearProvided = year !== null;
+            if (yearProvided) {
+                // Handle 2-digit year: YY format
+                if (year < 100) {
+                    year = year < 50 ? 2000 + year : 1900 + year;
+                }
+                console.log('Year provided:', year);
+            } else {
+                console.log('No year provided, will infer based on month');
+            }
+            
+            // Function to infer year based on month
+            const inferYear = (month) => {
+                if (month >= 11 && month <= 12) return 2025;
+                if (month >= 1 && month <= 3) return 2026;
+                return new Date().getFullYear();
+            };
+            
+            const possibleDates = [];
+            
+            // Try DD/MM (European format)
+            if (num1 >= 1 && num1 <= 31 && num2 >= 1 && num2 <= 12) {
+                const day = num1;
+                const month = num2;
+                const useYear = yearProvided ? year : inferYear(month);
+                const date = new Date(useYear, month - 1, day);
+                console.log('Trying DD/MM:', day + '/' + month + '/' + useYear);
+                if (date.getDate() === day && date.getMonth() === month - 1) {
+                    console.log('  Valid!');
+                    possibleDates.push(date);
+                } else {
+                    console.log('  Invalid date');
+                }
+            }
+            
+            // Try MM/DD (US format)
+            if (num1 >= 1 && num1 <= 12 && num2 >= 1 && num2 <= 31) {
+                const month = num1;
+                const day = num2;
+                const useYear = yearProvided ? year : inferYear(month);
+                const date = new Date(useYear, month - 1, day);
+                console.log('Trying MM/DD:', month + '/' + day + '/' + useYear);
+                if (date.getDate() === day && date.getMonth() === month - 1) {
+                    console.log('  Valid!');
+                    possibleDates.push(date);
+                } else {
+                    console.log('  Invalid date');
+                }
+            }
+            
+            console.log('Possible dates found:', possibleDates.length, possibleDates.map(d => d.toDateString()));
+            return possibleDates.length > 0 ? possibleDates : null;
+        }
+        
+        function updateLastUpdateDisplay() {
+            const displayElement = document.getElementById('lastUpdateDisplay');
+            if (!displayElement || !lastUpdateTime) return;
+            
+            // Parse the CET time string (format: "07/11/2025 18:15 CET")
+            const match = lastUpdateTime.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
+            if (!match) {
+                displayElement.textContent = '(Last update: ' + lastUpdateTime + ')';
+                return;
+            }
+            
+            const day = parseInt(match[1]);
+            const month = parseInt(match[2]) - 1; // JS months are 0-indexed
+            const year = parseInt(match[3]);
+            const hour = parseInt(match[4]);
+            const minute = parseInt(match[5]);
+            
+            // Create date in CET timezone (UTC+1 or UTC+2 depending on DST)
+            // For simplicity, we'll assume CET is UTC+1
+            const updateDate = new Date(Date.UTC(year, month, day, hour - 1, minute));
+            
+            // Get current time
+            const now = new Date();
+            const hoursDiff = (now - updateDate) / (1000 * 60 * 60);
+            
+            // Determine color based on age
+            let color;
+            if (hoursDiff < 24) {
+                color = 'darkgreen';
+            } else if (hoursDiff < 48) {
+                color = '#b8860b'; // dark yellow/goldenrod
+            } else {
+                color = 'darkred';
+            }
+            
+            displayElement.style.color = color;
+            displayElement.textContent = '(Last update: ' + lastUpdateTime + ')';
+        }
+        
+        fileInput.addEventListener('change', handleFileSelect);
+        
+        if (loadSavedDataBtn) {
+            loadSavedDataBtn.addEventListener('click', () => {
+                loadShiftData();
+            });
+        }
+        
+        // Debounced search input (200ms delay)
+        let searchTimeout;
+        searchInput.addEventListener('input', () => {
+            clearTimeout(searchTimeout);
+            searchTimeout = setTimeout(() => {
+                renderShifts();
+            }, 200);
+        });
+        
+        // Search info tooltip (hover only)
+        if (searchInfoBtn && searchTooltip) {
+            searchInfoBtn.addEventListener('mouseenter', () => {
+                searchTooltip.style.display = 'block';
+            });
+            searchInfoBtn.addEventListener('mouseleave', () => {
+                searchTooltip.style.display = 'none';
+            });
+        }
+        
+        // My Name info tooltip (hover only)
+        const myNameInfoBtn = document.getElementById('myNameInfoBtn');
+        const myNameTooltip = document.getElementById('myNameTooltip');
+        if (myNameInfoBtn && myNameTooltip) {
+            myNameInfoBtn.addEventListener('mouseenter', () => {
+                myNameTooltip.style.display = 'block';
+            });
+            myNameInfoBtn.addEventListener('mouseleave', () => {
+                myNameTooltip.style.display = 'none';
+            });
+        }
+        
+        // My Shifts functionality
+        if (myNameInput && myShiftsBtn) {
+            // Load saved name from localStorage
+            const savedName = getFromStorage('myShiftsName');
+            if (savedName) {
+                myNameInput.value = savedName;
+                myShiftsBtn.disabled = false;
+                myShiftsBtn.style.opacity = '1';
+                myShiftsBtn.style.cursor = 'pointer';
+            }
+            
+            // Enable/disable button based on input
+            myNameInput.addEventListener('input', () => {
+                const hasValue = myNameInput.value.trim().length > 0;
+                myShiftsBtn.disabled = !hasValue;
+                myShiftsBtn.style.opacity = hasValue ? '1' : '0.5';
+                myShiftsBtn.style.cursor = hasValue ? 'pointer' : 'not-allowed';
+                
+                // If name changed and filter was active, turn off filter and reset button
+                if (myShiftsFilter && myShiftsFilter !== myNameInput.value.trim()) {
+                    myShiftsFilter = '';
+                    myShiftsBtn.style.background = '#f3f4f6';
+                    myNameInput.style.color = '#9ca3af';
+                    renderShifts();
+                }
+                
+                // Save to localStorage
+                if (hasValue) {
+                    saveToStorage('myShiftsName', myNameInput.value.trim());
+                }
+            });
+            
+            // Apply My Shifts filter (toggle on/off)
+            myShiftsBtn.addEventListener('click', () => {
+                if (myNameInput.value.trim()) {
+                    if (myShiftsFilter === myNameInput.value.trim()) {
+                        // Filter is already active with this name - turn it off
+                        myShiftsFilter = '';
+                        myShiftsBtn.style.background = '#f3f4f6';
+                        myNameInput.style.color = '#9ca3af';
+                        console.log('My Shifts filter turned OFF');
+                    } else {
+                        // Turn filter on
+                        myShiftsFilter = myNameInput.value.trim();
+                        myShiftsBtn.style.background = '#667eea';
+                        myNameInput.style.color = '#000000';
+                        console.log('My Shifts filter applied:', myShiftsFilter);
+                    }
+                    renderShifts();
+                }
+            });
+            
+            // Clear filter when input is cleared
+            myNameInput.addEventListener('keyup', (e) => {
+                if (e.key === 'Escape' || myNameInput.value.trim() === '') {
+                    myShiftsFilter = '';
+                    renderShifts();
+                }
+            });
+        }
+        
+        // Saved search functionality
+        if (savedSearchInput) {
+            savedSearchInput.addEventListener('input', () => {
+                saveToStorage('savedSearch', savedSearchInput.value);
+            });
+        }
+        
+        if (executeSavedSearchBtn) {
+            executeSavedSearchBtn.addEventListener('click', () => {
+                if (savedSearchInput && savedSearchInput.value.trim()) {
+                    // Check if already active (search box has the saved search)
+                    if (searchInput.value === savedSearchInput.value.trim()) {
+                        // Clear the search
+                        executeSavedSearchBtn.style.background = '#f3f4f6';
+                        searchInput.value = '';
+                    } else {
+                        // Apply the saved search
+                        executeSavedSearchBtn.style.background = '#667eea';
+                        searchInput.value = savedSearchInput.value.trim();
+                    }
+                    renderShifts();
+                }
+            });
+        }
         
         document.querySelectorAll('.tab').forEach(tab => {
             tab.addEventListener('click', () => {
@@ -423,227 +807,433 @@
             const file = e.target.files[0];
             if (!file) return;
             
-            fileName.textContent = `Loading: ${file.name}`;
+            console.log('File selected:', file.name);
+            fileName.textContent = file.name;
             
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
+                    console.log('File read successfully, size:', e.total, 'bytes');
                     const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-                    const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
-                    const jsonData = XLSX.utils.sheet_to_json(firstSheet, { raw: false, defval: '' });
                     
-                    processData(jsonData);
+                    console.log('Parsing Excel workbook...');
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    console.log('Workbook sheets:', workbook.SheetNames);
+                    
+                    const firstSheetName = workbook.SheetNames[0];
+                    console.log('Using sheet:', firstSheetName);
+                    
+                    const worksheet = workbook.Sheets[firstSheetName];
+                    console.log('Worksheet range:', worksheet['!ref']);
+                    
+                    // First, get the raw data to see the actual structure
+                    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                    console.log('Raw sheet data (first 5 rows):', rawData.slice(0, 5));
+                    
+                    // Try with header: 1 to get array of arrays first
+                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                    console.log('Parsed JSON data (first 5 rows as arrays):', jsonData.slice(0, 5));
+                    
+                    // Show the structure more clearly
+                    console.log('\n=== RAW DATA STRUCTURE ===');
+                    for (let i = 0; i < Math.min(5, jsonData.length); i++) {
+                        console.log(`Row ${i} (${jsonData[i].length} columns):`, jsonData[i]);
+                    }
+                    
+                    if (jsonData.length === 0) {
+                        throw new Error('No data found in the Excel file');
+                    }
+                    
+                    // Find the actual header row (skip metadata rows)
+                    let actualHeaderRowIndex = 0;
+                    for (let i = 0; i < Math.min(5, jsonData.length); i++) {
+                        const row = jsonData[i];
+                        // Look for a row that has 'Date' in first column and other meaningful headers
+                        if (row[0] && row[0].toString().toUpperCase() === 'DATE' && row.length > 5) {
+                            actualHeaderRowIndex = i;
+                            break;
+                        }
+                    }
+                    
+                    console.log('Using row', actualHeaderRowIndex, 'as headers');
+                    
+                    // Extract last update time from row 0 if it exists
+                    let lastUpdateStr = '';
+                    if (jsonData[0] && jsonData[0][0]) {
+                        const firstCell = jsonData[0][0].toString();
+                        if (firstCell.includes('Last update:')) {
+                            lastUpdateStr = firstCell.replace('Last update:', '').trim();
+                            console.log('Last update:', lastUpdateStr);
+                            lastUpdateTime = lastUpdateStr;
+                            updateLastUpdateDisplay();
+                        }
+                    }
+                    
+                    // Convert array of arrays to array of objects
+                    const headers = jsonData[actualHeaderRowIndex].map(h => h ? h.toString().trim() : '');
+                    console.log('Detected headers:', headers);
+                    
+                    const formattedData = jsonData.slice(actualHeaderRowIndex + 1).map((row, rowIndex) => {
+                        const obj = {};
+                        headers.forEach((header, i) => {
+                            obj[header] = (i < row.length) ? row[i] : '';
+                            // If it's the first column and first row after header, log it for debugging
+                            if (i === 0 && rowIndex === 0) {
+                                console.log('First data cell value:', row[i], 'type:', typeof row[i]);
+                            }
+                        });
+                        return obj;
+                    });
+                    
+                    console.log('Formatted data (first 2 rows):', formattedData.slice(0, 2));
+                    
+                    // Process the data
+                    processData(formattedData);
+                    
+                    // Show the app interface
                     fileInputContainer.style.display = 'none';
                     appContainer.style.display = 'block';
+                    
+                    console.log('File processing completed');
                 } catch (error) {
                     console.error('Error reading file:', error);
+                    console.error('Error stack:', error.stack);
                     fileName.textContent = `Error: ${error.message}`;
                 }
             };
             reader.readAsArrayBuffer(file);
         }
         
-        function processData(data) {
-            // Skip header row and process actual data
-            const dataRows = data.slice(1);
+        function processCOLEFormat(data, headerRowIndex) {
+            console.log('Processing COLE format...');
+            console.log('Total rows to process:', data.length);
             
-            allShifts = dataRows.map(row => {
-                const keys = Object.keys(row);
+            // Data is already formatted as objects with column names as keys
+            const keys = Object.keys(data[0]);
+            console.log('Column names:', keys);
+            
+            // Show first 3 data rows for debugging
+            console.log('\n=== FIRST 3 DATA ROWS ===');
+            for (let i = 0; i < Math.min(3, data.length); i++) {
+                console.log(`\nRow ${i}:`, data[i]);
+            }
+            
+            allShifts = [];
+            
+            // Process each row
+            for (let i = 0; i < data.length; i++) {
+                const row = data[i];
                 
-                const namePart = row[keys[8]] || '';
-                const isUnassignedPlaceholder = namePart.includes('Unassigned') || namePart.includes('unassigned');
+                // Get the date from first column
+                const dateValue = row[keys[0]];
+                if (!dateValue) continue;
                 
-                return {
-                    date: parseDate(row[keys[0]]),
-                    shiftTimeCET: row[keys[1]] || '',
-                    shiftTimeIST: row[keys[2]] || '',
-                    venue: row[keys[3]] || '',
-                    location: row[keys[4]] || '',
-                    meetingRoom: row[keys[5]] || '',
-                    role: row[keys[6]] || '',
-                    shiftType: row[keys[7]] || '',
-                    name: namePart,
-                    email: row[keys[9]] || '',
-                    professionalPhone: row[keys[10]] || '',
-                    rolePhone: row[keys[11]] || '',
-                    isAssigned: !!(namePart && namePart.toString().trim() !== '' && !isUnassignedPlaceholder),
-                    rawDate: row[keys[0]]
+                // Convert Excel date serial number to JavaScript Date
+                let date;
+                if (typeof dateValue === 'number') {
+                    // Excel date serial (days since 1900-01-01)
+                    date = new Date((dateValue - 25569) * 86400 * 1000);
+                } else {
+                    date = parseDate(dateValue);
+                }
+                
+                if (!date) continue;
+                
+                // Look for name, role, venue, location in other columns
+                // Common column names: Name, Role, Venue, Location, Time, etc.
+                const shift = {
+                    date: date,
+                    rawDate: date.toISOString().split('T')[0],
+                    isAssigned: false,
+                    name: '',
+                    role: '',
+                    venue: '',
+                    location: '',
+                    shiftTimeCET: '',
+                    shiftTimeIST: '',
+                    email: '',
+                    professionalPhone: '',
+                    rolePhone: '',
+                    shiftType: '',
+                    meetingRoom: '',
+                    pattern: ''
                 };
-            }).filter(shift => shift.date !== null && shift.venue && shift.role);
+                
+                // Map columns to shift properties
+                keys.forEach(key => {
+                    const columnName = key.toUpperCase();
+                    const value = row[key] ? row[key].toString().trim() : '';
+                    
+                    if (!value) return;
+                    
+                    switch(columnName) {
+                        case 'NAME':
+                            if (value && !value.includes('Unassigned')) {
+                                shift.name = value;
+                                shift.isAssigned = true;
+                            }
+                            break;
+                        case 'ROLE':
+                            shift.role = value;
+                            break;
+                        case 'VENUE':
+                            shift.venue = value;
+                            break;
+                        case 'LOCATION':
+                            shift.location = value;
+                            break;
+                        case 'SHIFT (CET)':
+                            shift.shiftTimeCET = value;
+                            break;
+                        case '(IST)':
+                            shift.shiftTimeIST = value;
+                            break;
+                        case 'EMAIL':
+                            shift.email = value;
+                            break;
+                        case 'PROFESSIONAL NUMBER':
+                            shift.professionalPhone = value;
+                            break;
+                        case 'ROLE NUMBER':
+                            shift.rolePhone = value;
+                            break;
+                        case 'TYPE':
+                            shift.shiftType = value;
+                            break;
+                    }
+                });
+                
+                allShifts.push(shift);
+            }
             
-            // Populate venue filter
-            const venues = [...new Set(allShifts.map(s => s.venue))].filter(Boolean).sort();
-            venueFilter.innerHTML = '<option value="all">All Venues</option>';
-            venues.forEach(venue => {
-                const option = document.createElement('option');
-                option.value = venue;
-                option.textContent = venue;
-                venueFilter.appendChild(option);
-            });
+            console.log('Processed', allShifts.length, 'shifts from COLE format');
+            console.log('Sample shifts:', allShifts.slice(0, 3));
             
-            // Populate person list
-            allPeople = [...new Set(allShifts.map(s => s.name))].filter(Boolean).sort();
-            updatePersonDropdown('');
-            
+            updateFilters();
             renderShifts();
+            
+            // Save data to localStorage
+            saveShiftData();
         }
         
-        function handlePersonInput(e) {
-            const searchTerm = e.target.value;
+        function processData(data) {
+            console.log('Processing data...', data);
             
-            // If the input is cleared, reset to all people
-            if (searchTerm === '') {
-                selectedPerson = '';
-                renderShifts();
+            if (!Array.isArray(data) || data.length === 0) {
+                console.error('Invalid data format: Expected an array of rows');
+                return;
             }
+
+            // Log the first few rows to see the actual data structure
+            console.log('First 3 rows of data:', data.slice(0, 3));
             
-            updatePersonDropdown(searchTerm);
-            showPersonDropdown();
-        }
-        
-        function showPersonDropdown() {
-            if (personInput.value || allPeople.length > 0) {
-                personDropdown.classList.add('show');
-            }
-        }
-        
-        function updatePersonDropdown(searchTerm) {
-            const filtered = searchTerm 
-                ? allPeople.filter(name => name.toLowerCase().includes(searchTerm.toLowerCase()))
-                : allPeople;
+            // Check if this is COLE format by looking at the keys (column names)
+            const firstRowKeys = Object.keys(data[0]);
+            const isCOLEFormat = firstRowKeys.includes('Date') && firstRowKeys.includes('Venue') && firstRowKeys.includes('Role');
             
-            if (filtered.length === 0) {
-                personDropdown.innerHTML = '<div class="person-option" style="color: #9ca3af;">No matches found</div>';
+            console.log('First row keys:', firstRowKeys);
+            console.log('Is COLE format:', isCOLEFormat);
+            
+            if (isCOLEFormat) {
+                // COLE format: each row is a shift with Date, Venue, Role, Name, etc.
+                processCOLEFormat(data, 0);
                 return;
             }
             
-            personDropdown.innerHTML = `
-                <div class="person-option ${selectedPerson === '' ? 'selected' : ''}" data-person="">
-                    All People
-                </div>
-            ` + filtered.map(name => `
-                <div class="person-option ${selectedPerson === name ? 'selected' : ''}" data-person="${name}">
-                    ${name}
-                </div>
-            `).join('');
-            
-            // Add click handlers to options
-            personDropdown.querySelectorAll('.person-option').forEach(option => {
-                option.addEventListener('click', () => {
-                    const person = option.dataset.person;
-                    selectedPerson = person;
-                    personInput.value = person || '';
-                    personDropdown.classList.remove('show');
-                    renderShifts();
-                });
+            // Otherwise, look for NAME-based format (weekly schedule)
+            let headerRowIndex = data.findIndex(row => {
+                const firstKey = Object.keys(row)[0];
+                const value = row[firstKey];
+                if (!value) return false;
+                const upperValue = value.toString().trim().toUpperCase();
+                return upperValue === 'NAME';
             });
+            
+            console.log('Header row index for NAME format:', headerRowIndex);
+            
+            if (headerRowIndex === -1) {
+                console.error('Could not find header row in Excel data.');
+                console.log('First column values:', data.slice(0, 5).map(row => row[Object.keys(row)[0]]));
+                return;
+            }
+            
+            // Get the headers (week ranges)
+            const headers = [];
+            const nameHeaderRow = data[headerRowIndex];
+            const headerKeys = Object.keys(nameHeaderRow);
+            
+            console.log('Header keys:', headerKeys);
+            
+            for (let i = 2; i < headerKeys.length; i++) {
+                const header = nameHeaderRow[headerKeys[i]];
+                console.log(`Header ${i}:`, header);
+                
+                if (header && typeof header === 'string') {
+                    const trimmedHeader = header.trim().toUpperCase();
+                    if (trimmedHeader !== 'PATTERN') {
+                        console.log('Processing header:', trimmedHeader);
+                        const dateRange = parseDateRange(trimmedHeader);
+                        console.log('Parsed date range:', dateRange);
+                        
+                        headers.push({
+                            key: headerKeys[i],
+                            label: trimmedHeader,
+                            dateRange: dateRange
+                        });
+                    }
+                }
+            }
+            
+            console.log('Processed headers:', headers);
+            
+            // Process each person's row
+            allShifts = [];
+            
+            for (let i = headerRowIndex + 1; i < data.length; i++) {
+                const row = data[i];
+                const name = row[Object.keys(row)[0]];
+                const pattern = row[Object.keys(row)[1]];
+                
+                if (!name || typeof name !== 'string' || name.trim() === '') continue;
+                
+                // Process each week assignment
+                for (const header of headers) {
+                    const assignment = row[header.key];
+                    if (!assignment || typeof assignment !== 'string') continue;
+                    
+                    const role = assignment.trim().toUpperCase();
+                    if (role !== 'CSM' && role !== 'BACKUP') continue;
+                    
+                    // Create a shift for each day in the date range
+                    const startDate = new Date(header.dateRange.start);
+                    const endDate = new Date(header.dateRange.end);
+                    
+                    for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                        // Skip weekends (0 = Sunday, 6 = Saturday)
+                        if (d.getDay() === 0 || d.getDay() === 6) continue;
+                        
+                        allShifts.push({
+                            date: parseDate(d.toISOString().split('T')[0]),
+                            name: name.trim(),
+                            role: role,
+                            pattern: pattern,
+                            isAssigned: true,
+                            rawDate: d.toISOString().split('T')[0],
+                            // For backward compatibility with existing UI
+                            venue: 'N/A',
+                            location: 'N/A',
+                            shiftType: role,
+                            shiftTimeCET: '09:00-18:00',
+                            shiftTimeIST: '13:30-22:30',
+                            email: '',
+                            professionalPhone: '',
+                            rolePhone: ''
+                        });
+                    }
+                }
+            }
+            
+            // Update UI elements
+            updateFilters();
+            renderShifts();
+            
+            console.log('Processed shifts:', allShifts);
         }
         
         function parseDate(dateStr) {
             if (!dateStr) return null;
             
+            // If it's already a Date object, return it
+            if (dateStr instanceof Date) {
+                return new Date(dateStr);
+            }
+            
+            // Handle ISO date strings (from rawDate)
+            if (typeof dateStr === 'string' && dateStr.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                const [year, month, day] = dateStr.split('-').map(Number);
+                return new Date(year, month - 1, day);
+            }
+
             // Handle DD/MM/YY format (e.g., "23/10/25")
             const ddmmyyMatch = dateStr.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2,4})$/);
             if (ddmmyyMatch) {
                 const day = parseInt(ddmmyyMatch[1]);
                 const month = parseInt(ddmmyyMatch[2]) - 1;
                 let year = parseInt(ddmmyyMatch[3]);
-                
+
                 if (year < 100) {
                     year += 2000;
                 }
-                
+
                 return new Date(year, month, day);
             }
-            
+
             // Try parsing as a date object
-            let date = new Date(dateStr);
+            const date = new Date(dateStr);
             if (!isNaN(date.getTime())) {
                 return date;
             }
-            
+
+            console.warn('Could not parse date:', dateStr);
             return null;
         }
         
-        function getFilteredShifts() {
-            const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
+        function parseDateRange(rangeStr) {
+            // Example: 'DEC 2-6' -> { start: Date(2024-12-02), end: Date(2024-12-06) }
+            const months = {
+                'JAN': 0, 'FEB': 1, 'MAR': 2, 'APR': 3, 'MAY': 4, 'JUN': 5,
+                'JUL': 6, 'AUG': 7, 'SEP': 8, 'OCT': 9, 'NOV': 10, 'DEC': 11
+            };
             
-            let filtered = [...allShifts];
-            
-            // Tab filter
-            switch(currentTab) {
-                case 'current':
-                    const currentHour = now.getHours();
-                    filtered = filtered.filter(shift => {
-                        if (!shift.date) return false;
-                        const shiftDate = new Date(shift.date);
-                        const isToday = shiftDate.toDateString() === today.toDateString();
+            // Handle different date range formats
+            const formats = [
+                // Format: 'MMM D-D' (same month)
+                {
+                    regex: /^([A-Z]{3})\s*(\d+)\s*-\s*(\d+)$/i,
+                    parse: (match) => {
+                        const month = match[1].toUpperCase();
+                        const year = new Date().getFullYear() + (months[month] < new Date().getMonth() ? 1 : 0);
+                        return {
+                            start: new Date(year, months[month], parseInt(match[2])),
+                            end: new Date(year, months[month], parseInt(match[3]))
+                        };
+                    }
+                },
+                // Format: 'MMM D - MMM D' (cross-month)
+                {
+                    regex: /^([A-Z]{3})\s*(\d+)\s*-\s*([A-Z]{3})\s*(\d+)$/i,
+                    parse: (match) => {
+                        const month1 = match[1].toUpperCase();
+                        const month2 = match[3].toUpperCase();
+                        let year = new Date().getFullYear();
                         
-                        const timeMatch = shift.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
-                        if (isToday && timeMatch) {
-                            const startHour = parseInt(timeMatch[1]);
-                            const endHour = parseInt(timeMatch[3]);
-                            return currentHour >= startHour && currentHour < endHour;
+                        // Handle year transition (e.g., DEC 30 - JAN 3)
+                        if (months[month1] === 11 && months[month2] === 0) {
+                            year++;
                         }
-                        return false;
-                    });
-                    break;
-                case 'today':
-                    filtered = filtered.filter(shift => {
-                        if (!shift.date) return false;
-                        const shiftDate = new Date(shift.date);
-                        return shiftDate.toDateString() === today.toDateString();
-                    });
-                    break;
-                case 'tomorrow':
-                    filtered = filtered.filter(shift => {
-                        if (!shift.date) return false;
-                        const shiftDate = new Date(shift.date);
-                        return shiftDate.toDateString() === tomorrow.toDateString();
-                    });
-                    break;
-                case 'upcoming':
-                    filtered = filtered.filter(shift => {
-                        if (!shift.date) return false;
-                        return shift.date >= today;
-                    });
-                    break;
+                        
+                        return {
+                            start: new Date(year, months[month1], parseInt(match[2])),
+                            end: new Date(year, months[month2], parseInt(match[4]))
+                        };
+                    }
+                }
+            ];
+            
+            for (const format of formats) {
+                const match = rangeStr.match(format.regex);
+                if (match) {
+                    return format.parse(match);
+                }
             }
             
-            // Search filter
-            const searchTerm = searchInput.value.toLowerCase().trim();
-            if (searchTerm) {
-                filtered = applySearch(filtered, searchTerm);
-            }
-            
-            // Venue filter
-            if (venueFilter.value !== 'all') {
-                filtered = filtered.filter(shift => shift.venue === venueFilter.value);
-            }
-            
-            // Status filter
-            if (statusFilter.value === 'assigned') {
-                filtered = filtered.filter(shift => shift.isAssigned);
-            } else if (statusFilter.value === 'unassigned') {
-                filtered = filtered.filter(shift => !shift.isAssigned);
-            }
-            
-            // Person filter
-            if (selectedPerson) {
-                filtered = filtered.filter(shift => shift.name === selectedPerson);
-            }
-            
-            // Sort by date and time
-            filtered.sort((a, b) => {
-                if (!a.date || !b.date) return 0;
-                return a.date - b.date;
-            });
-            
-            return filtered;
+            console.warn('Could not parse date range:', rangeStr);
+            return { start: new Date(), end: new Date() };
+        }
+        
+        function updateFilters() {
+            // Update person list
+            allPeople = [...new Set(allShifts.map(s => s.name))].filter(Boolean).sort();
         }
         
         function applySearch(shifts, searchTerm) {
@@ -697,41 +1287,185 @@
             });
         }
         
-        function parseSearchDate(dateStr) {
-            const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            
-            // Handle relative dates
-            if (dateStr === 'today') return today;
-            if (dateStr === 'tomorrow') {
-                const tomorrow = new Date(today);
-                tomorrow.setDate(tomorrow.getDate() + 1);
-                return tomorrow;
-            }
-            
-            // Handle day names
-            const days = ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'];
-            const dayIndex = days.indexOf(dateStr.toLowerCase());
-            if (dayIndex !== -1) {
-                const targetDay = new Date(today);
-                const currentDay = today.getDay();
-                let daysToAdd = dayIndex - currentDay;
-                if (daysToAdd <= 0) daysToAdd += 7;
-                targetDay.setDate(targetDay.getDate() + daysToAdd);
-                return targetDay;
-            }
-            
-            // Try parsing as date
-            return parseDate(dateStr);
-        }
+
         
         function renderShifts() {
-            const filtered = getFilteredShifts();
+            const shiftsContainer = document.getElementById('content');
+            const statsElement = document.getElementById('stats');
+            
+            if (!shiftsContainer || !statsElement) {
+                console.error('Required DOM elements not found');
+                return;
+            }
+            
+            // Apply filters
+            let filtered = [...allShifts];
+            
+            // Tab filter
+            const now = new Date();
+            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+            const tomorrow = new Date(today);
+            tomorrow.setDate(tomorrow.getDate() + 1);
+            
+            switch(currentTab) {
+                case 'current':
+                    const currentHour = now.getHours();
+                    filtered = filtered.filter(shift => {
+                        if (!shift.date) return false;
+                        const shiftDate = new Date(shift.date);
+                        const isToday = shiftDate.toDateString() === today.toDateString();
+                        if (isToday && shift.shiftTimeCET) {
+                            const timeMatch = shift.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+                            if (timeMatch) {
+                                const startHour = parseInt(timeMatch[1]);
+                                const endHour = parseInt(timeMatch[3]);
+                                return currentHour >= startHour && currentHour < endHour;
+                            }
+                        }
+                        return false;
+                    });
+                    break;
+                case 'today':
+                    filtered = filtered.filter(shift => {
+                        if (!shift.date) return false;
+                        const shiftDate = new Date(shift.date);
+                        return shiftDate.toDateString() === today.toDateString();
+                    });
+                    break;
+                case 'tomorrow':
+                    filtered = filtered.filter(shift => {
+                        if (!shift.date) return false;
+                        const shiftDate = new Date(shift.date);
+                        return shiftDate.toDateString() === tomorrow.toDateString();
+                    });
+                    break;
+                case 'upcoming':
+                    filtered = filtered.filter(shift => {
+                        if (!shift.date) return false;
+                        return shift.date >= today;
+                    });
+                    break;
+            }
+            
+            // Search filter with field:value support and multiple criteria
+            if (searchInput && searchInput.value) {
+                const searchTerm = searchInput.value.trim();
+                if (searchTerm) {
+                    // Parse search into field:value pairs and general terms
+                    // Regex: field name, colon, optional space, then at least one non-space character
+                    console.log('Search term:', searchTerm);
+                    const fieldMatches = searchTerm.matchAll(/(name|role|venue|date):\s*([^\s]+)/gi);
+                    const fieldCriteria = {};
+                    let dateCriteria = null;
+                    let processedIndices = [];
+                    
+                    // Extract field:value pairs
+                    let matchCount = 0;
+                    for (const match of fieldMatches) {
+                        matchCount++;
+                        console.log('Match', matchCount, ':', match[0], '-> field:', match[1], 'value:', match[2]);
+                        const field = match[1].toLowerCase();
+                        const value = match[2];
+                        
+                        if (field === 'date') {
+                            // Parse date with smart format detection
+                            const parsedDates = parseSearchDate(value);
+                            if (parsedDates && parsedDates.length > 0) {
+                                dateCriteria = parsedDates;
+                                console.log('Parsed date search:', value, '->', dateCriteria.map(d => d.toDateString()));
+                            } else {
+                                console.warn('Could not parse date:', value);
+                            }
+                        } else {
+                            fieldCriteria[field] = value.toLowerCase();
+                        }
+                        processedIndices.push({ start: match.index, end: match.index + match[0].length });
+                    }
+                    
+                    // Extract remaining general search terms (not part of field:value)
+                    let generalTerms = searchTerm;
+                    // Remove field:value pairs from the search string
+                    processedIndices.sort((a, b) => b.start - a.start); // Sort in reverse to remove from end first
+                    processedIndices.forEach(range => {
+                        generalTerms = generalTerms.substring(0, range.start) + generalTerms.substring(range.end);
+                    });
+                    generalTerms = generalTerms.trim().toLowerCase();
+                    
+                    // If generalTerms only contains incomplete field:value syntax, ignore it
+                    if (generalTerms && /^(name|role|venue|date):\s*$/i.test(generalTerms)) {
+                        generalTerms = '';
+                    }
+                    
+                    console.log('Search criteria:', { fieldCriteria, generalTerms, dateCriteria: dateCriteria ? dateCriteria.length + ' dates' : 'none' });
+                    
+                    // Apply filters
+                    filtered = filtered.filter(shift => {
+                        // Check date criteria (if specified)
+                        if (dateCriteria && dateCriteria.length > 0) {
+                            if (!shift.date) return false;
+                            
+                            // Match if shift date matches any of the possible date interpretations
+                            const shiftDateStr = shift.date.toDateString();
+                            const matchesDate = dateCriteria.some(searchDate => 
+                                searchDate.toDateString() === shiftDateStr
+                            );
+                            if (!matchesDate) return false;
+                        }
+                        
+                        // Check field-specific criteria (all must match)
+                        for (const [field, value] of Object.entries(fieldCriteria)) {
+                            if (field === 'name') {
+                                if (!shift.name || !shift.name.toLowerCase().includes(value)) return false;
+                            } else if (field === 'role') {
+                                if (!shift.role || !shift.role.toLowerCase().includes(value)) return false;
+                            } else if (field === 'venue') {
+                                if (!shift.venue || !shift.venue.toLowerCase().includes(value)) return false;
+                            }
+                        }
+                        
+                        // Check general terms (must match at least one field)
+                        if (generalTerms) {
+                            const matchesGeneral = 
+                                (shift.name && shift.name.toLowerCase().includes(generalTerms)) ||
+                                (shift.role && shift.role.toLowerCase().includes(generalTerms)) ||
+                                (shift.venue && shift.venue.toLowerCase().includes(generalTerms));
+                            if (!matchesGeneral) return false;
+                        }
+                        
+                        return true;
+                    });
+                }
+            }
+            
+
+            
+            // My Shifts filter (AND condition with tab filters)
+            if (myShiftsFilter) {
+                filtered = filtered.filter(shift => 
+                    shift.name && shift.name.toLowerCase().includes(myShiftsFilter.toLowerCase())
+                );
+            }
+            
+            // Person filter
+            if (selectedPerson) {
+                filtered = filtered.filter(shift => shift.name === selectedPerson);
+            }
+            
+            // Sort by date
+            filtered.sort((a, b) => {
+                if (!a.date || !b.date) return 0;
+                return a.date - b.date;
+            });
             
             // Update stats
             const totalShifts = filtered.length;
             const assignedShifts = filtered.filter(s => s.isAssigned).length;
             const unassignedShifts = filtered.filter(s => !s.isAssigned).length;
+            
+            // Update stats display
+            statsElement.innerHTML = '<div>Total: ' + totalShifts + '</div>' +
+                '<div>Assigned: ' + assignedShifts + '</div>' +
+                '<div>Unassigned: ' + unassignedShifts + '</div>';
             
             // Debug logging
             console.log('Render stats:');
@@ -739,64 +1473,90 @@
             console.log('  Total in view:', totalShifts);
             console.log('  Assigned:', assignedShifts);
             console.log('  Unassigned:', unassignedShifts);
-            console.log('  Status filter:', statusFilter.value);
-            console.log('  Venue filter:', venueFilter.value);
-            console.log('  Selected person:', selectedPerson);
             console.log('  Total shifts loaded:', allShifts.length);
             
-            // Sample first few unassigned shifts
-            const unassignedSample = allShifts.filter(s => !s.isAssigned).slice(0, 3);
-            console.log('  Sample unassigned shifts:', unassignedSample);
-            
-            // Check raw name values from first 10 shifts
-            console.log('  First 10 shifts name check:');
-            allShifts.slice(0, 10).forEach((shift, idx) => {
-                console.log(`    [${idx}] name="${shift.name}" isAssigned=${shift.isAssigned} nameLength=${shift.name.length}`);
-            });
-            
-            stats.innerHTML = `
-                <div class="stat-card">
-                    <div class="stat-number">${totalShifts}</div>
-                    <div class="stat-label">Total Shifts</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${assignedShifts}</div>
-                    <div class="stat-label">Assigned</div>
-                </div>
-                <div class="stat-card">
-                    <div class="stat-number">${unassignedShifts}</div>
-                    <div class="stat-label">Unassigned</div>
-                </div>
-            `;
+            // Render shifts
+            shiftsContainer.innerHTML = '';
             
             if (filtered.length === 0) {
-                content.innerHTML = '<div class="no-results">No shifts found matching your criteria.</div>';
+                shiftsContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No shifts found</div>';
                 return;
             }
             
-            content.innerHTML = filtered.map(shift => `
-                <div class="shift-card ${shift.isAssigned ? '' : 'unassigned'}">
-                    <div class="shift-header">
-                        <div class="shift-name">${shift.isAssigned ? shift.name : 'UNASSIGNED'}</div>
-                        <span class="shift-badge ${shift.isAssigned ? 'badge-assigned' : 'badge-unassigned'}">
-                            ${shift.isAssigned ? 'Assigned' : 'Unassigned'}
-                        </span>
-                    </div>
-                    <div class="shift-details">
-                        <div class="shift-detail"><strong>Role:</strong> ${shift.role}</div>
-                        <div class="shift-detail"><strong>Venue:</strong> ${shift.venue}</div>
-                        <div class="shift-detail"><strong>Location:</strong> ${shift.location}</div>
-                        <div class="shift-detail"><strong>Date:</strong> ${shift.date ? shift.date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : 'N/A'}</div>
-                        <div class="shift-detail"><strong>Time (CET):</strong> ${shift.shiftTimeCET}</div>
-                        ${shift.shiftTimeIST ? `<div class="shift-detail"><strong>Time (IST):</strong> ${shift.shiftTimeIST}</div>` : ''}
-                        <div class="shift-detail"><strong>Shift Type:</strong> ${shift.shiftType}</div>
-                        ${shift.meetingRoom ? `<div class="shift-detail"><strong>Meeting Room:</strong> ${shift.meetingRoom}</div>` : ''}
-                        ${shift.email ? `<div class="shift-detail"><strong>Email:</strong> <a href="mailto:${shift.email}">${shift.email}</a> | <a href="https://teams.microsoft.com/l/chat/0/0?users=${shift.email}" target="_blank" style="color: #667eea;">Teams IM</a></div>` : ''}
-                        ${shift.professionalPhone ? `<div class="shift-detail"><strong>Professional Phone:</strong> ${shift.professionalPhone}</div>` : ''}
-                        ${shift.rolePhone ? `<div class="shift-detail"><strong>Role Phone:</strong> ${shift.rolePhone}</div>` : ''}
-                    </div>
-                </div>
-            `).join('');
+            filtered.forEach(shift => {
+                const shiftElement = document.createElement('div');
+                shiftElement.className = 'shift-card';
+                
+                const dateStr = shift.date ? shift.date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : 'No date';
+                
+                // Build contact section (horizontal)
+                let contactItems = [];
+                if (shift.email && !shift.email.includes('Unassigned')) {
+                    contactItems.push('<a href="msteams:/l/chat/0/0?users=' + shift.email + '" style="color: #667eea; text-decoration: none; font-weight: 500; font-size: 12px;">💬 Teams</a>');
+                    contactItems.push('<span style="color: #9ca3af; font-size: 11px;">' + shift.email + '</span>');
+                }
+                if (shift.professionalPhone) {
+                    contactItems.push('<span style="color: #374151; font-size: 12px;" title="Individual phone number">📱 Individual: ' + shift.professionalPhone + '</span>');
+                }
+                if (shift.rolePhone) {
+                    contactItems.push('<span style="color: #374151; font-size: 12px;" title="Shared role phone (passed between shifts)">🔄 Role: ' + shift.rolePhone + '</span>');
+                }
+                let contactSection = contactItems.length > 0 ? contactItems.join(' <span style="color: #d1d5db;">•</span> ') : '';
+                
+                shiftElement.innerHTML = 
+                    // Header with name and role
+                    '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb;">' +
+                        '<div>' +
+                            '<div style="font-size: 17px; font-weight: 700; color: #1f2937; margin-bottom: 2px;">' + (shift.name || '🔴 Unassigned') + '</div>' +
+                            '<div style="font-size: 13px; color: #667eea; font-weight: 500;">' + (shift.role || 'Unknown Role') + '</div>' +
+                        '</div>' +
+                        '<div style="background: ' + (shift.isAssigned ? '#10b981' : '#f59e0b') + '; color: white; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600;">' +
+                            (shift.isAssigned ? '✓ Assigned' : '⚠️ Unassigned') +
+                        '</div>' +
+                    '</div>' +
+                    
+                    // Grid layout for details
+                    '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px 20px; margin-bottom: 10px;">' +
+                        '<div>' +
+                            '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 3px;">📅 Date</div>' +
+                            '<div style="font-size: 13px; color: #1f2937; font-weight: 500;">' + dateStr + '</div>' +
+                        '</div>' +
+                        (shift.venue ? 
+                            '<div>' +
+                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 3px;">🏛️ Venue</div>' +
+                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500;">' + shift.venue + '</div>' +
+                            '</div>' : '') +
+                        (shift.location ? 
+                            '<div>' +
+                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 3px;">📍 Location</div>' +
+                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500;">' + shift.location + '</div>' +
+                            '</div>' : '') +
+                        (shift.shiftTimeCET ? 
+                            '<div>' +
+                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 3px;">⏰ Time (CET)</div>' +
+                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500;">' + shift.shiftTimeCET + '</div>' +
+                            '</div>' : '') +
+                        (shift.shiftTimeIST ? 
+                            '<div>' +
+                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 3px;">⏰ Time (IST)</div>' +
+                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500;">' + shift.shiftTimeIST + '</div>' +
+                            '</div>' : '') +
+                        (shift.shiftType ? 
+                            '<div>' +
+                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 3px;">💼 Type</div>' +
+                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500;">' + shift.shiftType + '</div>' +
+                            '</div>' : '') +
+                    '</div>' +
+                    
+                    // Contact section (horizontal)
+                    (contactSection ? 
+                        '<div style="background: #f9fafb; padding: 6px 10px; border-radius: 6px; border-left: 3px solid #667eea; margin-top: 8px;">' +
+                            '<span style="font-size: 10px; text-transform: uppercase; color: #667eea; font-weight: 600; margin-right: 10px;">📞</span>' +
+                            contactSection +
+                        '</div>' : '');
+                
+                shiftsContainer.appendChild(shiftElement);
+            });
         }
     </script>
 </body>
