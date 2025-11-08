@@ -384,9 +384,10 @@
                     </button>
                     <div id="searchTooltip" style="display: none; position: absolute; background: #1f2937; color: white; padding: 12px; border-radius: 8px; font-size: 12px; z-index: 1000; max-width: 420px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); top: 35px; right: 0; line-height: 1.6;">
                         <strong>Search Tips:</strong><br>
-                        • <strong>General:</strong> John (searches all fields)<br>
+                        • <strong>General:</strong> John (searches name, role, venue, type)<br>
                         • <strong>Multiple terms (AND):</strong> wmr olena<br>
                         • <strong>Quoted phrase:</strong> "duty manager"<br>
+                        • <strong>Type search:</strong> virtual or "on site"<br>
                         • <strong>Specific field:</strong> role:WMR<br>
                         • <strong>Multiple fields:</strong> name:Olena venue:RTOC<br>
                         • <strong>Date search:</strong> date:15/11 or date:11/15<br>
@@ -406,7 +407,7 @@
                             placeholder="This search will be saved"
                             style="flex: 1; min-width: 250px;"
                         >
-                        <button class="file-label" id="executeSavedSearch" style="padding: 8px 16px; cursor: pointer; background: #f3f4f6; color: #000000;">Execute Saved Search</button>
+                        <button class="file-label" id="executeSavedSearch" style="padding: 8px 16px; cursor: not-allowed; background: #f3f4f6; color: #000000; opacity: 0.5;" disabled>Execute Saved Search</button>
                     </div>
                 </div>
             </div>
@@ -751,10 +752,19 @@
                         myNameInput.style.color = '#9ca3af';
                         console.log('My Shifts filter turned OFF');
                     } else {
-                        // Turn filter on
+                        // Turn filter on - clear search boxes first
                         myShiftsFilter = myNameInput.value.trim();
                         myShiftsBtn.style.background = '#667eea';
                         myNameInput.style.color = '#000000';
+                        
+                        // Clear the main search box
+                        searchInput.value = '';
+                        
+                        // Reset Execute Saved Search button if it was active
+                        if (executeSavedSearchBtn && executeSavedSearchBtn.style.background === 'rgb(102, 126, 234)') {
+                            executeSavedSearchBtn.style.background = '#f3f4f6';
+                        }
+                        
                         console.log('My Shifts filter applied:', myShiftsFilter);
                     }
                     renderShifts();
@@ -772,9 +782,29 @@
         
         // Saved search functionality
         if (savedSearchInput) {
+            // Enable/disable Execute Saved Search button based on input
             savedSearchInput.addEventListener('input', () => {
+                const hasValue = savedSearchInput.value.trim().length > 0;
+                executeSavedSearchBtn.disabled = !hasValue;
+                executeSavedSearchBtn.style.opacity = hasValue ? '1' : '0.5';
+                executeSavedSearchBtn.style.cursor = hasValue ? 'pointer' : 'not-allowed';
+                
                 saveToStorage('savedSearch', savedSearchInput.value);
             });
+            
+            // Initialize button state based on saved search
+            const initialValue = savedSearchInput.value.trim();
+            if (initialValue) {
+                // Has saved value - enable button
+                executeSavedSearchBtn.disabled = false;
+                executeSavedSearchBtn.style.opacity = '1';
+                executeSavedSearchBtn.style.cursor = 'pointer';
+            } else {
+                // Empty - disable button
+                executeSavedSearchBtn.disabled = true;
+                executeSavedSearchBtn.style.opacity = '0.5';
+                executeSavedSearchBtn.style.cursor = 'not-allowed';
+            }
         }
         
         if (executeSavedSearchBtn) {
@@ -782,15 +812,18 @@
                 if (savedSearchInput && savedSearchInput.value.trim()) {
                     // Check if already active (search box has the saved search)
                     if (searchInput.value === savedSearchInput.value.trim()) {
-                        // Clear the search
+                        // Clear the search - change color FIRST
                         executeSavedSearchBtn.style.background = '#f3f4f6';
                         searchInput.value = '';
+                        // Force a small delay to ensure color change is visible
+                        setTimeout(() => renderShifts(), 0);
                     } else {
-                        // Apply the saved search
+                        // Apply the saved search - change color FIRST
                         executeSavedSearchBtn.style.background = '#667eea';
                         searchInput.value = savedSearchInput.value.trim();
+                        // Force a small delay to ensure color change is visible
+                        setTimeout(() => renderShifts(), 0);
                     }
-                    renderShifts();
                 }
             });
         }
@@ -1440,7 +1473,8 @@
                                 const matchesTerm = 
                                     (shift.name && shift.name.toLowerCase().includes(term)) ||
                                     (shift.role && shift.role.toLowerCase().includes(term)) ||
-                                    (shift.venue && shift.venue.toLowerCase().includes(term));
+                                    (shift.venue && shift.venue.toLowerCase().includes(term)) ||
+                                    (shift.shiftType && shift.shiftType.toLowerCase().includes(term));
                                 if (!matchesTerm) return false; // If any term doesn't match, exclude this shift
                             }
                         }
