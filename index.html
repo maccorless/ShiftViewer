@@ -321,7 +321,11 @@
 </head>
 <body>
     <div class="container">
-        <div class="header">
+        <div class="header" style="position: relative;">
+            <a href="USER_GUIDE.html" target="_blank" style="position: absolute; top: 20px; right: 20px; color: #1f2937; text-decoration: none; font-size: 15px; padding: 10px 18px; background: rgba(255,255,255,0.95); border-radius: 8px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 600; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 2px 8px rgba(0,0,0,0.15);" onmouseover="this.style.background='rgba(255,255,255,1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.95)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)'">
+                <span style="font-size: 20px;">❓</span>
+                <span style="line-height: 1;">Help / User Guide</span>
+            </a>
             <h1>📅 Shift Schedule Viewer <span id="lastUpdateDisplay" style="font-size: 0.6em; font-weight: normal;"></span></h1>
             <p>Easy access to shift schedules without spreadsheet hassle</p>
         </div>
@@ -387,7 +391,9 @@
                         • <strong>General:</strong> John (searches name, role, venue, type)<br>
                         • <strong>Multiple terms (AND):</strong> wmr olena<br>
                         • <strong>Quoted phrase:</strong> "duty manager"<br>
+                        • <strong>Assignment status:</strong> assigned or unassigned<br>
                         • <strong>Type search:</strong> virtual or "on site"<br>
+                        • <strong>Combine filters:</strong> unassigned wmr virtual<br>
                         • <strong>Specific field:</strong> role:WMR<br>
                         • <strong>Multiple fields:</strong> name:Olena venue:RTOC<br>
                         • <strong>Date search:</strong> date:15/11 or date:11/15<br>
@@ -1470,6 +1476,17 @@
                             
                             // Each term must match at least one field (AND across terms)
                             for (const term of terms) {
+                                // Check for assignment status keywords
+                                if (term === 'assigned') {
+                                    if (!shift.isAssigned) return false;
+                                    continue;
+                                }
+                                if (term === 'unassigned') {
+                                    if (shift.isAssigned) return false;
+                                    continue;
+                                }
+                                
+                                // Regular field matching
                                 const matchesTerm = 
                                     (shift.name && shift.name.toLowerCase().includes(term)) ||
                                     (shift.role && shift.role.toLowerCase().includes(term)) ||

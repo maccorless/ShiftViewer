@@ -1,0 +1,689 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShiftViewer User Guide</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            line-height: 1.6;
+            color: #333;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+        }
+        
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.2);
+            overflow: hidden;
+        }
+        
+        .header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+        }
+        
+        .header h1 {
+            font-size: 2.5em;
+            margin-bottom: 10px;
+        }
+        
+        .header p {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .content {
+            padding: 40px;
+        }
+        
+        .section {
+            margin-bottom: 40px;
+        }
+        
+        h2 {
+            color: #667eea;
+            font-size: 1.8em;
+            margin-bottom: 15px;
+            padding-bottom: 10px;
+            border-bottom: 3px solid #667eea;
+        }
+        
+        h3 {
+            color: #764ba2;
+            font-size: 1.3em;
+            margin-top: 25px;
+            margin-bottom: 10px;
+        }
+        
+        h4 {
+            color: #555;
+            font-size: 1.1em;
+            margin-top: 15px;
+            margin-bottom: 8px;
+        }
+        
+        p {
+            margin-bottom: 12px;
+        }
+        
+        ul, ol {
+            margin-left: 25px;
+            margin-bottom: 15px;
+        }
+        
+        li {
+            margin-bottom: 8px;
+        }
+        
+        code {
+            background: #f4f4f4;
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-family: 'Courier New', monospace;
+            color: #d63384;
+        }
+        
+        .example {
+            background: #f8f9fa;
+            border-left: 4px solid #667eea;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .tip {
+            background: #d1ecf1;
+            border-left: 4px solid #0c5460;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border-left: 4px solid #856404;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 4px;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 20px 0;
+        }
+        
+        th, td {
+            padding: 12px;
+            text-align: left;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        th {
+            background: #667eea;
+            color: white;
+            font-weight: 600;
+        }
+        
+        tr:hover {
+            background: #f5f5f5;
+        }
+        
+        .toc {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 8px;
+            margin-bottom: 30px;
+        }
+        
+        .toc h3 {
+            color: #667eea;
+            margin-top: 0;
+        }
+        
+        .toc ul {
+            list-style: none;
+            margin-left: 0;
+        }
+        
+        .toc a {
+            color: #667eea;
+            text-decoration: none;
+        }
+        
+        .toc a:hover {
+            text-decoration: underline;
+        }
+        
+        .badge {
+            display: inline-block;
+            padding: 4px 10px;
+            border-radius: 12px;
+            font-size: 0.85em;
+            font-weight: 600;
+            margin-right: 5px;
+        }
+        
+        .badge-new {
+            background: #10b981;
+            color: white;
+        }
+        
+        .badge-tip {
+            background: #3b82f6;
+            color: white;
+        }
+        
+        .footer {
+            background: #f8f9fa;
+            padding: 30px;
+            text-align: center;
+            color: #666;
+            border-top: 1px solid #ddd;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📋 ShiftViewer User Guide</h1>
+            <p>Complete guide to using ShiftViewer v1.01</p>
+        </div>
+        
+        <div class="content">
+            <!-- Table of Contents -->
+            <div class="toc">
+                <h3>📑 Table of Contents</h3>
+                <ul>
+                    <li><a href="#getting-started">1. Getting Started</a></li>
+                    <li><a href="#search">2. Search Features</a></li>
+                    <li><a href="#filters">3. Filters & Views</a></li>
+                    <li><a href="#ui">4. Understanding the Interface</a></li>
+                    <li><a href="#tips">5. Tips & Tricks</a></li>
+                    <li><a href="#troubleshooting">6. Troubleshooting</a></li>
+                </ul>
+            </div>
+
+            <!-- Getting Started -->
+            <div class="section" id="getting-started">
+                <h2>1. Getting Started</h2>
+                
+                <h3>Loading Your Shift Data</h3>
+                <p>There are two ways to load shift data into ShiftViewer:</p>
+                
+                <h4>Option 1: Upload Excel File</h4>
+                
+                <div class="tip">
+                    <strong>📍 Source File Location:</strong><br>
+                    The official shift schedule is published on SharePoint:<br>
+                    <a href="https://dtpsso.sharepoint.com/sites/DTEC_COLE_MICO26/SitePages/Published-Shift-Schedule.aspx" target="_blank">DTEC COLE MICO26 - Published Shift Schedule</a>
+                </div>
+                
+                <p><strong>Steps to upload:</strong></p>
+                <ol>
+                    <li><strong>Download from SharePoint:</strong> Visit the SharePoint link above and download the latest shift schedule Excel file to your local drive</li>
+                    <li><strong>Open ShiftViewer:</strong> Navigate to the ShiftViewer application</li>
+                    <li><strong>Choose File:</strong> Click the <strong>"Choose Excel File"</strong> button on the landing page</li>
+                    <li><strong>Select File:</strong> Browse to your downloaded Excel file (.xlsx or .xls) and select it</li>
+                    <li><strong>Automatic Processing:</strong> The app will automatically parse and display your shifts</li>
+                    <li><strong>Auto-Save:</strong> Data is saved to your browser for future sessions</li>
+                </ol>
+                
+                <div class="warning">
+                    <strong>⚠️ Important:</strong> Always download the Excel file to your local drive first. Do not try to open it directly from SharePoint.
+                </div>
+                
+                <h4>Option 2: Load Saved Data</h4>
+                <ol>
+                    <li>If you've previously uploaded a file, you'll see <strong>"Load Saved Data"</strong> button</li>
+                    <li>Click it to instantly load your last uploaded shift schedule</li>
+                    <li>No need to re-upload the Excel file</li>
+                </ol>
+                
+                <div class="tip">
+                    <strong>💡 Tip:</strong> The app shows when your data was last updated. Green = within 24 hours, Orange = 24-48 hours, Red = over 48 hours old.
+                </div>
+            </div>
+
+            <!-- Search Features -->
+            <div class="section" id="search">
+                <h2>2. Search Features</h2>
+                
+                <h3>Basic Search</h3>
+                <p>Type any text in the search box to search across all fields (name, role, venue, type).</p>
+                
+                <div class="example">
+                    <strong>Example:</strong> <code>John</code><br>
+                    Finds all shifts containing "John" in any field
+                </div>
+                
+                <h3>AND Search (Multiple Terms)</h3>
+                <p>Separate terms with spaces - ALL terms must match (AND logic).</p>
+                
+                <div class="example">
+                    <strong>Example:</strong> <code>wmr olena</code><br>
+                    Finds shifts containing BOTH "wmr" AND "olena"
+                </div>
+                
+                <h3>Quoted Phrase Search</h3>
+                <p>Use quotes to search for exact phrases with spaces.</p>
+                
+                <div class="example">
+                    <strong>Example:</strong> <code>"duty manager"</code><br>
+                    Finds shifts with the exact phrase "duty manager"<br><br>
+                    <strong>Compare:</strong> <code>duty manager</code> (without quotes)<br>
+                    Finds shifts with "duty" AND "manager" (can be in different fields)
+                </div>
+                
+                <h3>Field-Specific Search</h3>
+                <p>Search within specific fields using <code>field:value</code> syntax.</p>
+                
+                <table>
+                    <tr>
+                        <th>Search</th>
+                        <th>Description</th>
+                    </tr>
+                    <tr>
+                        <td><code>name:John</code></td>
+                        <td>Search only in names</td>
+                    </tr>
+                    <tr>
+                        <td><code>role:WMR</code></td>
+                        <td>Search only in roles</td>
+                    </tr>
+                    <tr>
+                        <td><code>venue:RTOC</code></td>
+                        <td>Search only in venues</td>
+                    </tr>
+                    <tr>
+                        <td><code>date:15/11</code></td>
+                        <td>Search by date</td>
+                    </tr>
+                </table>
+                
+                <h3>Date Search <span class="badge badge-new">POWERFUL</span></h3>
+                <p>Search by date with intelligent format detection and year inference.</p>
+                
+                <h4>Date Formats Supported:</h4>
+                <ul>
+                    <li><code>date:15/11</code> - Tries both EU (15 Nov) and US (Nov 15) formats</li>
+                    <li><code>date:11/15</code> - Same as above</li>
+                    <li><code>date:15/11/2025</code> - Specific date with 4-digit year</li>
+                    <li><code>date:15/11/25</code> - Specific date with 2-digit year</li>
+                </ul>
+                
+                <h4>Smart Year Inference:</h4>
+                <ul>
+                    <li>November-December → Assumes 2025</li>
+                    <li>January-March → Assumes 2026</li>
+                    <li>Other months → Uses current year</li>
+                </ul>
+                
+                <h3>Assignment Status Search <span class="badge badge-new">NEW</span></h3>
+                <p>Filter by whether shifts are assigned or not.</p>
+                
+                <div class="example">
+                    <strong>Examples:</strong><br>
+                    <code>assigned</code> - Shows only assigned shifts<br>
+                    <code>unassigned</code> - Shows only unassigned shifts<br>
+                    <code>unassigned wmr</code> - Shows unassigned WMR shifts<br>
+                    <code>unassigned virtual</code> - Shows unassigned virtual shifts
+                </div>
+                
+                <h3>Type Search</h3>
+                <p>Search by shift type (virtual or on-site).</p>
+                
+                <div class="example">
+                    <strong>Examples:</strong><br>
+                    <code>virtual</code> - Shows virtual shifts<br>
+                    <code>"on site"</code> - Shows on-site shifts (use quotes for spaces)
+                </div>
+                
+                <h3>Combining Search Types</h3>
+                <p>Mix and match different search types for powerful filtering.</p>
+                
+                <div class="example">
+                    <strong>Examples:</strong><br>
+                    <code>role:WMR date:15/11</code> - WMR shifts on Nov 15<br>
+                    <code>name:Olena venue:RTOC</code> - Olena's shifts at RTOC<br>
+                    <code>unassigned wmr virtual</code> - Unassigned virtual WMR shifts<br>
+                    <code>role:WMR date:15/11 virtual</code> - Virtual WMR shifts on Nov 15
+                </div>
+            </div>
+
+            <!-- Filters & Views -->
+            <div class="section" id="filters">
+                <h2>3. Filters & Views</h2>
+                
+                <h3>Tab Filters</h3>
+                <p>Quick access to common time-based views:</p>
+                
+                <table>
+                    <tr>
+                        <th>Tab</th>
+                        <th>Shows</th>
+                    </tr>
+                    <tr>
+                        <td>📋 Upcoming</td>
+                        <td>All future shifts (starting from today)</td>
+                    </tr>
+                    <tr>
+                        <td>🔴 Current Shifts</td>
+                        <td>Shifts happening right now</td>
+                    </tr>
+                    <tr>
+                        <td>📆 Today</td>
+                        <td>All shifts scheduled for today</td>
+                    </tr>
+                    <tr>
+                        <td>📅 Tomorrow</td>
+                        <td>All shifts scheduled for tomorrow</td>
+                    </tr>
+                    <tr>
+                        <td>🔍 ALL (incl. past)</td>
+                        <td>Every shift, including past ones</td>
+                    </tr>
+                </table>
+                
+                <h3>My Shifts Filter <span class="badge badge-tip">PERSONAL</span></h3>
+                <p>Filter to see only your assigned shifts.</p>
+                
+                <h4>How to Use:</h4>
+                <ol>
+                    <li>Enter your name in the <strong>"My name"</strong> text box</li>
+                    <li>Click <strong>"👤 My Shifts"</strong> button</li>
+                    <li>Button turns purple - filter is active</li>
+                    <li>Click again to turn off filter</li>
+                </ol>
+                
+                <h4>Behavior:</h4>
+                <ul>
+                    <li>✅ Works with tab filters (e.g., "Upcoming" + "My Shifts" = your upcoming shifts)</li>
+                    <li>✅ Clears search boxes when activated</li>
+                    <li>✅ Your name is saved for future sessions</li>
+                    <li>✅ Input text is gray when inactive, black when active</li>
+                </ul>
+                
+                <div class="tip">
+                    <strong>💡 Tip:</strong> Hover over the blue (i) button next to "My Shifts" for help.
+                </div>
+                
+                <h3>Saved Search</h3>
+                <p>Save and quickly execute frequently used searches.</p>
+                
+                <h4>How to Use:</h4>
+                <ol>
+                    <li>Type your search in <strong>"This search will be saved"</strong> box</li>
+                    <li>Search is automatically saved to your browser</li>
+                    <li>Click <strong>"Execute Saved Search"</strong> to apply it</li>
+                    <li>Button turns purple when active</li>
+                    <li>Click again to clear the search</li>
+                </ol>
+                
+                <h4>Features:</h4>
+                <ul>
+                    <li>✅ Automatically saved across sessions</li>
+                    <li>✅ Button disabled when search box is empty</li>
+                    <li>✅ Uses same powerful search syntax</li>
+                    <li>✅ Toggle on/off easily</li>
+                </ul>
+            </div>
+
+            <!-- Understanding the Interface -->
+            <div class="section" id="ui">
+                <h2>4. Understanding the Interface</h2>
+                
+                <h3>Shift Cards</h3>
+                <p>Each shift is displayed as a compact card with all relevant information.</p>
+                
+                <h4>Card Header:</h4>
+                <ul>
+                    <li><strong>Name:</strong> Large, bold text (or "🔴 Unassigned")</li>
+                    <li><strong>Role:</strong> Purple text below name</li>
+                    <li><strong>Status Badge:</strong> Green "✓ Assigned" or Orange "⚠️ Unassigned"</li>
+                </ul>
+                
+                <h4>Shift Details (Grid Layout):</h4>
+                <ul>
+                    <li>📅 Date (day, month, year)</li>
+                    <li>📍 Venue</li>
+                    <li>🌍 Location</li>
+                    <li>🕐 Time (CET)</li>
+                    <li>🕐 Time (IST)</li>
+                    <li>📋 Type (Virtual/On Site)</li>
+                </ul>
+                
+                <h4>Contact Information:</h4>
+                <p>Displayed in a horizontal line at the bottom of each card:</p>
+                <ul>
+                    <li><strong>💬 Teams:</strong> Click to open chat in desktop Teams app</li>
+                    <li><strong>Email:</strong> Shown in gray text</li>
+                    <li><strong>📱 Individual:</strong> Personal phone number (hover for tooltip)</li>
+                    <li><strong>🔄 Role:</strong> Shared phone passed between shifts (hover for tooltip)</li>
+                </ul>
+                
+                <h3>Statistics Bar</h3>
+                <p>Shows at the top of the shift list:</p>
+                <ul>
+                    <li><strong>Total:</strong> Number of shifts in current view</li>
+                    <li><strong>Assigned:</strong> Count of assigned shifts</li>
+                    <li><strong>Unassigned:</strong> Count of unassigned shifts</li>
+                </ul>
+                
+                <h3>Button States</h3>
+                
+                <h4>Filter Buttons (My Shifts, Execute Saved Search):</h4>
+                <table>
+                    <tr>
+                        <th>State</th>
+                        <th>Appearance</th>
+                    </tr>
+                    <tr>
+                        <td>Inactive</td>
+                        <td>Gray background, 100% opacity</td>
+                    </tr>
+                    <tr>
+                        <td>Active</td>
+                        <td>Purple background, 100% opacity</td>
+                    </tr>
+                    <tr>
+                        <td>Disabled</td>
+                        <td>Gray background, 50% opacity, cursor not-allowed</td>
+                    </tr>
+                </table>
+                
+                <div class="tip">
+                    <strong>💡 Tip:</strong> Button text is always black. Input text changes from gray (inactive) to black (active).
+                </div>
+            </div>
+
+            <!-- Tips & Tricks -->
+            <div class="section" id="tips">
+                <h2>5. Tips & Tricks</h2>
+                
+                <h3>Search Efficiency</h3>
+                <ul>
+                    <li>Use field-specific search when you know exactly what you're looking for</li>
+                    <li>Combine multiple criteria for precise results</li>
+                    <li>Use quotes for multi-word phrases</li>
+                    <li>Remember: spaces = AND logic (all terms must match)</li>
+                </ul>
+                
+                <h3>Finding Unassigned Shifts</h3>
+                <div class="example">
+                    <strong>Quick searches for coverage needs:</strong><br>
+                    <code>unassigned</code> - All unassigned shifts<br>
+                    <code>unassigned date:15/11</code> - Unassigned on specific date<br>
+                    <code>unassigned wmr</code> - Unassigned WMR roles<br>
+                    <code>unassigned virtual</code> - Unassigned virtual shifts
+                </div>
+                
+                <h3>Personal Workflow</h3>
+                <ol>
+                    <li>Enter your name in "My name" box (saved automatically)</li>
+                    <li>Click "Upcoming" tab</li>
+                    <li>Click "My Shifts" to see your upcoming shifts</li>
+                    <li>Click "My Shifts" again to see all upcoming shifts</li>
+                </ol>
+                
+                <h3>Keyboard Shortcuts</h3>
+                <ul>
+                    <li>Type in search box - results update after 200ms pause</li>
+                    <li>Press Escape in "My name" box to clear filter</li>
+                </ul>
+                
+                <h3>Data Management</h3>
+                <ul>
+                    <li>Data is saved to your browser automatically</li>
+                    <li>Use "Load Saved Data" to avoid re-uploading</li>
+                    <li>Check the "Last update" timestamp to know data freshness</li>
+                    <li>Upload a new file to replace saved data</li>
+                </ul>
+                
+                <h3>Combining Filters</h3>
+                <p>All filters work together:</p>
+                <div class="example">
+                    <strong>Example Workflow:</strong><br>
+                    1. Select "Upcoming" tab<br>
+                    2. Activate "My Shifts" filter<br>
+                    3. Result: Your upcoming shifts only<br><br>
+                    <strong>Another Example:</strong><br>
+                    1. Select "Today" tab<br>
+                    2. Search: <code>unassigned</code><br>
+                    3. Result: Unassigned shifts today
+                </div>
+            </div>
+
+            <!-- Troubleshooting -->
+            <div class="section" id="troubleshooting">
+                <h2>6. Troubleshooting</h2>
+                
+                <h3>No Shifts Showing</h3>
+                <ul>
+                    <li>Check if you're on the correct tab (try "ALL" to see everything)</li>
+                    <li>Clear search box and filters</li>
+                    <li>Verify your Excel file uploaded successfully</li>
+                    <li>Check browser console for errors (F12)</li>
+                </ul>
+                
+                <h3>Search Not Working</h3>
+                <ul>
+                    <li>Wait 200ms after typing (debounced search)</li>
+                    <li>Check search syntax (use <code>field:value</code> format)</li>
+                    <li>Verify spelling and case (searches are case-insensitive)</li>
+                    <li>Try simpler search terms first</li>
+                </ul>
+                
+                <h3>Date Search Issues</h3>
+                <ul>
+                    <li>Use <code>date:</code> prefix: <code>date:15/11</code></li>
+                    <li>Try both EU and US formats (app tries both)</li>
+                    <li>Include year if ambiguous: <code>date:15/11/2025</code></li>
+                    <li>Check console logs for date parsing details</li>
+                </ul>
+                
+                <h3>Teams Link Not Working</h3>
+                <ul>
+                    <li>Ensure Microsoft Teams desktop app is installed</li>
+                    <li>Link uses <code>msteams://</code> protocol for desktop app</li>
+                    <li>Falls back to web version if desktop not available</li>
+                    <li>Check browser allows protocol handlers</li>
+                </ul>
+                
+                <h3>Saved Data Not Loading</h3>
+                <ul>
+                    <li>Check if browser allows localStorage</li>
+                    <li>Try clearing browser cache and re-uploading</li>
+                    <li>Verify you're using the same browser</li>
+                    <li>Private/Incognito mode may not persist data</li>
+                </ul>
+                
+                <h3>Button Not Responding</h3>
+                <ul>
+                    <li>Check if button is disabled (50% opacity)</li>
+                    <li>Ensure text box has content (for filter buttons)</li>
+                    <li>Try refreshing the page</li>
+                    <li>Clear browser cache if persistent</li>
+                </ul>
+                
+                <div class="warning">
+                    <strong>⚠️ Important:</strong> ShiftViewer stores data in your browser's localStorage. Clearing browser data will delete saved shifts and preferences.
+                </div>
+            </div>
+
+            <!-- Quick Reference -->
+            <div class="section">
+                <h2>Quick Reference</h2>
+                
+                <h3>Search Syntax Cheat Sheet</h3>
+                <table>
+                    <tr>
+                        <th>Syntax</th>
+                        <th>Example</th>
+                        <th>Result</th>
+                    </tr>
+                    <tr>
+                        <td>General</td>
+                        <td><code>john</code></td>
+                        <td>Searches all fields</td>
+                    </tr>
+                    <tr>
+                        <td>AND</td>
+                        <td><code>wmr olena</code></td>
+                        <td>Both terms must match</td>
+                    </tr>
+                    <tr>
+                        <td>Quoted</td>
+                        <td><code>"duty manager"</code></td>
+                        <td>Exact phrase</td>
+                    </tr>
+                    <tr>
+                        <td>Field</td>
+                        <td><code>role:WMR</code></td>
+                        <td>Search specific field</td>
+                    </tr>
+                    <tr>
+                        <td>Date</td>
+                        <td><code>date:15/11</code></td>
+                        <td>Search by date</td>
+                    </tr>
+                    <tr>
+                        <td>Status</td>
+                        <td><code>unassigned</code></td>
+                        <td>Filter by assignment</td>
+                    </tr>
+                    <tr>
+                        <td>Type</td>
+                        <td><code>virtual</code></td>
+                        <td>Filter by shift type</td>
+                    </tr>
+                    <tr>
+                        <td>Combined</td>
+                        <td><code>role:WMR date:15/11 virtual</code></td>
+                        <td>All criteria must match</td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+        
+        <div class="footer">
+            <p><strong>ShiftViewer v1.01</strong></p>
+            <p>For support or feature requests, visit: <a href="https://github.com/maccorless/ShiftViewer" target="_blank">GitHub Repository</a></p>
+            <p style="margin-top: 15px; font-size: 0.9em;">Last Updated: November 8, 2025</p>
+        </div>
+    </div>
+</body>
+</html>
