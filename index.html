@@ -906,18 +906,48 @@
             const now = new Date();
             const hoursDiff = (now - updateDate) / (1000 * 60 * 60);
             
-            // Determine color based on age
+            // Determine color based on age (bright colors for dark navy background)
             let color;
+            let backgroundColor;
+            let icon = '';
+            let tooltip = '';
+            
             if (hoursDiff < 24) {
-                color = 'darkgreen';
+                color = '#10b981'; // Bright green
+                backgroundColor = 'rgba(16, 185, 129, 0.15)';
+                icon = '✓';
+                tooltip = 'File is up to date (updated within 24 hours)';
             } else if (hoursDiff < 48) {
-                color = '#b8860b'; // dark yellow/goldenrod
+                color = '#fbbf24'; // Bright yellow/amber
+                backgroundColor = 'rgba(251, 191, 36, 0.15)';
+                icon = '⚠️';
+                tooltip = 'File is 24-48 hours old. Consider checking for a more recent version.';
             } else {
-                color = 'darkred';
+                color = '#fb7185'; // Lighter red/rose for better contrast
+                backgroundColor = 'rgba(251, 113, 133, 0.15)';
+                icon = '❌';
+                tooltip = 'File is more than 48 hours old! Please check for a more recent version.';
             }
             
             displayElement.style.color = color;
-            displayElement.textContent = '(Last update: ' + lastUpdateTime + ')';
+            displayElement.style.backgroundColor = backgroundColor;
+            displayElement.style.padding = '4px 12px';
+            displayElement.style.borderRadius = '6px';
+            displayElement.style.fontWeight = '500';
+            displayElement.style.borderBottom = '1px dotted ' + color;
+            displayElement.style.transition = 'all 0.2s ease';
+            displayElement.title = tooltip;
+            displayElement.textContent = icon + ' (Last update: ' + lastUpdateTime + ')';
+            
+            // Add hover effect to make it clear there's a tooltip
+            displayElement.onmouseenter = function() {
+                this.style.opacity = '1';
+                this.style.transform = 'translateY(-1px)';
+            };
+            displayElement.onmouseleave = function() {
+                this.style.opacity = '0.9';
+                this.style.transform = 'translateY(0)';
+            };
         }
         
         fileInput.addEventListener('change', handleFileSelect);

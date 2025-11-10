@@ -1,5 +1,21 @@
 # ShiftViewer - Changelog
 
+## Version 1.05 - November 10, 2025
+
+### 🎨 UI Improvements
+- **Enhanced File Freshness Indicator**: Improved visibility and usability of last update timestamp
+  - Lighter red color (#fb7185) for better contrast on dark navy background
+  - Added status icons: ✓ (green), ⚠️ (yellow), ❌ (red)
+  - Added hover tooltips explaining file age and recommended actions
+  - Visual cues: dotted underline and subtle hover animation
+  - Color-coded background badges for better visibility
+
+### 📚 Documentation
+- Updated USER_GUIDE.html with detailed file freshness indicator information
+- Added visual examples of status colors and icons
+
+---
+
 ## Version 1.04 - November 10, 2025
 
 ### 🔍 New Features
@@ -295,6 +311,6 @@ Potential improvements for consideration:
 
 ---
 
-**Current Version**: 1.04  
+**Current Version**: 1.05  
 **Latest Release Date**: November 10, 2025  
 **Repository**: https://github.com/maccorless/ShiftViewer
