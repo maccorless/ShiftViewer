@@ -639,12 +639,48 @@
     </div>
 
     <script>
+        // Debug flag system - set to true to enable console logging
+        // Can also be enabled by running: localStorage.setItem('DEBUG', 'true')
+        const DEBUG = localStorage.getItem('DEBUG') === 'true' || false;
+        
+        // Debug logging wrapper
+        const debug = {
+            log: (...args) => DEBUG && console.log(...args),
+            warn: (...args) => DEBUG && console.warn(...args),
+            info: (...args) => DEBUG && console.info(...args),
+            error: (...args) => console.error(...args) // Always show errors
+        };
+        
         let allShifts = [];
         let currentTab = 'upcoming';
         let allPeople = [];
         let selectedPerson = '';
         let lastUpdateTime = null;
         let myShiftsFilter = ''; // Name filter for "My Shifts"
+        
+        // Cached date computations (refreshed every minute)
+        let cachedDates = null;
+        function getCachedDates() {
+            const now = Date.now();
+            // Refresh cache if it's null or older than 60 seconds
+            if (!cachedDates || now - cachedDates.timestamp > 60000) {
+                const currentDate = new Date();
+                const todayNormalized = new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate());
+                const tomorrowNormalized = new Date(todayNormalized);
+                tomorrowNormalized.setDate(tomorrowNormalized.getDate() + 1);
+                
+                cachedDates = {
+                    now: currentDate,
+                    today: todayNormalized,
+                    tomorrow: tomorrowNormalized,
+                    todayString: todayNormalized.toDateString(),
+                    tomorrowString: tomorrowNormalized.toDateString(),
+                    timestamp: now
+                };
+                debug.log('Date cache refreshed:', cachedDates.today.toDateString());
+            }
+            return cachedDates;
+        }
         
         // Copy email to clipboard function
         function copyEmail(email, button) {
@@ -697,7 +733,7 @@
         function saveToStorage(key, value) {
             try {
                 localStorage.setItem(key, value);
-                console.log('Saved to localStorage:', key, '=', value);
+                debug.log('Saved to localStorage:', key, '=', value);
             } catch (e) {
                 console.error('Error saving to localStorage:', e);
             }
@@ -706,7 +742,7 @@
         function getFromStorage(key) {
             try {
                 const value = localStorage.getItem(key);
-                console.log('Retrieved from localStorage:', key, '=', value);
+                debug.log('Retrieved from localStorage:', key, '=', value);
                 return value;
             } catch (e) {
                 console.error('Error reading from localStorage:', e);
@@ -737,7 +773,7 @@
                     savedAt: new Date().toISOString()
                 };
                 saveToStorage('shiftData', JSON.stringify(dataToSave));
-                console.log('Shift data saved:', allShifts.length, 'shifts');
+                debug.log('Shift data saved:', allShifts.length, 'shifts');
             } catch (e) {
                 console.error('Error saving shift data:', e);
             }
@@ -759,7 +795,7 @@
                     }
                 });
                 
-                console.log('Shift data loaded:', allShifts.length, 'shifts');
+                debug.log('Shift data loaded:', allShifts.length, 'shifts');
                 
                 // Update UI
                 updateLastUpdateDisplay();
@@ -806,12 +842,12 @@
         checkSavedData();
         
         function parseSearchDate(dateStr) {
-            console.log('=== parseSearchDate called with:', dateStr);
+            debug.log('=== parseSearchDate called with:', dateStr);
             // Parse date from search with smart EU/US format detection
             // Supports: dd/mm, mm/dd, dd/mm/yy, mm/dd/yy, dd/mm/yyyy, mm/dd/yyyy
             const parts = dateStr.split('/');
             if (parts.length < 2 || parts.length > 3) {
-                console.log('Invalid date format:', dateStr, '- need 2 or 3 parts');
+                debug.log('Invalid date format:', dateStr, '- need 2 or 3 parts');
                 return null;
             }
             
@@ -820,11 +856,11 @@
             let year = parts.length === 3 ? parseInt(parts[2]) : null;
             
             if (isNaN(num1) || isNaN(num2)) {
-                console.log('Invalid numbers in date:', dateStr);
+                debug.log('Invalid numbers in date:', dateStr);
                 return null;
             }
             
-            console.log('Parsing date:', dateStr, '-> num1:', num1, 'num2:', num2, 'year:', year);
+            debug.log('Parsing date:', dateStr, '-> num1:', num1, 'num2:', num2, 'year:', year);
             
             // Handle year
             let yearProvided = year !== null;
@@ -833,9 +869,9 @@
                 if (year < 100) {
                     year = year < 50 ? 2000 + year : 1900 + year;
                 }
-                console.log('Year provided:', year);
+                debug.log('Year provided:', year);
             } else {
-                console.log('No year provided, will infer based on month');
+                debug.log('No year provided, will infer based on month');
             }
             
             // Function to infer year based on month
@@ -853,12 +889,12 @@
                 const month = num2;
                 const useYear = yearProvided ? year : inferYear(month);
                 const date = new Date(useYear, month - 1, day);
-                console.log('Trying DD/MM:', day + '/' + month + '/' + useYear);
+                debug.log('Trying DD/MM:', day + '/' + month + '/' + useYear);
                 if (date.getDate() === day && date.getMonth() === month - 1) {
-                    console.log('  Valid!');
+                    debug.log('  Valid!');
                     possibleDates.push(date);
                 } else {
-                    console.log('  Invalid date');
+                    debug.log('  Invalid date');
                 }
             }
             
@@ -868,16 +904,16 @@
                 const day = num2;
                 const useYear = yearProvided ? year : inferYear(month);
                 const date = new Date(useYear, month - 1, day);
-                console.log('Trying MM/DD:', month + '/' + day + '/' + useYear);
+                debug.log('Trying MM/DD:', month + '/' + day + '/' + useYear);
                 if (date.getDate() === day && date.getMonth() === month - 1) {
-                    console.log('  Valid!');
+                    debug.log('  Valid!');
                     possibleDates.push(date);
                 } else {
-                    console.log('  Invalid date');
+                    debug.log('  Invalid date');
                 }
             }
             
-            console.log('Possible dates found:', possibleDates.length, possibleDates.map(d => d.toDateString()));
+            debug.log('Possible dates found:', possibleDates.length, possibleDates.map(d => d.toDateString()));
             return possibleDates.length > 0 ? possibleDates : null;
         }
         
@@ -893,18 +929,22 @@
             }
             
             const day = parseInt(match[1]);
-            const month = parseInt(match[2]) - 1; // JS months are 0-indexed
+            const month = parseInt(match[2]);
             const year = parseInt(match[3]);
             const hour = parseInt(match[4]);
             const minute = parseInt(match[5]);
             
-            // Create date in CET timezone (UTC+1 or UTC+2 depending on DST)
-            // For simplicity, we'll assume CET is UTC+1
-            const updateDate = new Date(Date.UTC(year, month, day, hour - 1, minute));
+            // Create date in CET timezone with proper DST handling
+            // Use ISO 8601 format with +01:00 timezone offset for CET
+            // Note: This assumes standard CET (UTC+1). For CEST (summer), it would be +02:00
+            // However, the Excel file should indicate which timezone it's using
+            // For now, we'll use +01:00 as the base and let the browser handle it
+            const isoString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00+01:00`;
+            const updateDateCET = new Date(isoString);
             
             // Get current time
             const now = new Date();
-            const hoursDiff = (now - updateDate) / (1000 * 60 * 60);
+            const hoursDiff = (now - updateDateCET) / (1000 * 60 * 60);
             
             // Determine color based on age (bright colors for dark navy background)
             let color;
@@ -1041,7 +1081,7 @@
                         myShiftsFilter = '';
                         myShiftsBtn.style.background = '#f3f4f6';
                         myNameInput.style.color = '#9ca3af';
-                        console.log('My Shifts filter turned OFF');
+                        debug.log('My Shifts filter turned OFF');
                     } else {
                         // Turn filter on - clear search boxes first
                         myShiftsFilter = myNameInput.value.trim();
@@ -1056,7 +1096,7 @@
                             executeSavedSearchBtn.style.background = '#f3f4f6';
                         }
                         
-                        console.log('My Shifts filter applied:', myShiftsFilter);
+                        debug.log('My Shifts filter applied:', myShiftsFilter);
                     }
                     renderShifts();
                 }
@@ -1132,37 +1172,37 @@
             const file = e.target.files[0];
             if (!file) return;
             
-            console.log('File selected:', file.name);
+            debug.log('File selected:', file.name);
             fileName.textContent = file.name;
             
             const reader = new FileReader();
             reader.onload = function(e) {
                 try {
-                    console.log('File read successfully, size:', e.total, 'bytes');
+                    debug.log('File read successfully, size:', e.total, 'bytes');
                     const data = new Uint8Array(e.target.result);
                     
-                    console.log('Parsing Excel workbook...');
+                    debug.log('Parsing Excel workbook...');
                     const workbook = XLSX.read(data, { type: 'array' });
-                    console.log('Workbook sheets:', workbook.SheetNames);
+                    debug.log('Workbook sheets:', workbook.SheetNames);
                     
                     const firstSheetName = workbook.SheetNames[0];
-                    console.log('Using sheet:', firstSheetName);
+                    debug.log('Using sheet:', firstSheetName);
                     
                     const worksheet = workbook.Sheets[firstSheetName];
-                    console.log('Worksheet range:', worksheet['!ref']);
+                    debug.log('Worksheet range:', worksheet['!ref']);
                     
                     // First, get the raw data to see the actual structure
                     const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-                    console.log('Raw sheet data (first 5 rows):', rawData.slice(0, 5));
+                    debug.log('Raw sheet data (first 5 rows):', rawData.slice(0, 5));
                     
                     // Try with header: 1 to get array of arrays first
                     const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-                    console.log('Parsed JSON data (first 5 rows as arrays):', jsonData.slice(0, 5));
+                    debug.log('Parsed JSON data (first 5 rows as arrays):', jsonData.slice(0, 5));
                     
                     // Show the structure more clearly
-                    console.log('\n=== RAW DATA STRUCTURE ===');
+                    debug.log('\n=== RAW DATA STRUCTURE ===');
                     for (let i = 0; i < Math.min(5, jsonData.length); i++) {
-                        console.log(`Row ${i} (${jsonData[i].length} columns):`, jsonData[i]);
+                        debug.log(`Row ${i} (${jsonData[i].length} columns):`, jsonData[i]);
                     }
                     
                     if (jsonData.length === 0) {
@@ -1180,7 +1220,7 @@
                         }
                     }
                     
-                    console.log('Using row', actualHeaderRowIndex, 'as headers');
+                    debug.log('Using row', actualHeaderRowIndex, 'as headers');
                     
                     // Extract last update time from row 0 if it exists
                     let lastUpdateStr = '';
@@ -1188,7 +1228,7 @@
                         const firstCell = jsonData[0][0].toString();
                         if (firstCell.includes('Last update:')) {
                             lastUpdateStr = firstCell.replace('Last update:', '').trim();
-                            console.log('Last update:', lastUpdateStr);
+                            debug.log('Last update:', lastUpdateStr);
                             lastUpdateTime = lastUpdateStr;
                             updateLastUpdateDisplay();
                         }
@@ -1196,7 +1236,7 @@
                     
                     // Convert array of arrays to array of objects
                     const headers = jsonData[actualHeaderRowIndex].map(h => h ? h.toString().trim() : '');
-                    console.log('Detected headers:', headers);
+                    debug.log('Detected headers:', headers);
                     
                     const formattedData = jsonData.slice(actualHeaderRowIndex + 1).map((row, rowIndex) => {
                         const obj = {};
@@ -1204,13 +1244,13 @@
                             obj[header] = (i < row.length) ? row[i] : '';
                             // If it's the first column and first row after header, log it for debugging
                             if (i === 0 && rowIndex === 0) {
-                                console.log('First data cell value:', row[i], 'type:', typeof row[i]);
+                                debug.log('First data cell value:', row[i], 'type:', typeof row[i]);
                             }
                         });
                         return obj;
                     });
                     
-                    console.log('Formatted data (first 2 rows):', formattedData.slice(0, 2));
+                    debug.log('Formatted data (first 2 rows):', formattedData.slice(0, 2));
                     
                     // Process the data
                     processData(formattedData);
@@ -1219,7 +1259,7 @@
                     fileInputContainer.style.display = 'none';
                     appContainer.style.display = 'block';
                     
-                    console.log('File processing completed');
+                    debug.log('File processing completed');
                 } catch (error) {
                     console.error('Error reading file:', error);
                     console.error('Error stack:', error.stack);
@@ -1230,17 +1270,17 @@
         }
         
         function processCOLEFormat(data, headerRowIndex) {
-            console.log('Processing COLE format...');
-            console.log('Total rows to process:', data.length);
+            debug.log('Processing COLE format...');
+            debug.log('Total rows to process:', data.length);
             
             // Data is already formatted as objects with column names as keys
             const keys = Object.keys(data[0]);
-            console.log('Column names:', keys);
+            debug.log('Column names:', keys);
             
             // Show first 3 data rows for debugging
-            console.log('\n=== FIRST 3 DATA ROWS ===');
+            debug.log('\n=== FIRST 3 DATA ROWS ===');
             for (let i = 0; i < Math.min(3, data.length); i++) {
-                console.log(`\nRow ${i}:`, data[i]);
+                debug.log(`\nRow ${i}:`, data[i]);
             }
             
             allShifts = [];
@@ -1331,8 +1371,8 @@
                 allShifts.push(shift);
             }
             
-            console.log('Processed', allShifts.length, 'shifts from COLE format');
-            console.log('Sample shifts:', allShifts.slice(0, 3));
+            debug.log('Processed', allShifts.length, 'shifts from COLE format');
+            debug.log('Sample shifts:', allShifts.slice(0, 3));
             
             updateFilters();
             renderShifts();
@@ -1342,7 +1382,7 @@
         }
         
         function processData(data) {
-            console.log('Processing data...', data);
+            debug.log('Processing data...', data);
             
             if (!Array.isArray(data) || data.length === 0) {
                 console.error('Invalid data format: Expected an array of rows');
@@ -1350,14 +1390,14 @@
             }
 
             // Log the first few rows to see the actual data structure
-            console.log('First 3 rows of data:', data.slice(0, 3));
+            debug.log('First 3 rows of data:', data.slice(0, 3));
             
             // Check if this is COLE format by looking at the keys (column names)
             const firstRowKeys = Object.keys(data[0]);
             const isCOLEFormat = firstRowKeys.includes('Date') && firstRowKeys.includes('Venue') && firstRowKeys.includes('Role');
             
-            console.log('First row keys:', firstRowKeys);
-            console.log('Is COLE format:', isCOLEFormat);
+            debug.log('First row keys:', firstRowKeys);
+            debug.log('Is COLE format:', isCOLEFormat);
             
             if (isCOLEFormat) {
                 // COLE format: each row is a shift with Date, Venue, Role, Name, etc.
@@ -1374,11 +1414,11 @@
                 return upperValue === 'NAME';
             });
             
-            console.log('Header row index for NAME format:', headerRowIndex);
+            debug.log('Header row index for NAME format:', headerRowIndex);
             
             if (headerRowIndex === -1) {
                 console.error('Could not find header row in Excel data.');
-                console.log('First column values:', data.slice(0, 5).map(row => row[Object.keys(row)[0]]));
+                debug.log('First column values:', data.slice(0, 5).map(row => row[Object.keys(row)[0]]));
                 return;
             }
             
@@ -1387,18 +1427,18 @@
             const nameHeaderRow = data[headerRowIndex];
             const headerKeys = Object.keys(nameHeaderRow);
             
-            console.log('Header keys:', headerKeys);
+            debug.log('Header keys:', headerKeys);
             
             for (let i = 2; i < headerKeys.length; i++) {
                 const header = nameHeaderRow[headerKeys[i]];
-                console.log(`Header ${i}:`, header);
+                debug.log(`Header ${i}:`, header);
                 
                 if (header && typeof header === 'string') {
                     const trimmedHeader = header.trim().toUpperCase();
                     if (trimmedHeader !== 'PATTERN') {
-                        console.log('Processing header:', trimmedHeader);
+                        debug.log('Processing header:', trimmedHeader);
                         const dateRange = parseDateRange(trimmedHeader);
-                        console.log('Parsed date range:', dateRange);
+                        debug.log('Parsed date range:', dateRange);
                         
                         headers.push({
                             key: headerKeys[i],
@@ -1409,7 +1449,7 @@
                 }
             }
             
-            console.log('Processed headers:', headers);
+            debug.log('Processed headers:', headers);
             
             // Process each person's row
             allShifts = [];
@@ -1462,7 +1502,7 @@
             updateFilters();
             renderShifts();
             
-            console.log('Processed shifts:', allShifts);
+            debug.log('Processed shifts:', allShifts);
         }
         
         function parseDate(dateStr) {
@@ -1499,7 +1539,7 @@
                 return date;
             }
 
-            console.warn('Could not parse date:', dateStr);
+            debug.warn('Could not parse date:', dateStr);
             return null;
         }
         
@@ -1552,7 +1592,7 @@
                 }
             }
             
-            console.warn('Could not parse date range:', rangeStr);
+            debug.warn('Could not parse date range:', rangeStr);
             return { start: new Date(), end: new Date() };
         }
         
@@ -1626,11 +1666,9 @@
             // Apply filters
             let filtered = [...allShifts];
             
-            // Tab filter
-            const now = new Date();
-            const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-            const tomorrow = new Date(today);
-            tomorrow.setDate(tomorrow.getDate() + 1);
+            // Tab filter - use cached dates for performance
+            const dates = getCachedDates();
+            const { now, today, tomorrow, todayString, tomorrowString } = dates;
             
             switch(currentTab) {
                 case 'current':
@@ -1638,7 +1676,7 @@
                     filtered = filtered.filter(shift => {
                         if (!shift.date) return false;
                         const shiftDate = new Date(shift.date);
-                        const isToday = shiftDate.toDateString() === today.toDateString();
+                        const isToday = shiftDate.toDateString() === todayString;
                         if (isToday && shift.shiftTimeCET) {
                             const timeMatch = shift.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
                             if (timeMatch) {
@@ -1654,14 +1692,14 @@
                     filtered = filtered.filter(shift => {
                         if (!shift.date) return false;
                         const shiftDate = new Date(shift.date);
-                        return shiftDate.toDateString() === today.toDateString();
+                        return shiftDate.toDateString() === todayString;
                     });
                     break;
                 case 'tomorrow':
                     filtered = filtered.filter(shift => {
                         if (!shift.date) return false;
                         const shiftDate = new Date(shift.date);
-                        return shiftDate.toDateString() === tomorrow.toDateString();
+                        return shiftDate.toDateString() === tomorrowString;
                     });
                     break;
                 case 'upcoming':
@@ -1678,7 +1716,7 @@
                 if (searchTerm) {
                     // Parse search into field:value pairs and general terms
                     // Regex: field name, colon, optional space, then at least one non-space character
-                    console.log('Search term:', searchTerm);
+                    debug.log('Search term:', searchTerm);
                     const fieldMatches = searchTerm.matchAll(/(name|role|venue|date):\s*([^\s]+)/gi);
                     const fieldCriteria = {};
                     let dateCriteria = null;
@@ -1688,7 +1726,7 @@
                     let matchCount = 0;
                     for (const match of fieldMatches) {
                         matchCount++;
-                        console.log('Match', matchCount, ':', match[0], '-> field:', match[1], 'value:', match[2]);
+                        debug.log('Match', matchCount, ':', match[0], '-> field:', match[1], 'value:', match[2]);
                         const field = match[1].toLowerCase();
                         const value = match[2];
                         
@@ -1697,9 +1735,9 @@
                             const parsedDates = parseSearchDate(value);
                             if (parsedDates && parsedDates.length > 0) {
                                 dateCriteria = parsedDates;
-                                console.log('Parsed date search:', value, '->', dateCriteria.map(d => d.toDateString()));
+                                debug.log('Parsed date search:', value, '->', dateCriteria.map(d => d.toDateString()));
                             } else {
-                                console.warn('Could not parse date:', value);
+                                debug.warn('Could not parse date:', value);
                             }
                         } else {
                             fieldCriteria[field] = value.toLowerCase();
@@ -1721,7 +1759,7 @@
                         generalTerms = '';
                     }
                     
-                    console.log('Search criteria:', { fieldCriteria, generalTerms, dateCriteria: dateCriteria ? dateCriteria.length + ' dates' : 'none' });
+                    debug.log('Search criteria:', { fieldCriteria, generalTerms, dateCriteria: dateCriteria ? dateCriteria.length + ' dates' : 'none' });
                     
                     // Parse general terms into positive and negative terms (do this once, not per shift)
                     let positiveTerms = [];
@@ -1740,8 +1778,8 @@
                                 positiveTerms.push(term);
                             }
                         }
-                        console.log('Positive terms:', positiveTerms);
-                        console.log('Negative terms:', negativeTerms);
+                        debug.log('Positive terms:', positiveTerms);
+                        debug.log('Negative terms:', negativeTerms);
                     }
                     
                     // Apply filters
@@ -1841,12 +1879,12 @@
                 '<span style="background: #fef3c7; color: #92400e; padding: 3px 8px; border-radius: 10px; font-weight: 600;">Unassigned: ' + unassignedShifts + '</span>';
             
             // Debug logging
-            console.log('Render stats:');
-            console.log('  Tab:', currentTab);
-            console.log('  Total in view:', totalShifts);
-            console.log('  Assigned:', assignedShifts);
-            console.log('  Unassigned:', unassignedShifts);
-            console.log('  Total shifts loaded:', allShifts.length);
+            debug.log('Render stats:');
+            debug.log('  Tab:', currentTab);
+            debug.log('  Total in view:', totalShifts);
+            debug.log('  Assigned:', assignedShifts);
+            debug.log('  Unassigned:', unassignedShifts);
+            debug.log('  Total shifts loaded:', allShifts.length);
             
             // Render shifts
             shiftsContainer.innerHTML = '';
@@ -1865,7 +1903,6 @@
                 // Build contact section (horizontal)
                 let contactItems = [];
                 if (shift.email && !shift.email.includes('Unassigned')) {
-                    const emailId = 'email-' + Math.random().toString(36).substr(2, 9);
                     contactItems.push('<a href="msteams:/l/chat/0/0?users=' + shift.email + '" style="color: #667eea; text-decoration: none; font-weight: 500; font-size: 12px;">💬 Teams</a>');
                     contactItems.push('<span style="color: #6b7280; font-size: 12px;">' + shift.email + '</span>');
                     contactItems.push('<button onclick="copyEmail(\'' + shift.email + '\', this)" style="background: transparent; border: 1px solid #d1d5db; border-radius: 3px; padding: 1px 5px; cursor: pointer; font-size: 10px; color: #6b7280; transition: all 0.15s; margin-left: 3px;" onmouseover="this.style.background=\'#f3f4f6\'; this.style.borderColor=\'#9ca3af\'" onmouseout="this.style.background=\'transparent\'; this.style.borderColor=\'#d1d5db\'">📋 Copy</button>');

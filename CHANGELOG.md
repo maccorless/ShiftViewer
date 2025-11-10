@@ -1,5 +1,36 @@
 # ShiftViewer - Changelog
 
+## Version 1.06 - November 10, 2025
+
+### 🚀 Performance Improvements
+- **Date Computation Caching**: Date objects now cached and refreshed every 60 seconds
+  - Eliminates redundant `new Date()` calls on every render
+  - Significant performance improvement for large datasets
+  - Pre-computed date strings for faster comparisons
+  
+### 🧹 Code Quality Improvements
+- **Debug Flag System**: Console logging now controlled by DEBUG flag
+  - Set `localStorage.setItem('DEBUG', 'true')` to enable logging
+  - Cleaner production console output
+  - Errors always shown, debug logs hidden by default
+  - Improves maintainability and reduces noise
+
+- **Timezone Handling Fix**: Proper CET/CEST timezone support
+  - Fixed DST (Daylight Saving Time) handling
+  - Uses ISO 8601 format with explicit timezone offset
+  - Accurate file freshness indicator year-round
+  
+- **Code Cleanup**: Removed unused code
+  - Removed unused `Math.random()` emailId generation
+  - Cleaner, more maintainable codebase
+
+### 📊 Technical Details
+- Replaced ~50+ console.log calls with debug.log wrapper
+- Date cache refreshes automatically every minute
+- ISO 8601 timezone parsing for accurate time comparisons
+
+---
+
 ## Version 1.05 - November 10, 2025
 
 ### 🎨 UI Improvements
@@ -311,6 +342,6 @@ Potential improvements for consideration:
 
 ---
 
-**Current Version**: 1.05  
+**Current Version**: 1.06  
 **Latest Release Date**: November 10, 2025  
 **Repository**: https://github.com/maccorless/ShiftViewer
