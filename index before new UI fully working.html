@@ -3,144 +3,47 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Milano Cortina 2026 - Shift Viewer</title>
+    <title>Shift Schedule Viewer</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <!-- Olympic Winter Theme: Ice blues, deep navy, minimalist elegance -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
     <style>
-        /* ============================================
-           OLYMPIC WINTER DESIGN SYSTEM
-           Milano Cortina 2026
-           ============================================ */
-        
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
         }
         
-        :root {
-            /* Olympic Winter Color Palette */
-            --ice-blue: #E3F2FD;
-            --sky-blue: #90CAF9;
-            --olympic-blue: #1976D2;
-            --deep-navy: #0D47A1;
-            --silver: #ECEFF1;
-            --frost-white: #FAFAFA;
-            --snow-white: #FFFFFF;
-            --charcoal: #263238;
-            --slate: #546E7A;
-            --accent-gold: #FFB300;
-            
-            /* Spacing */
-            --space-xs: 4px;
-            --space-sm: 8px;
-            --space-md: 16px;
-            --space-lg: 24px;
-            --space-xl: 32px;
-            --space-2xl: 48px;
-            
-            /* Radius */
-            --radius-sm: 6px;
-            --radius-md: 12px;
-            --radius-lg: 16px;
-            --radius-full: 9999px;
-            
-            /* Shadows */
-            --shadow-sm: 0 1px 3px rgba(0,0,0,0.08);
-            --shadow-md: 0 4px 12px rgba(0,0,0,0.1);
-            --shadow-lg: 0 8px 24px rgba(0,0,0,0.12);
-            --shadow-xl: 0 12px 36px rgba(0,0,0,0.15);
-        }
-        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: linear-gradient(135deg, var(--ice-blue) 0%, var(--sky-blue) 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             min-height: 100vh;
-            padding: var(--space-lg);
-            color: var(--charcoal);
-            line-height: 1.6;
-            font-size: 15px;
-            -webkit-font-smoothing: antialiased;
+            padding: 20px;
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 1200px;
             margin: 0 auto;
         }
         
-        /* Olympic Header - Deep Navy Gradient */
         .header {
-            background: linear-gradient(135deg, var(--deep-navy) 0%, var(--olympic-blue) 100%);
-            padding: var(--space-lg) var(--space-xl);
-            border-radius: var(--radius-lg);
-            margin-bottom: var(--space-md);
-            box-shadow: var(--shadow-xl);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        /* Subtle Olympic rings pattern */
-        .header::before {
-            content: '';
-            position: absolute;
-            top: -50px;
-            right: -50px;
-            width: 300px;
-            height: 300px;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, transparent 70%);
-            border-radius: 50%;
-            pointer-events: none;
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
         .header h1 {
-            color: var(--snow-white);
-            font-size: 2.5rem;
-            font-weight: 700;
-            margin-bottom: var(--space-sm);
-            letter-spacing: -0.02em;
-            position: relative;
-            z-index: 1;
+            color: #667eea;
+            margin-bottom: 10px;
         }
         
-        .header p {
-            color: rgba(255,255,255,0.9);
-            font-size: 1.1rem;
-            font-weight: 400;
-            position: relative;
-            z-index: 1;
-        }
-        
-        /* File Upload Section */
         .file-input-container {
-            background: var(--snow-white);
-            padding: var(--space-2xl);
-            border-radius: var(--radius-lg);
+            background: white;
+            padding: 30px;
+            border-radius: 12px;
             text-align: center;
-            margin-bottom: var(--space-xl);
-            box-shadow: var(--shadow-md);
-            border: 2px dashed var(--silver);
-            transition: all 0.25s ease;
-        }
-        
-        .file-input-container:hover {
-            border-color: var(--olympic-blue);
-            box-shadow: var(--shadow-lg);
-        }
-        
-        .file-input-container h2 {
-            color: var(--charcoal);
-            font-size: 1.5rem;
-            font-weight: 600;
-            margin-bottom: var(--space-sm);
-        }
-        
-        .file-input-container p {
-            color: var(--slate);
-            margin-bottom: var(--space-lg);
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
         .file-input-container input[type="file"] {
@@ -148,99 +51,69 @@
         }
         
         .file-label {
-            display: inline-flex;
-            align-items: center;
-            gap: var(--space-sm);
-            padding: var(--space-md) var(--space-xl);
-            background: linear-gradient(135deg, var(--olympic-blue), var(--deep-navy));
-            color: var(--snow-white);
-            border-radius: var(--radius-md);
+            display: inline-block;
+            padding: 12px 24px;
+            background: #667eea;
+            color: white;
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.25s ease;
-            border: none;
-            font-size: 1rem;
-            font-weight: 600;
-            box-shadow: var(--shadow-sm);
+            transition: background 0.3s;
         }
         
         .file-label:hover {
-            transform: translateY(-2px);
-            box-shadow: var(--shadow-lg);
+            background: #5568d3;
         }
         
-        .file-label:active {
-            transform: translateY(0);
-        }
-        
-        /* Tabs - Olympic Rings Inspired */
         .tabs {
             display: flex;
-            gap: var(--space-sm);
-            background: var(--snow-white);
-            padding: var(--space-sm);
-            border-radius: var(--radius-md);
-            margin-bottom: var(--space-lg);
-            box-shadow: var(--shadow-sm);
+            gap: 10px;
+            background: white;
+            padding: 10px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
             flex-wrap: wrap;
         }
         
         .tab {
-            flex: 1;
-            min-width: 120px;
-            padding: var(--space-md) var(--space-lg);
-            background: transparent;
+            padding: 10px 20px;
+            background: #f3f4f6;
             border: none;
-            color: var(--slate);
-            border-radius: var(--radius-sm);
+            border-radius: 8px;
             cursor: pointer;
-            transition: all 0.15s ease;
+            transition: all 0.3s;
             font-weight: 500;
-            font-size: 0.95rem;
-            white-space: nowrap;
         }
         
         .tab:hover {
-            background: var(--ice-blue);
-            color: var(--olympic-blue);
+            background: #e5e7eb;
         }
         
         .tab.active {
-            background: linear-gradient(135deg, var(--olympic-blue), var(--deep-navy));
-            color: var(--snow-white);
-            box-shadow: var(--shadow-sm);
+            background: #667eea;
+            color: white;
         }
         
-        /* Search & Filters Section */
         .search-container {
-            background: var(--snow-white);
-            padding: var(--space-lg);
-            border-radius: var(--radius-md);
-            margin-bottom: var(--space-lg);
-            box-shadow: var(--shadow-sm);
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
         }
         
         .search-input {
-            flex: 1;
-            min-width: 250px;
-            padding: var(--space-md);
-            border: 2px solid var(--silver);
-            border-radius: var(--radius-sm);
-            font-size: 0.95rem;
-            font-family: inherit;
-            transition: all 0.15s ease;
-            background: var(--frost-white);
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            font-size: 16px;
+            transition: border-color 0.3s;
         }
         
         .search-input:focus {
             outline: none;
-            border-color: var(--olympic-blue);
-            box-shadow: 0 0 0 3px rgba(25, 118, 210, 0.1);
-            background: var(--snow-white);
-        }
-        
-        .search-input::placeholder {
-            color: var(--slate);
-            opacity: 0.6;
+            border-color: #667eea;
         }
         
         .search-help {
@@ -326,108 +199,68 @@
             min-height: 400px;
         }
         
-        /* Shift Cards - Elegant Design */
         .shift-card {
-            background: var(--snow-white);
-            border-radius: var(--radius-sm);
-            padding: 10px 12px;
-            margin-bottom: 6px;
-            box-shadow: var(--shadow-sm);
-            transition: all 0.25s ease;
-            border: 1px solid transparent;
-            animation: fadeIn 0.3s ease;
-        }
-        
-        @keyframes fadeIn {
-            from {
-                opacity: 0;
-                transform: translateY(10px);
-            }
-            to {
-                opacity: 1;
-                transform: translateY(0);
-            }
+            border: 2px solid #e5e7eb;
+            border-radius: 8px;
+            padding: 16px;
+            margin-bottom: 12px;
+            transition: all 0.3s;
         }
         
         .shift-card:hover {
-            box-shadow: var(--shadow-lg);
-            transform: translateY(-2px);
-            border-color: var(--olympic-blue);
+            border-color: #667eea;
+            box-shadow: 0 2px 8px rgba(102, 126, 234, 0.2);
         }
         
         .shift-card.unassigned {
-            border-left: 4px solid var(--accent-gold);
+            border-color: #fbbf24;
+            background: #fef3c7;
         }
         
-        /* Card Header */
         .shift-header {
             display: flex;
             justify-content: space-between;
-            align-items: start;
-            margin-bottom: var(--space-md);
-            padding-bottom: var(--space-md);
-            border-bottom: 2px solid var(--silver);
+            align-items: center;
+            margin-bottom: 10px;
         }
         
         .shift-name {
-            font-size: 1.25rem;
-            font-weight: 700;
-            color: var(--charcoal);
-            margin-bottom: var(--space-xs);
-        }
-        
-        .shift-role {
-            font-size: 1rem;
+            font-size: 18px;
             font-weight: 600;
-            color: var(--olympic-blue);
+            color: #1f2937;
         }
         
         .shift-badge {
-            padding: var(--space-xs) var(--space-md);
-            border-radius: var(--radius-full);
-            font-size: 0.8rem;
-            font-weight: 600;
-            white-space: nowrap;
+            padding: 4px 12px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
         }
         
         .badge-assigned {
-            background: rgba(67, 160, 71, 0.1);
-            color: #2E7D32;
-            border: 1px solid rgba(67, 160, 71, 0.3);
+            background: #d1fae5;
+            color: #065f46;
         }
         
         .badge-unassigned {
-            background: rgba(255, 179, 0, 0.1);
-            color: #F57C00;
-            border: 1px solid rgba(255, 179, 0, 0.3);
+            background: #fef3c7;
+            color: #92400e;
         }
         
-        /* Card Details Grid */
         .shift-details {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: var(--space-md);
-            margin-bottom: var(--space-md);
+            gap: 10px;
+            margin-top: 10px;
         }
         
         .shift-detail {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-xs);
+            font-size: 14px;
+            color: #4b5563;
         }
         
         .shift-detail strong {
-            font-size: 0.75rem;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--slate);
-            font-weight: 600;
-        }
-        
-        .shift-detail span {
-            font-size: 0.95rem;
-            color: var(--charcoal);
-            font-weight: 500;
+            color: #1f2937;
         }
         
         .loading {
@@ -442,49 +275,38 @@
             color: #6b7280;
         }
         
-        /* Statistics Bar */
         .stats {
-            background: var(--snow-white);
-            padding: var(--space-md) var(--space-lg);
-            border-radius: var(--radius-md);
-            margin-bottom: var(--space-lg);
             display: flex;
-            gap: var(--space-xl);
-            align-items: center;
-            box-shadow: var(--shadow-sm);
+            gap: 20px;
+            margin-bottom: 20px;
             flex-wrap: wrap;
         }
         
         .stat-card {
-            display: flex;
-            align-items: center;
-            gap: var(--space-sm);
-        }
-        
-        .stat-label {
-            color: var(--slate);
-            font-size: 0.9rem;
-            font-weight: 500;
+            background: #f3f4f6;
+            padding: 15px 20px;
+            border-radius: 8px;
+            flex: 1;
+            min-width: 150px;
         }
         
         .stat-number {
-            color: var(--olympic-blue);
-            font-size: 1.5rem;
+            font-size: 24px;
             font-weight: 700;
+            color: #667eea;
         }
         
-        /* Responsive Design */
+        .stat-label {
+            font-size: 14px;
+            color: #6b7280;
+            margin-top: 5px;
+        }
+        
         @media (max-width: 768px) {
-            body {
-                padding: var(--space-md);
-            }
-            
-            .header {
-                padding: var(--space-xl) var(--space-lg);
-            }
-            
-            .header h1 {
-                font-size: 1.75rem;
+            .shift-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
             }
             
             .tabs {
@@ -494,146 +316,112 @@
             .tab {
                 width: 100%;
             }
-            
-            .shift-header {
-                flex-direction: column;
-                align-items: flex-start;
-                gap: var(--space-sm);
-            }
-            
-            .shift-details {
-                grid-template-columns: 1fr;
-            }
         }
     </style>
 </head>
 <body>
     <div class="container">
-        <div class="header">
-            <a href="USER_GUIDE.html" target="_blank" style="position: absolute; top: 24px; right: 32px; color: white; text-decoration: none; font-size: 0.9rem; padding: 8px 16px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 8px; transition: all 0.25s; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 500; border: 1px solid rgba(255,255,255,0.2); z-index: 10;" onmouseover="this.style.background='rgba(255,255,255,0.25)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(0)'">
-                <span>❓</span>
-                <span>Help / User Guide</span>
+        <div class="header" style="position: relative;">
+            <a href="USER_GUIDE.html" target="_blank" style="position: absolute; top: 20px; right: 20px; color: #1f2937; text-decoration: none; font-size: 15px; padding: 10px 18px; background: rgba(255,255,255,0.95); border-radius: 8px; transition: all 0.3s; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 600; border: 1px solid rgba(255,255,255,0.3); box-shadow: 0 2px 8px rgba(0,0,0,0.15);" onmouseover="this.style.background='rgba(255,255,255,1)'; this.style.boxShadow='0 4px 12px rgba(0,0,0,0.2)'" onmouseout="this.style.background='rgba(255,255,255,0.95)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)'">
+                <span style="font-size: 20px;">❓</span>
+                <span style="line-height: 1;">Help / User Guide</span>
             </a>
-            <h1>🏔️ Milano Cortina 2026 - Shift Viewer <span id="lastUpdateDisplay" style="font-size: 0.5em; font-weight: 400; opacity: 0.9;"></span></h1>
-            <p>Olympic shift schedule viewing made simple</p>
+            <h1>📅 Shift Schedule Viewer <span id="lastUpdateDisplay" style="font-size: 0.6em; font-weight: normal;"></span></h1>
+            <p>Easy access to shift schedules without spreadsheet hassle</p>
         </div>
         
         <div class="file-input-container" id="fileInputContainer">
-            <h2>📊 Load Shift Schedule</h2>
-            <p>Obtain the latest file from <strong>COLE</strong> • Upload Excel file or load previously saved data</p>
-            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap;">
-                <button id="loadSavedDataBtn" class="file-label" style="display: none;">
+            <h2>Shift Schedule Viewer</h2>
+            <p style="color: #6b7280; margin: 10px 0;">Load your shift schedule data</p>
+            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 20px;">
+                <button id="loadSavedDataBtn" class="file-label" style="padding: 12px 24px; cursor: pointer; display: none;">
                     📂 Load Saved Data
                 </button>
-                <label for="fileInput" class="file-label">
-                    📁 Choose Excel File
+                <label for="fileInput" class="file-label" style="padding: 12px 24px; cursor: pointer;">
+                    📁 Load New File
                 </label>
             </div>
             <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
-            <p id="fileName"></p>
-            <p id="savedDataInfo"></p>
+            <p id="fileName" style="margin-top: 15px; color: #667eea; font-size: 14px;"></p>
+            <p id="savedDataInfo" style="margin-top: 10px; color: #10b981; font-size: 13px;"></p>
         </div>
         
         <div id="appContainer" style="display: none;">
-            
-            <!-- COMPACT CONTROLS ROW -->
-            <div style="background: var(--snow-white); padding: var(--space-md); border-radius: var(--radius-md); margin-bottom: var(--space-md); box-shadow: var(--shadow-sm);">
-                <!-- Tabs -->
-                <div class="tabs" style="margin-bottom: 0;">
+            <div style="display: flex; gap: 15px; align-items: center; flex-wrap: wrap; margin-bottom: 20px;">
+                <div class="tabs" style="flex: 1; min-width: 300px;">
                     <button class="tab active" data-tab="upcoming">📋 Upcoming</button>
-                    <button class="tab" data-tab="current">🔴 Current</button>
+                    <button class="tab" data-tab="current">🔴 Current Shifts</button>
                     <button class="tab" data-tab="today">📆 Today</button>
                     <button class="tab" data-tab="tomorrow">📅 Tomorrow</button>
-                    <button class="tab" data-tab="search">🔍 All</button>
+                    <button class="tab" data-tab="search">🔍 ALL (incl. past)</button>
+                </div>
+                <div style="display: flex; gap: 8px; align-items: center;">
+                    <input 
+                        type="text" 
+                        id="myNameInput" 
+                        placeholder="My name"
+                        style="padding: 8px 12px; border: 2px solid #e5e7eb; border-radius: 6px; font-size: 14px; width: 150px; color: #9ca3af;"
+                    >
+                    <button 
+                        id="myShiftsBtn" 
+                        class="file-label" 
+                        style="padding: 8px 16px; cursor: not-allowed; opacity: 0.5; background: #f3f4f6; color: #000000;"
+                        disabled
+                    >
+                        👤 My Shifts
+                    </button>
+                    <button id="myNameInfoBtn" style="background: #3b82f6; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; cursor: help; font-weight: bold; font-size: 11px; position: relative;" title="My Name Filter Help">
+                        i
+                    </button>
+                    <div id="myNameTooltip" style="display: none; position: absolute; background: #1f2937; color: white; padding: 10px; border-radius: 6px; font-size: 12px; z-index: 1000; max-width: 300px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); margin-top: 120px; margin-left: -250px;">
+                        <strong>My Name Filter:</strong><br>
+                        Enter your name and click "My Shifts" to filter shifts assigned to you. Works with the tab filters (e.g., "Upcoming" + "My Shifts" = your upcoming shifts).
+                    </div>
                 </div>
             </div>
             
-            <!-- COMPACT FILTERS ROW -->
-            <div style="background: var(--snow-white); padding: var(--space-md); border-radius: var(--radius-md); margin-bottom: var(--space-md); box-shadow: var(--shadow-sm);">
-                <div style="display: grid; grid-template-columns: 1fr auto auto; gap: var(--space-sm); align-items: center;">
-                    <!-- Main Search -->
-                    <div style="display: flex; gap: var(--space-sm); align-items: center; position: relative;">
-                        <input type="text" class="search-input" id="searchInput" placeholder="🔍 Search shifts..." style="flex: 1;">
-                        <button id="searchInfoBtn" style="background: var(--olympic-blue); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: help; font-weight: bold; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s;" title="Search Help" onmouseover="this.style.background='var(--deep-navy)'; this.style.transform='scale(1.1)'" onmouseout="this.style.background='var(--olympic-blue)'; this.style.transform='scale(1)'">
-                            i
-                        </button>
-                        <div id="searchTooltip" style="display: none; position: absolute; background: var(--charcoal); color: white; padding: var(--space-md); border-radius: var(--radius-md); font-size: 0.85rem; z-index: 1000; max-width: 420px; box-shadow: var(--shadow-xl); top: 45px; right: 0; line-height: 1.6;">
-                            <strong style="color: var(--sky-blue);">Search Tips:</strong><br>
-                            • <strong>General:</strong> John (searches name, role, venue, type)<br>
-                            • <strong>Multiple terms (AND):</strong> wmr olena<br>
-                            • <strong>Quoted phrase:</strong> "duty manager"<br>
-                            • <strong>Exclude terms:</strong> -RTOC or venue:TOC -RTOC<br>
-                            • <strong>Assignment status:</strong> assigned or unassigned<br>
-                            • <strong>Type search:</strong> virtual or "on site"<br>
-                            • <strong>Combine filters:</strong> unassigned wmr -virtual<br>
-                            • <strong>Specific field:</strong> role:WMR<br>
-                            • <strong>Multiple fields:</strong> name:Olena venue:RTOC<br>
-                            • <strong>Date search:</strong> date:15/11 or date:11/15<br>
-                            &nbsp;&nbsp;(tries both EU and US formats)<br>
-                            • <strong>Date with year:</strong> date:15/11/2025<br>
-                            • Year inference: Nov-Dec→2025, Jan-Mar→2026<br>
-                            • All searches are case insensitive<br>
-                            • Supported fields: name, role, venue, date
-                        </div>
+            <div class="search-container">
+                <div style="display: flex; gap: 10px; align-items: center;">
+                    <input type="text" class="search-input" id="searchInput" placeholder="Search shifts... (hover over blue i for more info)" style="flex: 1;">
+                    <button id="searchInfoBtn" style="background: #3b82f6; color: white; border: none; border-radius: 50%; width: 24px; height: 24px; cursor: help; font-weight: bold; position: relative;" title="Search Help">
+                        i
+                    </button>
+                    <div id="searchTooltip" style="display: none; position: absolute; background: #1f2937; color: white; padding: 12px; border-radius: 8px; font-size: 12px; z-index: 1000; max-width: 420px; box-shadow: 0 4px 6px rgba(0,0,0,0.3); top: 35px; right: 0; line-height: 1.6;">
+                        <strong>Search Tips:</strong><br>
+                        • <strong>General:</strong> John (searches name, role, venue, type)<br>
+                        • <strong>Multiple terms (AND):</strong> wmr olena<br>
+                        • <strong>Quoted phrase:</strong> "duty manager"<br>
+                        • <strong>Assignment status:</strong> assigned or unassigned<br>
+                        • <strong>Type search:</strong> virtual or "on site"<br>
+                        • <strong>Combine filters:</strong> unassigned wmr virtual<br>
+                        • <strong>Specific field:</strong> role:WMR<br>
+                        • <strong>Multiple fields:</strong> name:Olena venue:RTOC<br>
+                        • <strong>Date search:</strong> date:15/11 or date:11/15<br>
+                        &nbsp;&nbsp;(tries both EU and US formats)<br>
+                        • <strong>Date with year:</strong> date:15/11/2025<br>
+                        • Year inference: Nov-Dec→2025, Jan-Mar→2026<br>
+                        • All searches are case insensitive<br>
+                        • Supported fields: name, role, venue, date
                     </div>
-                    
-                    
-                    <!-- My Shifts -->
-                    <div style="display: flex; gap: var(--space-sm); align-items: center; position: relative;">
-                        <input 
-                            type="text" 
-                            id="myNameInput" 
-                            placeholder="My name"
-                            class="search-input"
-                            style="width: 150px; color: #9ca3af;"
-                        >
-                        <button 
-                            id="myShiftsBtn" 
-                            class="file-label" 
-                            style="padding: var(--space-sm) var(--space-md); cursor: not-allowed; opacity: 0.5; background: var(--frost-white); color: var(--charcoal); border: 2px solid var(--silver); white-space: nowrap;"
-                            disabled
-                        >
-                            👤 My Shifts
-                        </button>
-                        <button id="myNameInfoBtn" style="background: var(--olympic-blue); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: help; font-weight: bold; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s;" title="My Name Filter Help" onmouseover="this.style.background='var(--deep-navy)'; this.style.transform='scale(1.1)'" onmouseout="this.style.background='var(--olympic-blue)'; this.style.transform='scale(1)'">
-                            i
-                        </button>
-                        <div id="myNameTooltip" style="display: none; position: absolute; background: var(--charcoal); color: white; padding: var(--space-md); border-radius: var(--radius-md); font-size: 0.85rem; z-index: 1000; max-width: 300px; box-shadow: var(--shadow-xl); top: 45px; right: 0;">
-                            <strong style="color: var(--sky-blue);">My Name Filter:</strong><br>
-                            Enter your name and click "My Shifts" to filter shifts assigned to you. Your name is saved across sessions but the filter is deactivated by default. Works with tab filters (e.g., "Upcoming" + "My Shifts" = your upcoming shifts).
-                        </div>
-                    </div>
-                    
-                    
-                    <!-- Saved Search -->
-                    <div style="display: flex; gap: var(--space-sm); align-items: center; position: relative;">
+                </div>
+                <div class="filters">
+                    <div style="display: flex; gap: 10px; align-items: center;">
                         <input 
                             type="text" 
                             class="search-input" 
                             id="savedSearchInput" 
-                            placeholder="Saved search"
-                            style="width: 200px;"
+                            placeholder="This search will be saved"
+                            style="flex: 1; min-width: 250px;"
                         >
-                        <button class="file-label" id="executeSavedSearch" style="padding: var(--space-sm) var(--space-md); cursor: not-allowed; background: var(--frost-white); color: var(--charcoal); opacity: 0.5; border: 2px solid var(--silver); white-space: nowrap;" disabled>
-                            ▶️ Execute
-                        </button>
-                        <button id="savedSearchInfoBtn" style="background: var(--olympic-blue); color: white; border: none; border-radius: 50%; width: 28px; height: 28px; cursor: help; font-weight: bold; font-size: 0.75rem; display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.15s;" title="Saved Search Help" onmouseover="this.style.background='var(--deep-navy)'; this.style.transform='scale(1.1)'" onmouseout="this.style.background='var(--olympic-blue)'; this.style.transform='scale(1)'">
-                            i
-                        </button>
-                        <div id="savedSearchTooltip" style="display: none; position: absolute; background: var(--charcoal); color: white; padding: var(--space-md); border-radius: var(--radius-md); font-size: 0.85rem; z-index: 1000; max-width: 300px; box-shadow: var(--shadow-xl); top: 45px; right: 0;">
-                            <strong style="color: var(--sky-blue);">Saved Search:</strong><br>
-                            Your search is automatically saved across sessions. Click "Execute" to toggle the search on/off. Uses the same powerful search syntax as the main search box.
+                        <button class="file-label" id="executeSavedSearch" style="padding: 8px 16px; cursor: not-allowed; background: #f3f4f6; color: #000000; opacity: 0.5;" disabled>Execute Saved Search</button>
                     </div>
                 </div>
             </div>
             
-            <!-- RESULTS -->
-            <div style="background: var(--snow-white); padding: var(--space-md); border-radius: var(--radius-md); box-shadow: var(--shadow-sm);">
-                <!-- Compact stats header -->
-                <div id="stats" style="font-size: 11px; color: var(--slate); margin-bottom: 8px; padding-bottom: 6px; border-bottom: 1px solid var(--silver); display: flex; gap: 8px;"></div>
-                <div id="content">
-                    <div class="loading">Loading shifts...</div>
-                </div>
+            <div class="stats" id="stats"></div>
+            
+            <div class="content" id="content">
+                <div class="loading">Loading shifts...</div>
             </div>
         </div>
     </div>
@@ -645,37 +433,6 @@
         let selectedPerson = '';
         let lastUpdateTime = null;
         let myShiftsFilter = ''; // Name filter for "My Shifts"
-        
-        // Copy email to clipboard function
-        function copyEmail(email, button) {
-            navigator.clipboard.writeText(email).then(() => {
-                // Store original button content
-                const originalHTML = button.innerHTML;
-                const originalColor = button.style.color;
-                
-                // Show success feedback
-                button.innerHTML = '✓ Copied!';
-                button.style.color = '#10b981';
-                button.style.borderColor = '#10b981';
-                button.style.background = '#d1fae5';
-                
-                // Reset after 2 seconds
-                setTimeout(() => {
-                    button.innerHTML = originalHTML;
-                    button.style.color = originalColor;
-                    button.style.borderColor = '#d1d5db';
-                    button.style.background = 'transparent';
-                }, 2000);
-            }).catch(err => {
-                console.error('Failed to copy email:', err);
-                button.innerHTML = '✗ Failed';
-                button.style.color = '#ef4444';
-                setTimeout(() => {
-                    button.innerHTML = '📋 Copy';
-                    button.style.color = '#6b7280';
-                }, 2000);
-            });
-        }
         
         const fileInput = document.getElementById('fileInput');
         const fileInputContainer = document.getElementById('fileInputContainer');
@@ -956,18 +713,6 @@
             });
             myNameInfoBtn.addEventListener('mouseleave', () => {
                 myNameTooltip.style.display = 'none';
-            });
-        }
-        
-        // Saved Search info tooltip (hover only)
-        const savedSearchInfoBtn = document.getElementById('savedSearchInfoBtn');
-        const savedSearchTooltip = document.getElementById('savedSearchTooltip');
-        if (savedSearchInfoBtn && savedSearchTooltip) {
-            savedSearchInfoBtn.addEventListener('mouseenter', () => {
-                savedSearchTooltip.style.display = 'block';
-            });
-            savedSearchInfoBtn.addEventListener('mouseleave', () => {
-                savedSearchTooltip.style.display = 'none';
             });
         }
         
@@ -1693,27 +1438,6 @@
                     
                     console.log('Search criteria:', { fieldCriteria, generalTerms, dateCriteria: dateCriteria ? dateCriteria.length + ' dates' : 'none' });
                     
-                    // Parse general terms into positive and negative terms (do this once, not per shift)
-                    let positiveTerms = [];
-                    let negativeTerms = [];
-                    if (generalTerms) {
-                        const regex = /"([^"]+)"|([^\s]+)/g;
-                        let match;
-                        while ((match = regex.exec(generalTerms)) !== null) {
-                            // match[1] is quoted content, match[2] is unquoted word
-                            let term = (match[1] || match[2]).toLowerCase();
-                            
-                            // Check if term starts with - (negative search)
-                            if (term.startsWith('-') && term.length > 1) {
-                                negativeTerms.push(term.substring(1)); // Remove the - prefix
-                            } else {
-                                positiveTerms.push(term);
-                            }
-                        }
-                        console.log('Positive terms:', positiveTerms);
-                        console.log('Negative terms:', negativeTerms);
-                    }
-                    
                     // Apply filters
                     filtered = filtered.filter(shift => {
                         // Check date criteria (if specified)
@@ -1739,21 +1463,19 @@
                             }
                         }
                         
-                        // Check general terms (positive and negative)
-                        if (positiveTerms.length > 0 || negativeTerms.length > 0) {
-                            
-                            // First check negative terms - if any match, exclude this shift
-                            for (const term of negativeTerms) {
-                                const matchesTerm = 
-                                    (shift.name && shift.name.toLowerCase().includes(term)) ||
-                                    (shift.role && shift.role.toLowerCase().includes(term)) ||
-                                    (shift.venue && shift.venue.toLowerCase().includes(term)) ||
-                                    (shift.shiftType && shift.shiftType.toLowerCase().includes(term));
-                                if (matchesTerm) return false; // Exclude if negative term matches
+                        // Check general terms (space-separated terms are AND conditions, quoted strings are single terms)
+                        if (generalTerms) {
+                            // Parse terms, respecting quoted strings
+                            const terms = [];
+                            const regex = /"([^"]+)"|([^\s]+)/g;
+                            let match;
+                            while ((match = regex.exec(generalTerms)) !== null) {
+                                // match[1] is quoted content, match[2] is unquoted word
+                                terms.push((match[1] || match[2]).toLowerCase());
                             }
                             
-                            // Each positive term must match at least one field (AND across terms)
-                            for (const term of positiveTerms) {
+                            // Each term must match at least one field (AND across terms)
+                            for (const term of terms) {
                                 // Check for assignment status keywords
                                 if (term === 'assigned') {
                                     if (!shift.isAssigned) return false;
@@ -1804,11 +1526,10 @@
             const assignedShifts = filtered.filter(s => s.isAssigned).length;
             const unassignedShifts = filtered.filter(s => !s.isAssigned).length;
             
-            // Update stats display as compact inline badges
-            statsElement.innerHTML = 
-                '<span style="background: var(--ice-blue); color: var(--charcoal); padding: 3px 8px; border-radius: 10px; font-weight: 600;">Total: ' + totalShifts + '</span>' +
-                '<span style="background: #d1fae5; color: #065f46; padding: 3px 8px; border-radius: 10px; font-weight: 600;">Assigned: ' + assignedShifts + '</span>' +
-                '<span style="background: #fef3c7; color: #92400e; padding: 3px 8px; border-radius: 10px; font-weight: 600;">Unassigned: ' + unassignedShifts + '</span>';
+            // Update stats display
+            statsElement.innerHTML = '<div>Total: ' + totalShifts + '</div>' +
+                '<div>Assigned: ' + assignedShifts + '</div>' +
+                '<div>Unassigned: ' + unassignedShifts + '</div>';
             
             // Debug logging
             console.log('Render stats:');
@@ -1835,10 +1556,8 @@
                 // Build contact section (horizontal)
                 let contactItems = [];
                 if (shift.email && !shift.email.includes('Unassigned')) {
-                    const emailId = 'email-' + Math.random().toString(36).substr(2, 9);
                     contactItems.push('<a href="msteams:/l/chat/0/0?users=' + shift.email + '" style="color: #667eea; text-decoration: none; font-weight: 500; font-size: 12px;">💬 Teams</a>');
-                    contactItems.push('<span style="color: #6b7280; font-size: 12px;">' + shift.email + '</span>');
-                    contactItems.push('<button onclick="copyEmail(\'' + shift.email + '\', this)" style="background: transparent; border: 1px solid #d1d5db; border-radius: 3px; padding: 1px 5px; cursor: pointer; font-size: 10px; color: #6b7280; transition: all 0.15s; margin-left: 3px;" onmouseover="this.style.background=\'#f3f4f6\'; this.style.borderColor=\'#9ca3af\'" onmouseout="this.style.background=\'transparent\'; this.style.borderColor=\'#d1d5db\'">📋 Copy</button>');
+                    contactItems.push('<span style="color: #9ca3af; font-size: 11px;">' + shift.email + '</span>');
                 }
                 if (shift.professionalPhone) {
                     contactItems.push('<span style="color: #374151; font-size: 12px;" title="Individual phone number">📱 Individual: ' + shift.professionalPhone + '</span>');
@@ -1850,53 +1569,53 @@
                 
                 shiftElement.innerHTML = 
                     // Header with name and role
-                    '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid #e5e7eb;">' +
+                    '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 10px; padding-bottom: 8px; border-bottom: 1px solid #e5e7eb;">' +
                         '<div>' +
-                            '<div style="font-size: 17px; font-weight: 700; color: #1f2937; margin-bottom: 1px; line-height: 1.2;">' + (shift.name || '🔴 Unassigned') + '</div>' +
-                            '<div style="font-size: 14px; color: #667eea; font-weight: 600; line-height: 1.2;">' + (shift.role || 'Unknown Role') + '</div>' +
+                            '<div style="font-size: 17px; font-weight: 700; color: #1f2937; margin-bottom: 2px;">' + (shift.name || '🔴 Unassigned') + '</div>' +
+                            '<div style="font-size: 13px; color: #667eea; font-weight: 500;">' + (shift.role || 'Unknown Role') + '</div>' +
                         '</div>' +
-                        '<div style="background: ' + (shift.isAssigned ? '#10b981' : '#f59e0b') + '; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; line-height: 1.4;">' +
+                        '<div style="background: ' + (shift.isAssigned ? '#10b981' : '#f59e0b') + '; color: white; padding: 3px 10px; border-radius: 10px; font-size: 11px; font-weight: 600;">' +
                             (shift.isAssigned ? '✓ Assigned' : '⚠️ Unassigned') +
                         '</div>' +
                     '</div>' +
                     
                     // Grid layout for details
-                    '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 4px 16px; margin-bottom: 4px;">' +
+                    '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 8px 20px; margin-bottom: 10px;">' +
                         '<div>' +
-                            '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 1px; line-height: 1.3;">📅 Date</div>' +
-                            '<div style="font-size: 13px; color: #1f2937; font-weight: 500; line-height: 1.3;">' + dateStr + '</div>' +
+                            '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 3px;">📅 Date</div>' +
+                            '<div style="font-size: 13px; color: #1f2937; font-weight: 500;">' + dateStr + '</div>' +
                         '</div>' +
                         (shift.venue ? 
                             '<div>' +
-                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 1px; line-height: 1.3;">🏛️ Venue</div>' +
-                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500; line-height: 1.3;">' + shift.venue + '</div>' +
+                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 3px;">🏛️ Venue</div>' +
+                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500;">' + shift.venue + '</div>' +
                             '</div>' : '') +
                         (shift.location ? 
                             '<div>' +
-                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 1px; line-height: 1.3;">📍 Location</div>' +
-                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500; line-height: 1.3;">' + shift.location + '</div>' +
+                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 3px;">📍 Location</div>' +
+                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500;">' + shift.location + '</div>' +
                             '</div>' : '') +
                         (shift.shiftTimeCET ? 
                             '<div>' +
-                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 1px; line-height: 1.3;">⏰ Time (CET)</div>' +
-                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500; line-height: 1.3;">' + shift.shiftTimeCET + '</div>' +
+                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 3px;">⏰ Time (CET)</div>' +
+                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500;">' + shift.shiftTimeCET + '</div>' +
                             '</div>' : '') +
                         (shift.shiftTimeIST ? 
                             '<div>' +
-                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 1px; line-height: 1.3;">⏰ Time (IST)</div>' +
-                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500; line-height: 1.3;">' + shift.shiftTimeIST + '</div>' +
+                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 3px;">⏰ Time (IST)</div>' +
+                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500;">' + shift.shiftTimeIST + '</div>' +
                             '</div>' : '') +
                         (shift.shiftType ? 
                             '<div>' +
-                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 1px; line-height: 1.3;">💼 Type</div>' +
-                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500; line-height: 1.3;">' + shift.shiftType + '</div>' +
+                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 3px;">💼 Type</div>' +
+                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500;">' + shift.shiftType + '</div>' +
                             '</div>' : '') +
                     '</div>' +
                     
                     // Contact section (horizontal)
                     (contactSection ? 
-                        '<div style="background: #f9fafb; padding: 5px 8px; border-radius: 4px; border-left: 2px solid #667eea; margin-top: 4px;">' +
-                            '<span style="font-size: 10px; text-transform: uppercase; color: #667eea; font-weight: 600; margin-right: 8px;">📞</span>' +
+                        '<div style="background: #f9fafb; padding: 6px 10px; border-radius: 6px; border-left: 3px solid #667eea; margin-top: 8px;">' +
+                            '<span style="font-size: 10px; text-transform: uppercase; color: #667eea; font-weight: 600; margin-right: 10px;">📞</span>' +
                             contactSection +
                         '</div>' : '');
                 

@@ -1,6 +1,31 @@
-# ShiftViewer - Recent Improvements
+# ShiftViewer - Changelog
 
-## Overview
+## Version 1.04 - November 10, 2025
+
+### 🔍 New Features
+- **Negative Search**: Exclude terms from search results using `-` prefix
+  - Example: `TOC -RTOC` - Find TOC but exclude RTOC
+  - Example: `unassigned -virtual` - Unassigned non-virtual shifts
+  - Example: `wmr -john` - WMR shifts excluding John
+  - Works with all search types (general, field-specific, quoted phrases)
+  - Multiple exclusions supported: `-virtual -assigned`
+
+### 🚀 Performance Improvements
+- **Optimized Search Parsing**: Term parsing now happens once per search instead of per shift
+  - Significantly faster for large datasets
+  - Reduced memory usage
+  - Better console logging for debugging
+
+### 📚 Documentation
+- Updated USER_GUIDE.html with negative search examples
+- Added search syntax cheat sheet entries for exclusion
+- Updated version to 1.04
+
+---
+
+## Version 1.03 - November 8, 2025
+
+### Overview
 Major enhancements to the ShiftViewer application improving search capabilities, UI/UX, data persistence, and overall usability.
 
 ---
@@ -270,6 +295,6 @@ Potential improvements for consideration:
 
 ---
 
-**Version**: 1.0 (First Official Release)  
-**Release Date**: November 8, 2025  
+**Current Version**: 1.04  
+**Latest Release Date**: November 10, 2025  
 **Repository**: https://github.com/maccorless/ShiftViewer

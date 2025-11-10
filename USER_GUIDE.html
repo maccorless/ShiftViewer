@@ -378,6 +378,23 @@
                     <code>"on site"</code> - Shows on-site shifts (use quotes for spaces)
                 </div>
                 
+                <h3>Negative Search (Exclude Terms) <span class="badge badge-new">NEW</span></h3>
+                <p>Use the minus sign (<code>-</code>) prefix to exclude terms from results.</p>
+                
+                <div class="example">
+                    <strong>Examples:</strong><br>
+                    <code>-RTOC</code> - Exclude shifts containing "RTOC"<br>
+                    <code>venue:TOC -RTOC</code> - Find TOC venue but exclude RTOC<br>
+                    <code>TOC -RTOC</code> - Same as above (general search)<br>
+                    <code>unassigned -virtual</code> - Unassigned non-virtual shifts<br>
+                    <code>wmr -john</code> - WMR shifts excluding John<br>
+                    <code>-virtual -assigned</code> - Exclude multiple terms
+                </div>
+                
+                <div class="tip">
+                    <strong>💡 How It Works:</strong> Negative terms are checked first. If any negative term matches a shift, that shift is excluded from results. Then positive terms are applied normally.
+                </div>
+                
                 <h3>Combining Search Types</h3>
                 <p>Mix and match different search types for powerful filtering.</p>
                 
@@ -386,7 +403,9 @@
                     <code>role:WMR date:15/11</code> - WMR shifts on Nov 15<br>
                     <code>name:Olena venue:RTOC</code> - Olena's shifts at RTOC<br>
                     <code>unassigned wmr virtual</code> - Unassigned virtual WMR shifts<br>
-                    <code>role:WMR date:15/11 virtual</code> - Virtual WMR shifts on Nov 15
+                    <code>role:WMR date:15/11 virtual</code> - Virtual WMR shifts on Nov 15<br>
+                    <code>venue:TOC -RTOC unassigned</code> - Unassigned TOC shifts (excluding RTOC)<br>
+                    <code>wmr -virtual -john</code> - WMR shifts, excluding virtual and John
                 </div>
             </div>
 
@@ -554,7 +573,8 @@
                     <code>unassigned</code> - All unassigned shifts<br>
                     <code>unassigned date:15/11</code> - Unassigned on specific date<br>
                     <code>unassigned wmr</code> - Unassigned WMR roles<br>
-                    <code>unassigned virtual</code> - Unassigned virtual shifts
+                    <code>unassigned virtual</code> - Unassigned virtual shifts<br>
+                    <code>unassigned -virtual</code> - Unassigned on-site shifts only
                 </div>
                 
                 <h3>Personal Workflow</h3>
@@ -697,18 +717,28 @@
                         <td>Filter by shift type</td>
                     </tr>
                     <tr>
+                        <td>Exclude</td>
+                        <td><code>-RTOC</code></td>
+                        <td>Exclude matching terms</td>
+                    </tr>
+                    <tr>
                         <td>Combined</td>
                         <td><code>role:WMR date:15/11 virtual</code></td>
                         <td>All criteria must match</td>
+                    </tr>
+                    <tr>
+                        <td>Combined w/ Exclude</td>
+                        <td><code>venue:TOC -RTOC unassigned</code></td>
+                        <td>Include TOC, exclude RTOC, unassigned only</td>
                     </tr>
                 </table>
             </div>
         </div>
         
         <div class="footer">
-            <p><strong>Milano Cortina 2026 - Shift Viewer v1.03</strong></p>
+            <p><strong>Milano Cortina 2026 - Shift Viewer v1.04</strong></p>
             <p>For support or feature requests, visit: <a href="https://github.com/maccorless/ShiftViewer" target="_blank">GitHub Repository</a></p>
-            <p style="margin-top: 15px; font-size: 0.9em;">Last Updated: November 8, 2025</p>
+            <p style="margin-top: 15px; font-size: 0.9em;">Last Updated: November 10, 2025</p>
         </div>
     </div>
 </body>
