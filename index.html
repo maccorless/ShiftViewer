@@ -210,6 +210,36 @@
             box-shadow: var(--shadow-sm);
         }
         
+        .my-shifts-btn,
+        .execute-saved-search-btn {
+            padding: var(--space-sm) var(--space-lg);
+            border-radius: var(--radius-full);
+            background: linear-gradient(135deg, #4f46e5, #7c3aed);
+            color: white;
+            border: none;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .my-shifts-btn:disabled,
+        .execute-saved-search-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .button-unset-transition {
+            background: linear-gradient(135deg, rgba(79,70,229,0.4), rgba(124,58,237,0.4)) !important;
+            color: #1f2937 !important;
+        }
+
+        .button-unset-complete {
+            background: #f3f4f6 !important;
+            color: #1f2937 !important;
+            box-shadow: none !important;
+        }
+        
         /* Search & Filters Section */
         .search-container {
             background: var(--snow-white);
@@ -353,6 +383,25 @@
             box-shadow: var(--shadow-lg);
             transform: translateY(-2px);
             border-color: var(--olympic-blue);
+        }
+
+        @keyframes criticalFlash {
+            0% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+            50% {
+                opacity: 0.55;
+                transform: translateY(-2px);
+            }
+            100% {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .last-update-flash {
+            animation: criticalFlash 0.8s ease-in-out infinite;
         }
         
         .shift-card.unassigned {
@@ -657,6 +706,7 @@
         let selectedPerson = '';
         let lastUpdateTime = null;
         let myShiftsFilter = ''; // Name filter for "My Shifts"
+        let lastUpdateFlashTimeout = null;
         
         // Cached date computations (refreshed every minute)
         let cachedDates = null;
@@ -682,6 +732,23 @@
             return cachedDates;
         }
         
+        function highlightUnsetButton(button) {
+            if (!button) return;
+            button.classList.remove('button-unset-transition', 'button-unset-complete');
+            // Force reflow to restart animation
+            void button.offsetWidth;
+            button.classList.add('button-unset-transition');
+            setTimeout(() => {
+                if (!button.classList.contains('button-unset-transition')) return;
+                button.classList.remove('button-unset-transition');
+                button.classList.add('button-unset-complete');
+                setTimeout(() => {
+                    button.classList.remove('button-unset-complete');
+                    button.style.background = '#f3f4f6';
+                }, 300);
+            }, 400);
+        }
+
         // Copy email to clipboard function
         function copyEmail(email, button) {
             navigator.clipboard.writeText(email).then(() => {
@@ -973,11 +1040,27 @@
             displayElement.style.backgroundColor = backgroundColor;
             displayElement.style.padding = '4px 12px';
             displayElement.style.borderRadius = '6px';
-            displayElement.style.fontWeight = '500';
+            displayElement.style.fontWeight = hoursDiff >= 48 ? '700' : '500';
             displayElement.style.borderBottom = '1px dotted ' + color;
             displayElement.style.transition = 'all 0.2s ease';
             displayElement.title = tooltip;
             displayElement.textContent = icon + ' (Last update: ' + lastUpdateTime + ')';
+            if (hoursDiff >= 48) {
+                displayElement.classList.add('last-update-flash');
+                if (lastUpdateFlashTimeout) {
+                    clearTimeout(lastUpdateFlashTimeout);
+                }
+                lastUpdateFlashTimeout = setTimeout(() => {
+                    displayElement.classList.remove('last-update-flash');
+                    lastUpdateFlashTimeout = null;
+                }, 5000);
+            } else {
+                displayElement.classList.remove('last-update-flash');
+                if (lastUpdateFlashTimeout) {
+                    clearTimeout(lastUpdateFlashTimeout);
+                    lastUpdateFlashTimeout = null;
+                }
+            }
             
             // Add hover effect to make it clear there's a tooltip
             displayElement.onmouseenter = function() {
@@ -1079,8 +1162,8 @@
                     if (myShiftsFilter === myNameInput.value.trim()) {
                         // Filter is already active with this name - turn it off
                         myShiftsFilter = '';
-                        myShiftsBtn.style.background = '#f3f4f6';
                         myNameInput.style.color = '#9ca3af';
+                        highlightUnsetButton(myShiftsBtn);
                         debug.log('My Shifts filter turned OFF');
                     } else {
                         // Turn filter on - clear search boxes first
@@ -1093,7 +1176,7 @@
                         
                         // Reset Execute Saved Search button if it was active
                         if (executeSavedSearchBtn && executeSavedSearchBtn.style.background === 'rgb(102, 126, 234)') {
-                            executeSavedSearchBtn.style.background = '#f3f4f6';
+                            highlightUnsetButton(executeSavedSearchBtn);
                         }
                         
                         debug.log('My Shifts filter applied:', myShiftsFilter);
@@ -1144,12 +1227,13 @@
                     // Check if already active (search box has the saved search)
                     if (searchInput.value === savedSearchInput.value.trim()) {
                         // Clear the search - change color FIRST
-                        executeSavedSearchBtn.style.background = '#f3f4f6';
+                        highlightUnsetButton(executeSavedSearchBtn);
                         searchInput.value = '';
                         // Force a small delay to ensure color change is visible
                         setTimeout(() => renderShifts(), 0);
                     } else {
                         // Apply the saved search - change color FIRST
+                        executeSavedSearchBtn.classList.remove('button-unset-transition', 'button-unset-complete');
                         executeSavedSearchBtn.style.background = '#667eea';
                         searchInput.value = savedSearchInput.value.trim();
                         // Force a small delay to ensure color change is visible
@@ -1185,81 +1269,110 @@
                     const workbook = XLSX.read(data, { type: 'array' });
                     debug.log('Workbook sheets:', workbook.SheetNames);
                     
-                    const firstSheetName = workbook.SheetNames[0];
-                    debug.log('Using sheet:', firstSheetName);
+                    let processedSheet = '';
+                    let lastError = null;
                     
-                    const worksheet = workbook.Sheets[firstSheetName];
-                    debug.log('Worksheet range:', worksheet['!ref']);
-                    
-                    // First, get the raw data to see the actual structure
-                    const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-                    debug.log('Raw sheet data (first 5 rows):', rawData.slice(0, 5));
-                    
-                    // Try with header: 1 to get array of arrays first
-                    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
-                    debug.log('Parsed JSON data (first 5 rows as arrays):', jsonData.slice(0, 5));
-                    
-                    // Show the structure more clearly
-                    debug.log('\n=== RAW DATA STRUCTURE ===');
-                    for (let i = 0; i < Math.min(5, jsonData.length); i++) {
-                        debug.log(`Row ${i} (${jsonData[i].length} columns):`, jsonData[i]);
-                    }
-                    
-                    if (jsonData.length === 0) {
-                        throw new Error('No data found in the Excel file');
-                    }
-                    
-                    // Find the actual header row (skip metadata rows)
-                    let actualHeaderRowIndex = 0;
-                    for (let i = 0; i < Math.min(5, jsonData.length); i++) {
-                        const row = jsonData[i];
-                        // Look for a row that has 'Date' in first column and other meaningful headers
-                        if (row[0] && row[0].toString().toUpperCase() === 'DATE' && row.length > 5) {
-                            actualHeaderRowIndex = i;
-                            break;
-                        }
-                    }
-                    
-                    debug.log('Using row', actualHeaderRowIndex, 'as headers');
-                    
-                    // Extract last update time from row 0 if it exists
-                    let lastUpdateStr = '';
-                    if (jsonData[0] && jsonData[0][0]) {
-                        const firstCell = jsonData[0][0].toString();
-                        if (firstCell.includes('Last update:')) {
-                            lastUpdateStr = firstCell.replace('Last update:', '').trim();
-                            debug.log('Last update:', lastUpdateStr);
-                            lastUpdateTime = lastUpdateStr;
-                            updateLastUpdateDisplay();
-                        }
-                    }
-                    
-                    // Convert array of arrays to array of objects
-                    const headers = jsonData[actualHeaderRowIndex].map(h => h ? h.toString().trim() : '');
-                    debug.log('Detected headers:', headers);
-                    
-                    const formattedData = jsonData.slice(actualHeaderRowIndex + 1).map((row, rowIndex) => {
-                        const obj = {};
-                        headers.forEach((header, i) => {
-                            obj[header] = (i < row.length) ? row[i] : '';
-                            // If it's the first column and first row after header, log it for debugging
-                            if (i === 0 && rowIndex === 0) {
-                                debug.log('First data cell value:', row[i], 'type:', typeof row[i]);
+                    for (const sheetName of workbook.SheetNames) {
+                        const worksheet = workbook.Sheets[sheetName];
+                        debug.log('Attempting sheet:', sheetName);
+                        debug.log('Worksheet range:', worksheet['!ref']);
+                        
+                        try {
+                            // First, get the raw data to see the actual structure
+                            const rawData = XLSX.utils.sheet_to_json(worksheet, { header: 1, defval: '' });
+                            debug.log('Raw sheet data (first 5 rows):', rawData.slice(0, 5));
+                            
+                            const jsonData = rawData;
+                            debug.log('Parsed JSON data (first 5 rows as arrays):', jsonData.slice(0, 5));
+                            
+                            debug.log('\n=== RAW DATA STRUCTURE ===');
+                            for (let i = 0; i < Math.min(5, jsonData.length); i++) {
+                                debug.log(`Row ${i} (${jsonData[i].length} columns):`, jsonData[i]);
                             }
-                        });
-                        return obj;
-                    });
+                            
+                            if (jsonData.length === 0) {
+                                throw new Error('No data found in the Excel file');
+                            }
+                            
+                            // Find the actual header row (skip metadata rows)
+                            let actualHeaderRowIndex = -1;
+                            const maxHeaderScan = Math.min(jsonData.length, 200);
+                            for (let i = 0; i < maxHeaderScan; i++) {
+                                const row = jsonData[i];
+                                const normalizedCells = row.map(cell => cell ? cell.toString().trim().toUpperCase() : '');
+                                const headerMatches = normalizedCells.filter(cell => ['DATE', 'SHIFT (CET)', 'VENUE', 'ROLE', 'NAME'].includes(cell));
+                                if (headerMatches.length >= 3) {
+                                    actualHeaderRowIndex = i;
+                                    debug.log(`Potential header row at ${i} with matches:`, headerMatches);
+                                    break;
+                                }
+                            }
+
+                            if (actualHeaderRowIndex === -1) {
+                                throw new Error(`Could not locate the header row in sheet "${sheetName}". Please double-check the COLE template.`);
+                            }
+                            
+                            debug.log('Using row', actualHeaderRowIndex, 'as headers');
+                            
+                            // Extract last update time from any metadata row before the headers
+                            let lastUpdateStr = '';
+                            for (let i = 0; i < actualHeaderRowIndex && !lastUpdateStr; i++) {
+                                const row = jsonData[i];
+                                for (let j = 0; j < row.length; j++) {
+                                    const cellValue = row[j];
+                                    if (cellValue && cellValue.toString().includes('Last update:')) {
+                                        lastUpdateStr = cellValue.toString().replace('Last update:', '').trim();
+                                        break;
+                                    }
+                                }
+                            }
+
+                            if (lastUpdateStr) {
+                                debug.log('Last update:', lastUpdateStr);
+                                lastUpdateTime = lastUpdateStr;
+                                updateLastUpdateDisplay();
+                            }
+                            
+                            const headers = jsonData[actualHeaderRowIndex].map(h => h ? h.toString().trim() : '');
+                            debug.log('Detected headers:', headers);
+                            const normalizedHeaders = headers.map(h => h ? h.toString().trim().toUpperCase() : '');
+                            const looksLikeCOLE = normalizedHeaders.includes('DATE') && normalizedHeaders.includes('ROLE');
+                            if (looksLikeCOLE) {
+                                const requiredCOLEHeaders = ['DATE', 'SHIFT (CET)', 'VENUE', 'ROLE', 'NAME'];
+                                const missingHeaders = requiredCOLEHeaders.filter(required => !normalizedHeaders.includes(required));
+                                if (missingHeaders.length > 0) {
+                                    throw new Error(`The Excel file is missing required COLE columns: ${missingHeaders.join(', ')}`);
+                                }
+                            }
+                            
+                            const formattedData = jsonData.slice(actualHeaderRowIndex + 1).map((row, rowIndex) => {
+                                const obj = {};
+                                headers.forEach((header, i) => {
+                                    obj[header] = (i < row.length) ? row[i] : '';
+                                    if (i === 0 && rowIndex === 0) {
+                                        debug.log('First data cell value:', row[i], 'type:', typeof row[i]);
+                                    }
+                                });
+                                return obj;
+                            });
+                            
+                            debug.log('Formatted data (first 2 rows):', formattedData.slice(0, 2));
+                            
+                            processData(formattedData);
+                            fileInputContainer.style.display = 'none';
+                            appContainer.style.display = 'block';
+                            processedSheet = sheetName;
+                            debug.log('File processing completed using sheet:', sheetName);
+                            break;
+                        } catch (sheetError) {
+                            debug.warn(`Sheet ${sheetName} failed:`, sheetError.message);
+                            lastError = sheetError;
+                        }
+                    }
                     
-                    debug.log('Formatted data (first 2 rows):', formattedData.slice(0, 2));
-                    
-                    // Process the data
-                    processData(formattedData);
-                    
-                    // Show the app interface
-                    fileInputContainer.style.display = 'none';
-                    appContainer.style.display = 'block';
-                    
-                    debug.log('File processing completed');
+                    if (!processedSheet) {
+                        throw lastError || new Error('No compatible sheet found in the Excel file.');
+                    }
                 } catch (error) {
                     console.error('Error reading file:', error);
                     console.error('Error stack:', error.stack);
@@ -1276,6 +1389,14 @@
             // Data is already formatted as objects with column names as keys
             const keys = Object.keys(data[0]);
             debug.log('Column names:', keys);
+            const findColumnKey = (target) =>
+                keys.find(key => key && key.toUpperCase() === target);
+            const dateKey = findColumnKey('DATE');
+            
+            if (!dateKey) {
+                console.error('Could not find Date column in COLE format data.');
+                return;
+            }
             
             // Show first 3 data rows for debugging
             debug.log('\n=== FIRST 3 DATA ROWS ===');
@@ -1289,8 +1410,8 @@
             for (let i = 0; i < data.length; i++) {
                 const row = data[i];
                 
-                // Get the date from first column
-                const dateValue = row[keys[0]];
+                // Get the date from the Date column (handles hidden blank leading columns)
+                const dateValue = row[dateKey];
                 if (!dateValue) continue;
                 
                 // Convert Excel date serial number to JavaScript Date
@@ -1326,6 +1447,7 @@
                 
                 // Map columns to shift properties
                 keys.forEach(key => {
+                    if (!key) return;
                     const columnName = key.toUpperCase();
                     const value = row[key] ? row[key].toString().trim() : '';
                     
@@ -1357,6 +1479,7 @@
                             shift.email = value;
                             break;
                         case 'PROFESSIONAL NUMBER':
+                        case 'PERSONAL NUMBER':
                             shift.professionalPhone = value;
                             break;
                         case 'ROLE NUMBER':
@@ -1394,7 +1517,8 @@
             
             // Check if this is COLE format by looking at the keys (column names)
             const firstRowKeys = Object.keys(data[0]);
-            const isCOLEFormat = firstRowKeys.includes('Date') && firstRowKeys.includes('Venue') && firstRowKeys.includes('Role');
+            const normalizedFirstRowKeys = firstRowKeys.map(key => key ? key.toUpperCase() : '');
+            const isCOLEFormat = ['DATE', 'VENUE', 'ROLE'].every(column => normalizedFirstRowKeys.includes(column));
             
             debug.log('First row keys:', firstRowKeys);
             debug.log('Is COLE format:', isCOLEFormat);
@@ -1417,9 +1541,9 @@
             debug.log('Header row index for NAME format:', headerRowIndex);
             
             if (headerRowIndex === -1) {
-                console.error('Could not find header row in Excel data.');
-                debug.log('First column values:', data.slice(0, 5).map(row => row[Object.keys(row)[0]]));
-                return;
+                const firstColumnValues = data.slice(0, 5).map(row => row[Object.keys(row)[0]]);
+                debug.log('First column values:', firstColumnValues);
+                throw new Error('Could not find the NAME-based header row in the Excel data. Please verify the template has not changed.');
             }
             
             // Get the headers (week ranges)
