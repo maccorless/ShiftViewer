@@ -1,0 +1,11 @@
+# OS artifacts
+.DS_Store
+
+# Python virtual environments
+venv/
+.venv/
+
+# Excel inputs and generated inspection output
+*.xlsx
+*.xls
+cole*_structure.txt

@@ -413,70 +413,152 @@
             display: flex;
             justify-content: space-between;
             align-items: start;
-            margin-bottom: var(--space-md);
-            padding-bottom: var(--space-md);
-            border-bottom: 2px solid var(--silver);
+            margin-bottom: 6px;
+            padding-bottom: 4px;
+            border-bottom: 1px solid #e5e7eb;
+        }
+        
+        .shift-header-info {
+            /* Container for name and role */
+            display: block;
         }
         
         .shift-name {
-            font-size: 1.25rem;
+            font-size: 17px;
             font-weight: 700;
-            color: var(--charcoal);
-            margin-bottom: var(--space-xs);
+            color: #1f2937;
+            margin-bottom: 1px;
+            line-height: 1.2;
         }
         
         .shift-role {
-            font-size: 1rem;
+            font-size: 14px;
             font-weight: 600;
-            color: var(--olympic-blue);
+            color: #667eea;
+            line-height: 1.2;
         }
         
         .shift-badge {
-            padding: var(--space-xs) var(--space-md);
-            border-radius: var(--radius-full);
-            font-size: 0.8rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
             font-weight: 600;
-            white-space: nowrap;
+            line-height: 1.4;
+            color: white;
         }
         
         .badge-assigned {
-            background: rgba(67, 160, 71, 0.1);
-            color: #2E7D32;
-            border: 1px solid rgba(67, 160, 71, 0.3);
+            background: #10b981;
         }
         
         .badge-unassigned {
-            background: rgba(255, 179, 0, 0.1);
-            color: #F57C00;
-            border: 1px solid rgba(255, 179, 0, 0.3);
+            background: #f59e0b;
         }
         
         /* Card Details Grid */
         .shift-details {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: var(--space-md);
-            margin-bottom: var(--space-md);
+            grid-template-columns: repeat(auto-fit, minmax(160px, 1fr));
+            gap: 4px 16px;
+            margin-bottom: 4px;
         }
         
         .shift-detail {
-            display: flex;
-            flex-direction: column;
-            gap: var(--space-xs);
+            /* Container for label + value */
+            display: block;
         }
         
-        .shift-detail strong {
-            font-size: 0.75rem;
+        .shift-detail-label {
+            font-size: 10px;
             text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--slate);
+            color: #9ca3af;
+            font-weight: 600;
+            margin-bottom: 1px;
+            line-height: 1.3;
+        }
+        
+        .shift-detail-value {
+            font-size: 13px;
+            color: #1f2937;
+            font-weight: 500;
+            line-height: 1.3;
+        }
+        
+        /* Contact Section */
+        .shift-contact {
+            background: #f9fafb;
+            padding: 5px 8px;
+            border-radius: 4px;
+            border-left: 2px solid #667eea;
+            margin-top: 4px;
+        }
+        
+        .shift-contact-icon {
+            font-size: 10px;
+            text-transform: uppercase;
+            color: #667eea;
+            font-weight: 600;
+            margin-right: 8px;
+        }
+        
+        .shift-contact-separator {
+            color: #d1d5db;
+        }
+        
+        .shift-contact-link {
+            color: #667eea;
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 12px;
+        }
+        
+        .shift-contact-email {
+            color: #6b7280;
+            font-size: 12px;
+        }
+        
+        .shift-contact-phone {
+            color: #374151;
+            font-size: 12px;
+        }
+        
+        .shift-copy-btn {
+            background: transparent;
+            border: 1px solid #d1d5db;
+            border-radius: 3px;
+            padding: 1px 5px;
+            cursor: pointer;
+            font-size: 10px;
+            color: #6b7280;
+            transition: all 0.15s;
+            margin-left: 3px;
+        }
+        
+        .shift-copy-btn:hover {
+            background: #f3f4f6;
+            border-color: #9ca3af;
+        }
+        
+        /* Stats Badges */
+        .stat-badge {
+            padding: 3px 8px;
+            border-radius: 10px;
             font-weight: 600;
         }
         
-        .shift-detail span {
-            font-size: 0.95rem;
+        .stat-badge-total {
+            background: var(--ice-blue);
             color: var(--charcoal);
-            font-weight: 500;
+        }
+        
+        .stat-badge-assigned {
+            background: #d1fae5;
+            color: #065f46;
+        }
+        
+        .stat-badge-unassigned {
+            background: #fef3c7;
+            color: #92400e;
         }
         
         .loading {
@@ -578,7 +660,7 @@
                     📁 Choose Excel File
                 </label>
             </div>
-            <input type="file" id="fileInput" accept=".xlsx,.xls" style="display: none;">
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm" style="display: none;">
             <p id="fileName"></p>
             <p id="savedDataInfo"></p>
         </div>
@@ -688,6 +770,10 @@
     </div>
 
     <script>
+        // ============================================
+        // CONFIGURATION & DEBUG
+        // ============================================
+        
         // Debug flag system - set to true to enable console logging
         // Can also be enabled by running: localStorage.setItem('DEBUG', 'true')
         const DEBUG = localStorage.getItem('DEBUG') === 'true' || false;
@@ -700,6 +786,33 @@
             error: (...args) => console.error(...args) // Always show errors
         };
         
+        // ============================================
+        // SECURITY UTILITIES
+        // ============================================
+        
+        // XSS Protection: Escape HTML entities in user-provided data
+        function escapeHtml(text) {
+            if (text === null || text === undefined) return '';
+            const div = document.createElement('div');
+            div.textContent = String(text);
+            return div.innerHTML;
+        }
+        
+        // Escape for use in HTML attributes (stricter escaping)
+        function escapeAttr(text) {
+            if (text === null || text === undefined) return '';
+            return String(text)
+                .replace(/&/g, '&amp;')
+                .replace(/'/g, '&#39;')
+                .replace(/"/g, '&quot;')
+                .replace(/</g, '&lt;')
+                .replace(/>/g, '&gt;');
+        }
+        
+        // ============================================
+        // APPLICATION STATE
+        // ============================================
+        
         let allShifts = [];
         let currentTab = 'upcoming';
         let allPeople = [];
@@ -707,6 +820,10 @@
         let lastUpdateTime = null;
         let myShiftsFilter = ''; // Name filter for "My Shifts"
         let lastUpdateFlashTimeout = null;
+        
+        // ============================================
+        // UTILITY FUNCTIONS
+        // ============================================
         
         // Cached date computations (refreshed every minute)
         let cachedDates = null;
@@ -780,6 +897,10 @@
             });
         }
         
+        // ============================================
+        // DOM ELEMENT REFERENCES
+        // ============================================
+        
         const fileInput = document.getElementById('fileInput');
         const fileInputContainer = document.getElementById('fileInputContainer');
         const appContainer = document.getElementById('appContainer');
@@ -795,6 +916,10 @@
         const myNameInput = document.getElementById('myNameInput');
         const myShiftsBtn = document.getElementById('myShiftsBtn');
         const stats = document.getElementById('stats');
+        
+        // ============================================
+        // LOCAL STORAGE & DATA PERSISTENCE
+        // ============================================
         
         // LocalStorage functions (works with file:// protocol unlike cookies)
         function saveToStorage(key, value) {
@@ -855,10 +980,14 @@
                 allShifts = data.shifts || [];
                 lastUpdateTime = data.lastUpdate || null;
                 
-                // Convert date strings back to Date objects
+                // Convert date strings back to Date objects and pre-compute dateString
                 allShifts.forEach(shift => {
                     if (shift.date && typeof shift.date === 'string') {
                         shift.date = new Date(shift.date);
+                    }
+                    // Ensure dateString is computed (for data saved before this optimization)
+                    if (shift.date && !shift.dateString) {
+                        shift.dateString = shift.date.toDateString();
                     }
                 });
                 
@@ -907,6 +1036,10 @@
         }
         
         checkSavedData();
+        
+        // ============================================
+        // DATE PARSING UTILITIES
+        // ============================================
         
         function parseSearchDate(dateStr) {
             debug.log('=== parseSearchDate called with:', dateStr);
@@ -1072,6 +1205,10 @@
                 this.style.transform = 'translateY(0)';
             };
         }
+        
+        // ============================================
+        // EVENT HANDLERS & UI INTERACTIONS
+        // ============================================
         
         fileInput.addEventListener('change', handleFileSelect);
         
@@ -1252,6 +1389,10 @@
             });
         });
         
+        // ============================================
+        // EXCEL FILE PARSING
+        // ============================================
+        
         function handleFileSelect(e) {
             const file = e.target.files[0];
             if (!file) return;
@@ -1430,6 +1571,7 @@
                 const shift = {
                     date: date,
                     rawDate: date.toISOString().split('T')[0],
+                    dateString: date.toDateString(), // Pre-computed for filtering performance
                     isAssigned: false,
                     name: '',
                     role: '',
@@ -1601,13 +1743,15 @@
                         // Skip weekends (0 = Sunday, 6 = Saturday)
                         if (d.getDay() === 0 || d.getDay() === 6) continue;
                         
+                        const shiftDate = parseDate(d.toISOString().split('T')[0]);
                         allShifts.push({
-                            date: parseDate(d.toISOString().split('T')[0]),
+                            date: shiftDate,
                             name: name.trim(),
                             role: role,
                             pattern: pattern,
                             isAssigned: true,
                             rawDate: d.toISOString().split('T')[0],
+                            dateString: shiftDate ? shiftDate.toDateString() : '', // Pre-computed for filtering
                             // For backward compatibility with existing UI
                             venue: 'N/A',
                             location: 'N/A',
@@ -1725,6 +1869,10 @@
             allPeople = [...new Set(allShifts.map(s => s.name))].filter(Boolean).sort();
         }
         
+        // ============================================
+        // SEARCH & FILTERING (UNUSED - logic is inline in renderShifts)
+        // ============================================
+        
         function applySearch(shifts, searchTerm) {
             // Parse search parameters
             const params = {};
@@ -1763,9 +1911,8 @@
                             break;
                         case 'date':
                             const targetDate = parseSearchDate(value);
-                            if (targetDate && shift.date) {
-                                const shiftDate = new Date(shift.date);
-                                if (shiftDate.toDateString() !== targetDate.toDateString()) {
+                            if (targetDate && shift.dateString) {
+                                if (shift.dateString !== targetDate.toDateString()) {
                                     return false;
                                 }
                             }
@@ -1776,7 +1923,9 @@
             });
         }
         
-
+        // ============================================
+        // RENDERING
+        // ============================================
         
         function renderShifts() {
             const shiftsContainer = document.getElementById('content');
@@ -1798,9 +1947,8 @@
                 case 'current':
                     const currentHour = now.getHours();
                     filtered = filtered.filter(shift => {
-                        if (!shift.date) return false;
-                        const shiftDate = new Date(shift.date);
-                        const isToday = shiftDate.toDateString() === todayString;
+                        if (!shift.dateString) return false;
+                        const isToday = shift.dateString === todayString;
                         if (isToday && shift.shiftTimeCET) {
                             const timeMatch = shift.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
                             if (timeMatch) {
@@ -1813,24 +1961,13 @@
                     });
                     break;
                 case 'today':
-                    filtered = filtered.filter(shift => {
-                        if (!shift.date) return false;
-                        const shiftDate = new Date(shift.date);
-                        return shiftDate.toDateString() === todayString;
-                    });
+                    filtered = filtered.filter(shift => shift.dateString === todayString);
                     break;
                 case 'tomorrow':
-                    filtered = filtered.filter(shift => {
-                        if (!shift.date) return false;
-                        const shiftDate = new Date(shift.date);
-                        return shiftDate.toDateString() === tomorrowString;
-                    });
+                    filtered = filtered.filter(shift => shift.dateString === tomorrowString);
                     break;
                 case 'upcoming':
-                    filtered = filtered.filter(shift => {
-                        if (!shift.date) return false;
-                        return shift.date >= today;
-                    });
+                    filtered = filtered.filter(shift => shift.date && shift.date >= today);
                     break;
             }
             
@@ -1910,12 +2047,12 @@
                     filtered = filtered.filter(shift => {
                         // Check date criteria (if specified)
                         if (dateCriteria && dateCriteria.length > 0) {
-                            if (!shift.date) return false;
+                            if (!shift.dateString) return false;
                             
                             // Match if shift date matches any of the possible date interpretations
-                            const shiftDateStr = shift.date.toDateString();
+                            // Use pre-computed dateString for performance
                             const matchesDate = dateCriteria.some(searchDate => 
-                                searchDate.toDateString() === shiftDateStr
+                                searchDate.toDateString() === shift.dateString
                             );
                             if (!matchesDate) return false;
                         }
@@ -1998,9 +2135,9 @@
             
             // Update stats display as compact inline badges
             statsElement.innerHTML = 
-                '<span style="background: var(--ice-blue); color: var(--charcoal); padding: 3px 8px; border-radius: 10px; font-weight: 600;">Total: ' + totalShifts + '</span>' +
-                '<span style="background: #d1fae5; color: #065f46; padding: 3px 8px; border-radius: 10px; font-weight: 600;">Assigned: ' + assignedShifts + '</span>' +
-                '<span style="background: #fef3c7; color: #92400e; padding: 3px 8px; border-radius: 10px; font-weight: 600;">Unassigned: ' + unassignedShifts + '</span>';
+                '<span class="stat-badge stat-badge-total">Total: ' + totalShifts + '</span>' +
+                '<span class="stat-badge stat-badge-assigned">Assigned: ' + assignedShifts + '</span>' +
+                '<span class="stat-badge stat-badge-unassigned">Unassigned: ' + unassignedShifts + '</span>';
             
             // Debug logging
             debug.log('Render stats:');
@@ -2014,7 +2151,7 @@
             shiftsContainer.innerHTML = '';
             
             if (filtered.length === 0) {
-                shiftsContainer.innerHTML = '<div style="text-align: center; padding: 40px; color: #666;">No shifts found</div>';
+                shiftsContainer.innerHTML = '<div class="no-results">No shifts found</div>';
                 return;
             }
             
@@ -2024,70 +2161,82 @@
                 
                 const dateStr = shift.date ? shift.date.toLocaleDateString('en-US', { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' }) : 'No date';
                 
-                // Build contact section (horizontal)
+                // Build contact section (horizontal) - escape all user data for XSS protection
                 let contactItems = [];
                 if (shift.email && !shift.email.includes('Unassigned')) {
-                    contactItems.push('<a href="msteams:/l/chat/0/0?users=' + shift.email + '" style="color: #667eea; text-decoration: none; font-weight: 500; font-size: 12px;">💬 Teams</a>');
-                    contactItems.push('<span style="color: #6b7280; font-size: 12px;">' + shift.email + '</span>');
-                    contactItems.push('<button onclick="copyEmail(\'' + shift.email + '\', this)" style="background: transparent; border: 1px solid #d1d5db; border-radius: 3px; padding: 1px 5px; cursor: pointer; font-size: 10px; color: #6b7280; transition: all 0.15s; margin-left: 3px;" onmouseover="this.style.background=\'#f3f4f6\'; this.style.borderColor=\'#9ca3af\'" onmouseout="this.style.background=\'transparent\'; this.style.borderColor=\'#d1d5db\'">📋 Copy</button>');
+                    const safeEmail = escapeHtml(shift.email);
+                    const safeEmailAttr = escapeAttr(shift.email);
+                    const safeEmailUrl = encodeURIComponent(shift.email);
+                    contactItems.push('<a href="msteams:/l/chat/0/0?users=' + safeEmailUrl + '" class="shift-contact-link">💬 Teams</a>');
+                    contactItems.push('<span class="shift-contact-email">' + safeEmail + '</span>');
+                    contactItems.push('<button onclick="copyEmail(\'' + safeEmailAttr + '\', this)" class="shift-copy-btn">📋 Copy</button>');
                 }
                 if (shift.professionalPhone) {
-                    contactItems.push('<span style="color: #374151; font-size: 12px;" title="Individual phone number">📱 Individual: ' + shift.professionalPhone + '</span>');
+                    contactItems.push('<span class="shift-contact-phone" title="Individual phone number">📱 Individual: ' + escapeHtml(shift.professionalPhone) + '</span>');
                 }
                 if (shift.rolePhone) {
-                    contactItems.push('<span style="color: #374151; font-size: 12px;" title="Shared role phone (passed between shifts)">🔄 Role: ' + shift.rolePhone + '</span>');
+                    contactItems.push('<span class="shift-contact-phone" title="Shared role phone (passed between shifts)">🔄 Role: ' + escapeHtml(shift.rolePhone) + '</span>');
                 }
-                let contactSection = contactItems.length > 0 ? contactItems.join(' <span style="color: #d1d5db;">•</span> ') : '';
+                let contactSection = contactItems.length > 0 ? contactItems.join(' <span class="shift-contact-separator">•</span> ') : '';
+                
+                // Escape user-provided data for XSS protection
+                const safeName = shift.name ? escapeHtml(shift.name) : '🔴 Unassigned';
+                const safeRole = shift.role ? escapeHtml(shift.role) : 'Unknown Role';
+                const safeVenue = escapeHtml(shift.venue);
+                const safeLocation = escapeHtml(shift.location);
+                const safeTimeCET = escapeHtml(shift.shiftTimeCET);
+                const safeTimeIST = escapeHtml(shift.shiftTimeIST);
+                const safeType = escapeHtml(shift.shiftType);
                 
                 shiftElement.innerHTML = 
                     // Header with name and role
-                    '<div style="display: flex; justify-content: space-between; align-items: start; margin-bottom: 6px; padding-bottom: 4px; border-bottom: 1px solid #e5e7eb;">' +
-                        '<div>' +
-                            '<div style="font-size: 17px; font-weight: 700; color: #1f2937; margin-bottom: 1px; line-height: 1.2;">' + (shift.name || '🔴 Unassigned') + '</div>' +
-                            '<div style="font-size: 14px; color: #667eea; font-weight: 600; line-height: 1.2;">' + (shift.role || 'Unknown Role') + '</div>' +
+                    '<div class="shift-header">' +
+                        '<div class="shift-header-info">' +
+                            '<div class="shift-name">' + safeName + '</div>' +
+                            '<div class="shift-role">' + safeRole + '</div>' +
                         '</div>' +
-                        '<div style="background: ' + (shift.isAssigned ? '#10b981' : '#f59e0b') + '; color: white; padding: 2px 8px; border-radius: 10px; font-size: 11px; font-weight: 600; line-height: 1.4;">' +
+                        '<div class="shift-badge ' + (shift.isAssigned ? 'badge-assigned' : 'badge-unassigned') + '">' +
                             (shift.isAssigned ? '✓ Assigned' : '⚠️ Unassigned') +
                         '</div>' +
                     '</div>' +
                     
                     // Grid layout for details
-                    '<div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 4px 16px; margin-bottom: 4px;">' +
-                        '<div>' +
-                            '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 1px; line-height: 1.3;">📅 Date</div>' +
-                            '<div style="font-size: 13px; color: #1f2937; font-weight: 500; line-height: 1.3;">' + dateStr + '</div>' +
+                    '<div class="shift-details">' +
+                        '<div class="shift-detail">' +
+                            '<div class="shift-detail-label">📅 Date</div>' +
+                            '<div class="shift-detail-value">' + dateStr + '</div>' +
                         '</div>' +
                         (shift.venue ? 
-                            '<div>' +
-                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 1px; line-height: 1.3;">🏛️ Venue</div>' +
-                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500; line-height: 1.3;">' + shift.venue + '</div>' +
+                            '<div class="shift-detail">' +
+                                '<div class="shift-detail-label">🏛️ Venue</div>' +
+                                '<div class="shift-detail-value">' + safeVenue + '</div>' +
                             '</div>' : '') +
                         (shift.location ? 
-                            '<div>' +
-                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 1px; line-height: 1.3;">📍 Location</div>' +
-                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500; line-height: 1.3;">' + shift.location + '</div>' +
+                            '<div class="shift-detail">' +
+                                '<div class="shift-detail-label">📍 Location</div>' +
+                                '<div class="shift-detail-value">' + safeLocation + '</div>' +
                             '</div>' : '') +
                         (shift.shiftTimeCET ? 
-                            '<div>' +
-                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 1px; line-height: 1.3;">⏰ Time (CET)</div>' +
-                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500; line-height: 1.3;">' + shift.shiftTimeCET + '</div>' +
+                            '<div class="shift-detail">' +
+                                '<div class="shift-detail-label">⏰ Time (CET)</div>' +
+                                '<div class="shift-detail-value">' + safeTimeCET + '</div>' +
                             '</div>' : '') +
                         (shift.shiftTimeIST ? 
-                            '<div>' +
-                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 1px; line-height: 1.3;">⏰ Time (IST)</div>' +
-                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500; line-height: 1.3;">' + shift.shiftTimeIST + '</div>' +
+                            '<div class="shift-detail">' +
+                                '<div class="shift-detail-label">⏰ Time (IST)</div>' +
+                                '<div class="shift-detail-value">' + safeTimeIST + '</div>' +
                             '</div>' : '') +
                         (shift.shiftType ? 
-                            '<div>' +
-                                '<div style="font-size: 10px; text-transform: uppercase; color: #9ca3af; font-weight: 600; margin-bottom: 1px; line-height: 1.3;">💼 Type</div>' +
-                                '<div style="font-size: 13px; color: #1f2937; font-weight: 500; line-height: 1.3;">' + shift.shiftType + '</div>' +
+                            '<div class="shift-detail">' +
+                                '<div class="shift-detail-label">💼 Type</div>' +
+                                '<div class="shift-detail-value">' + safeType + '</div>' +
                             '</div>' : '') +
                     '</div>' +
                     
                     // Contact section (horizontal)
                     (contactSection ? 
-                        '<div style="background: #f9fafb; padding: 5px 8px; border-radius: 4px; border-left: 2px solid #667eea; margin-top: 4px;">' +
-                            '<span style="font-size: 10px; text-transform: uppercase; color: #667eea; font-weight: 600; margin-right: 8px;">📞</span>' +
+                        '<div class="shift-contact">' +
+                            '<span class="shift-contact-icon">📞</span>' +
                             contactSection +
                         '</div>' : '');
                 
