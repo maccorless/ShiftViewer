@@ -9,3 +9,5 @@ venv/
 *.xlsx
 *.xls
 cole*_structure.txt
+.DS_Store
+index.html.backup-pre-calendar-export

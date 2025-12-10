@@ -237,9 +237,10 @@
                     <li><a href="#getting-started">1. Getting Started</a></li>
                     <li><a href="#search">2. Search Features</a></li>
                     <li><a href="#filters">3. Filters & Views</a></li>
-                    <li><a href="#ui">4. Understanding the Interface</a></li>
-                    <li><a href="#tips">5. Tips & Tricks</a></li>
-                    <li><a href="#troubleshooting">6. Troubleshooting</a></li>
+                    <li><a href="#calendar-export">4. Calendar Export</a></li>
+                    <li><a href="#ui">5. Understanding the Interface</a></li>
+                    <li><a href="#tips">6. Tips & Tricks</a></li>
+                    <li><a href="#troubleshooting">7. Troubleshooting</a></li>
                 </ul>
             </div>
 
@@ -492,9 +493,86 @@
                 </ul>
             </div>
 
+            <!-- Calendar Export -->
+            <div class="section" id="calendar-export">
+                <h2>4. Calendar Export <span class="badge badge-new">NEW</span></h2>
+                
+                <p>Export your shifts to an ICS calendar file for import into Outlook, Google Calendar, or other calendar applications.</p>
+                
+                <h3>How to Export</h3>
+                <ol>
+                    <li>Enter your name in the <strong>"My name"</strong> text box</li>
+                    <li>Click <strong>"👤 My Shifts"</strong> to filter to your shifts</li>
+                    <li>The <strong>"📅 Export Calendar"</strong> button appears in the stats bar</li>
+                    <li>Click the button to open the export dialog</li>
+                    <li>Choose whether to show shifts as <strong>Busy</strong> (default) or <strong>Free</strong></li>
+                    <li>Click <strong>"📅 Export"</strong> to download the ICS file</li>
+                </ol>
+                
+                <div class="tip">
+                    <strong>💡 Busy vs Free:</strong><br>
+                    • <strong>Busy:</strong> The time will show as unavailable in your calendar (blocks the time slot)<br>
+                    • <strong>Free:</strong> The event appears but doesn't block your availability (useful for reference only)
+                </div>
+                
+                <h3>Importing into Outlook</h3>
+                <ol>
+                    <li>Double-click the downloaded <code>.ics</code> file, or</li>
+                    <li>In Outlook: File → Open & Export → Import/Export → Import an iCalendar file</li>
+                    <li>Choose to add to your calendar</li>
+                </ol>
+                
+                <h3>Change Tracking</h3>
+                <p>ShiftViewer tracks changes between exports:</p>
+                <ul>
+                    <li><strong>🆕 New:</strong> Shifts added since your last export</li>
+                    <li><strong>✏️ Modified:</strong> Shifts with changed details</li>
+                    <li><strong>⚠️ Removed:</strong> Shifts that no longer exist in the schedule</li>
+                </ul>
+                
+                <div class="warning">
+                    <strong>⚠️ Handling Removed Shifts:</strong><br>
+                    When shifts are removed from the schedule, the export includes cancellation events that attempt to remove them from your calendar. However, this may not work in all calendar applications.<br><br>
+                    The cancelled events will appear with <strong>"CANCELLED:"</strong> prepended to the title. If automatic deletion doesn't work, you may need to manually delete these events from your calendar.
+                </div>
+                
+                <h3>Color-Coding Your Shifts in Outlook <span class="badge badge-tip">RECOMMENDED</span></h3>
+                <p>Make your shifts stand out by assigning a color category in Outlook:</p>
+                
+                <h4>One-Time Setup:</h4>
+                <ol>
+                    <li>After importing, right-click any shift event in your calendar</li>
+                    <li>Select <strong>"Categorize"</strong> → <strong>"All Categories..."</strong></li>
+                    <li>Click <strong>"New"</strong> to create a category</li>
+                    <li>Name it something like <strong>"CO26 Shifts"</strong> or <strong>"Olympics"</strong></li>
+                    <li>Choose a distinctive color (e.g., Olympic Blue, Gold)</li>
+                    <li>Click <strong>OK</strong></li>
+                </ol>
+                
+                <h4>Applying the Category:</h4>
+                <ol>
+                    <li>In Outlook Calendar, switch to <strong>List View</strong> (View → Change View → List)</li>
+                    <li>Sort or filter by the <strong>"Categories"</strong> column to find "ShiftViewer" events</li>
+                    <li>Select all your shift events (Ctrl+Click or Shift+Click)</li>
+                    <li>Right-click → <strong>"Categorize"</strong> → Select your custom category</li>
+                    <li>All selected events will now display in your chosen color</li>
+                </ol>
+                
+                <div class="tip">
+                    <strong>💡 Pro Tip:</strong> All exported shifts include a "ShiftViewer" category tag. You can search for <code>category:ShiftViewer</code> in Outlook to find all your imported shifts.
+                </div>
+                
+                <h4>Quick Category Assignment:</h4>
+                <p>For faster categorization of future imports:</p>
+                <ul>
+                    <li>Create a <strong>Quick Step</strong> in Outlook to apply your category with one click</li>
+                    <li>Or use keyboard shortcut: Select events → Press the category shortcut key (if assigned)</li>
+                </ul>
+            </div>
+
             <!-- Understanding the Interface -->
             <div class="section" id="ui">
-                <h2>4. Understanding the Interface</h2>
+                <h2>5. Understanding the Interface</h2>
                 
                 <h3>Shift Cards</h3>
                 <p>Each shift is displayed as a compact card with all relevant information.</p>
@@ -562,7 +640,7 @@
 
             <!-- Tips & Tricks -->
             <div class="section" id="tips">
-                <h2>5. Tips & Tricks</h2>
+                <h2>6. Tips & Tricks</h2>
                 
                 <h3>Search Efficiency</h3>
                 <ul>
@@ -620,7 +698,7 @@
 
             <!-- Troubleshooting -->
             <div class="section" id="troubleshooting">
-                <h2>6. Troubleshooting</h2>
+                <h2>7. Troubleshooting</h2>
                 
                 <h3>No Shifts Showing</h3>
                 <ul>
@@ -741,10 +819,10 @@
         </div>
         
         <div class="footer">
-            <p><strong>Milano Cortina 2026 - Shift Viewer v1.06</strong></p>
+            <p><strong>Milano Cortina 2026 - Shift Viewer v1.07</strong></p>
             <p>For support or feature requests, visit: <a href="https://github.com/maccorless/ShiftViewer" target="_blank">GitHub Repository</a></p>
             <p style="margin-top: 15px; font-size: 0.9em;"><strong>💡 Developer Tip:</strong> Enable debug logging by opening browser console and running: <code>localStorage.setItem('DEBUG', 'true')</code> then refresh the page.</p>
-            <p style="margin-top: 5px; font-size: 0.9em;">Last Updated: November 10, 2025</p>
+            <p style="margin-top: 5px; font-size: 0.9em;">Last Updated: December 10, 2025</p>
         </div>
     </div>
 </body>

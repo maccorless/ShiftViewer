@@ -573,6 +573,220 @@
             color: #6b7280;
         }
         
+        /* Calendar Export Button */
+        .export-calendar-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, #059669, #047857);
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            margin-left: auto;
+        }
+        
+        .export-calendar-btn:hover {
+            background: linear-gradient(135deg, #047857, #065f46);
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(5, 150, 105, 0.3);
+        }
+        
+        .export-calendar-btn:active {
+            transform: translateY(0);
+        }
+        
+        /* Export Modal Overlay */
+        .export-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(4px);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .export-modal-overlay.show {
+            display: flex;
+        }
+        
+        .export-modal {
+            background: var(--snow-white);
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            max-width: 480px;
+            width: 90%;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: modalSlideIn 0.25s ease;
+        }
+        
+        @keyframes modalSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+        
+        .export-modal-header {
+            padding: var(--space-lg);
+            border-bottom: 1px solid var(--silver);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .export-modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+            color: var(--charcoal);
+        }
+        
+        .export-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: var(--slate);
+            padding: 4px;
+            line-height: 1;
+            transition: color 0.15s;
+        }
+        
+        .export-modal-close:hover {
+            color: var(--charcoal);
+        }
+        
+        .export-modal-body {
+            padding: var(--space-lg);
+        }
+        
+        .export-option {
+            padding: var(--space-md);
+            border: 2px solid var(--silver);
+            border-radius: var(--radius-md);
+            margin-bottom: var(--space-md);
+            cursor: pointer;
+            transition: all 0.15s ease;
+        }
+        
+        .export-option:hover {
+            border-color: var(--olympic-blue);
+            background: var(--ice-blue);
+        }
+        
+        .export-option-title {
+            font-weight: 600;
+            color: var(--charcoal);
+            margin-bottom: 4px;
+        }
+        
+        .export-option-desc {
+            font-size: 0.85rem;
+            color: var(--slate);
+        }
+        
+        .export-option-count {
+            display: inline-block;
+            background: var(--olympic-blue);
+            color: white;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            margin-left: 8px;
+        }
+        
+        .export-changes-summary {
+            margin-top: var(--space-lg);
+            padding: var(--space-md);
+            background: var(--frost-white);
+            border-radius: var(--radius-sm);
+            border-left: 3px solid var(--olympic-blue);
+        }
+        
+        .export-changes-title {
+            font-weight: 600;
+            font-size: 0.9rem;
+            color: var(--charcoal);
+            margin-bottom: var(--space-sm);
+        }
+        
+        .export-changes-stats {
+            display: flex;
+            gap: var(--space-md);
+            flex-wrap: wrap;
+            font-size: 0.85rem;
+        }
+        
+        .export-change-new { color: #059669; }
+        .export-change-modified { color: #d97706; }
+        .export-change-removed { color: #dc2626; }
+        
+        .export-removed-list {
+            margin-top: var(--space-sm);
+            padding-top: var(--space-sm);
+            border-top: 1px solid var(--silver);
+            font-size: 0.8rem;
+            color: var(--slate);
+            max-height: 150px;
+            overflow-y: auto;
+        }
+        
+        .export-removed-item {
+            padding: 4px 0;
+            color: #dc2626;
+        }
+        
+        .export-toggle-removed {
+            background: none;
+            border: none;
+            color: var(--olympic-blue);
+            cursor: pointer;
+            font-size: 0.85rem;
+            padding: 0;
+            margin-top: var(--space-sm);
+        }
+        
+        .export-toggle-removed:hover {
+            text-decoration: underline;
+        }
+        
+        .export-modal-footer {
+            padding: var(--space-md) var(--space-lg);
+            border-top: 1px solid var(--silver);
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .export-cancel-btn {
+            padding: var(--space-sm) var(--space-lg);
+            background: var(--frost-white);
+            border: 2px solid var(--silver);
+            border-radius: var(--radius-sm);
+            color: var(--charcoal);
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.15s;
+        }
+        
+        .export-cancel-btn:hover {
+            background: var(--silver);
+        }
+        
         /* Statistics Bar */
         .stats {
             background: var(--snow-white);
@@ -768,6 +982,53 @@
             </div>
         </div>
     </div>
+    
+    <!-- Calendar Export Modal -->
+    <div id="exportModal" class="export-modal-overlay">
+        <div class="export-modal">
+            <div class="export-modal-header">
+                <h3>📅 Export Shifts to Calendar</h3>
+                <button class="export-modal-close" onclick="closeExportModal()">&times;</button>
+            </div>
+            <div class="export-modal-body">
+                <p style="margin-bottom: var(--space-md); color: var(--slate);">
+                    Export <strong><span id="exportDisplayedCount">0</span> displayed shifts</strong> to an ICS calendar file.
+                </p>
+                
+                <!-- Show As Option -->
+                <div style="margin-bottom: var(--space-md); padding: var(--space-md); background: var(--frost-white); border-radius: var(--radius-sm); border: 1px solid var(--silver);">
+                    <div style="font-weight: 600; color: var(--charcoal); margin-bottom: var(--space-sm); font-size: 0.9rem;">Show time as:</div>
+                    <div style="display: flex; gap: var(--space-md);">
+                        <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                            <input type="radio" name="showAs" value="BUSY" checked style="accent-color: var(--olympic-blue);">
+                            <span style="font-size: 0.9rem; color: var(--charcoal);">Busy</span>
+                        </label>
+                        <label style="display: flex; align-items: center; gap: var(--space-sm); cursor: pointer;">
+                            <input type="radio" name="showAs" value="FREE" style="accent-color: var(--olympic-blue);">
+                            <span style="font-size: 0.9rem; color: var(--charcoal);">Free</span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div id="exportChangesSummary" class="export-changes-summary" style="display: none;">
+                    <div class="export-changes-title">Changes since last export:</div>
+                    <div class="export-changes-stats">
+                        <span class="export-change-new">🆕 <span id="exportNewCount">0</span> new</span>
+                        <span class="export-change-modified">✏️ <span id="exportModifiedCount">0</span> modified</span>
+                        <span class="export-change-removed">⚠️ <span id="exportRemovedCount">0</span> removed</span>
+                    </div>
+                    <button id="exportToggleRemoved" class="export-toggle-removed" onclick="toggleRemovedList()" style="display: none;">
+                        Show removed shifts...
+                    </button>
+                    <div id="exportRemovedList" class="export-removed-list" style="display: none;"></div>
+                </div>
+            </div>
+            <div class="export-modal-footer">
+                <button class="export-cancel-btn" onclick="closeExportModal()">Cancel</button>
+                <button class="export-calendar-btn" onclick="exportShifts()" style="margin-left: var(--space-sm);">📅 Export</button>
+            </div>
+        </div>
+    </div>
 
     <script>
         // ============================================
@@ -896,6 +1157,482 @@
                 }, 2000);
             });
         }
+        
+        // ============================================
+        // CALENDAR EXPORT FUNCTIONS
+        // ============================================
+        
+        // Generate a stable UID for a shift (used for change detection)
+        function generateShiftUID(shift) {
+            // Format: mico26-YYYYMMDD-VENUE-ROLE-HHMM@shiftviewer
+            const dateStr = shift.date ? 
+                shift.date.getFullYear().toString() +
+                String(shift.date.getMonth() + 1).padStart(2, '0') +
+                String(shift.date.getDate()).padStart(2, '0') : 'NODATE';
+            
+            // Extract start time from shiftTimeCET (e.g., "08:00-16:00" -> "0800")
+            let startTime = '0000';
+            if (shift.shiftTimeCET) {
+                const timeMatch = shift.shiftTimeCET.match(/(\d{1,2}):(\d{2})/);
+                if (timeMatch) {
+                    startTime = String(timeMatch[1]).padStart(2, '0') + timeMatch[2];
+                }
+            }
+            
+            // Sanitize venue and role for UID (remove spaces, special chars)
+            const venue = (shift.venue || 'UNKNOWN').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            const role = (shift.role || 'UNKNOWN').replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
+            
+            return `mico26-${dateStr}-${venue}-${role}-${startTime}@shiftviewer`;
+        }
+        
+        // Generate shift hash for detecting modifications (includes all relevant fields)
+        function generateShiftHash(shift) {
+            const parts = [
+                shift.date ? shift.date.toISOString().split('T')[0] : '',
+                shift.venue || '',
+                shift.role || '',
+                shift.shiftTimeCET || '',
+                shift.location || '',
+                shift.shiftType || ''
+            ];
+            return parts.join('|');
+        }
+        
+        // Format date for ICS (YYYYMMDD)
+        function formatICSDate(date) {
+            return date.getFullYear().toString() +
+                String(date.getMonth() + 1).padStart(2, '0') +
+                String(date.getDate()).padStart(2, '0');
+        }
+        
+        // Format datetime for ICS with timezone (YYYYMMDDTHHMMSS)
+        function formatICSDateTime(date, hours, minutes) {
+            return formatICSDate(date) + 'T' +
+                String(hours).padStart(2, '0') +
+                String(minutes).padStart(2, '0') + '00';
+        }
+        
+        // Parse shift time string to get start and end hours/minutes
+        function parseShiftTime(timeStr) {
+            // Expected format: "08:00-16:00" or "08:00 - 16:00"
+            const match = timeStr.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+            if (match) {
+                return {
+                    startHour: parseInt(match[1]),
+                    startMin: parseInt(match[2]),
+                    endHour: parseInt(match[3]),
+                    endMin: parseInt(match[4])
+                };
+            }
+            // Default to 9-5 if parsing fails
+            return { startHour: 9, startMin: 0, endHour: 17, endMin: 0 };
+        }
+        
+        // Escape special characters for ICS format
+        function escapeICS(text) {
+            if (!text) return '';
+            return text
+                .replace(/\\/g, '\\\\')
+                .replace(/;/g, '\\;')
+                .replace(/,/g, '\\,')
+                .replace(/\n/g, '\\n');
+        }
+        
+        // Generate ICS file content for shifts
+        // removedShifts: array of {uid, date, venue, role, time} for cancelled events
+        function generateICSContent(shifts, showAsBusy = true, removedShifts = []) {
+            const lines = [
+                'BEGIN:VCALENDAR',
+                'VERSION:2.0',
+                'PRODID:-//ShiftViewer//Milano Cortina 2026//EN',
+                'CALSCALE:GREGORIAN',
+                'METHOD:PUBLISH',
+                'X-WR-CALNAME:My CO26 Shifts',
+                'X-WR-TIMEZONE:Europe/Rome',
+                // Timezone definition for CET/CEST
+                'BEGIN:VTIMEZONE',
+                'TZID:Europe/Rome',
+                'BEGIN:DAYLIGHT',
+                'TZOFFSETFROM:+0100',
+                'TZOFFSETTO:+0200',
+                'TZNAME:CEST',
+                'DTSTART:19700329T020000',
+                'RRULE:FREQ=YEARLY;BYMONTH=3;BYDAY=-1SU',
+                'END:DAYLIGHT',
+                'BEGIN:STANDARD',
+                'TZOFFSETFROM:+0200',
+                'TZOFFSETTO:+0100',
+                'TZNAME:CET',
+                'DTSTART:19701025T030000',
+                'RRULE:FREQ=YEARLY;BYMONTH=10;BYDAY=-1SU',
+                'END:STANDARD',
+                'END:VTIMEZONE'
+            ];
+            
+            const now = new Date();
+            const dtstamp = formatICSDate(now) + 'T' + 
+                String(now.getUTCHours()).padStart(2, '0') +
+                String(now.getUTCMinutes()).padStart(2, '0') +
+                String(now.getUTCSeconds()).padStart(2, '0') + 'Z';
+            
+            // Add confirmed events for current shifts
+            shifts.forEach(shift => {
+                const uid = generateShiftUID(shift);
+                const time = parseShiftTime(shift.shiftTimeCET || '09:00-17:00');
+                
+                // Build description
+                const descParts = [];
+                if (shift.role) descParts.push('Role: ' + shift.role);
+                if (shift.venue) descParts.push('Venue: ' + shift.venue);
+                if (shift.location) descParts.push('Location: ' + shift.location);
+                if (shift.shiftType) descParts.push('Type: ' + shift.shiftType);
+                if (shift.shiftTimeCET) descParts.push('Time: ' + shift.shiftTimeCET + ' CET');
+                const description = descParts.join('\\n');
+                
+                // Build summary: [Role] @ [Venue]
+                const summary = (shift.role || 'Shift') + ' @ ' + (shift.venue || 'TBD');
+                
+                // Build location
+                const location = [shift.venue, shift.location].filter(Boolean).join(' - ');
+                
+                lines.push('BEGIN:VEVENT');
+                lines.push('UID:' + uid);
+                lines.push('DTSTAMP:' + dtstamp);
+                lines.push('DTSTART;TZID=Europe/Rome:' + formatICSDateTime(shift.date, time.startHour, time.startMin));
+                lines.push('DTEND;TZID=Europe/Rome:' + formatICSDateTime(shift.date, time.endHour, time.endMin));
+                lines.push('SUMMARY:' + escapeICS(summary));
+                if (location) lines.push('LOCATION:' + escapeICS(location));
+                if (description) lines.push('DESCRIPTION:' + description);
+                lines.push('CATEGORIES:ShiftViewer');
+                // Outlook-specific color category (X-MICROSOFT-CDO properties)
+                const busyStatus = showAsBusy ? 'BUSY' : 'FREE';
+                const transp = showAsBusy ? 'OPAQUE' : 'TRANSPARENT';
+                lines.push('X-MICROSOFT-CDO-BUSYSTATUS:' + busyStatus);
+                lines.push('STATUS:CONFIRMED');
+                lines.push('TRANSP:' + transp);
+                lines.push('END:VEVENT');
+            });
+            
+            // Add cancellation events for removed shifts
+            // These request deletion of previously exported events
+            removedShifts.forEach(removed => {
+                const time = parseShiftTime(removed.time || '09:00-17:00');
+                const removedDate = new Date(removed.date);
+                const summary = 'CANCELLED: ' + (removed.role || 'Shift') + ' @ ' + (removed.venue || 'TBD');
+                
+                lines.push('BEGIN:VEVENT');
+                lines.push('UID:' + removed.uid);
+                lines.push('DTSTAMP:' + dtstamp);
+                lines.push('DTSTART;TZID=Europe/Rome:' + formatICSDateTime(removedDate, time.startHour, time.startMin));
+                lines.push('DTEND;TZID=Europe/Rome:' + formatICSDateTime(removedDate, time.endHour, time.endMin));
+                lines.push('SUMMARY:' + escapeICS(summary));
+                lines.push('STATUS:CANCELLED');
+                lines.push('METHOD:CANCEL');
+                lines.push('SEQUENCE:1');
+                lines.push('END:VEVENT');
+            });
+            
+            lines.push('END:VCALENDAR');
+            return lines.join('\r\n');
+        }
+        
+        // Get last export data from localStorage
+        function getLastExportData() {
+            try {
+                const data = localStorage.getItem('shiftExport');
+                return data ? JSON.parse(data) : null;
+            } catch (e) {
+                console.error('Error reading export data:', e);
+                return null;
+            }
+        }
+        
+        // Save export data to localStorage
+        function saveExportData(shifts) {
+            try {
+                const exportData = {
+                    lastExportDate: new Date().toISOString(),
+                    shifts: shifts.map(s => ({
+                        uid: generateShiftUID(s),
+                        hash: generateShiftHash(s),
+                        date: s.date ? s.date.toISOString().split('T')[0] : '',
+                        venue: s.venue || '',
+                        role: s.role || '',
+                        time: s.shiftTimeCET || ''
+                    }))
+                };
+                localStorage.setItem('shiftExport', JSON.stringify(exportData));
+                debug.log('Export data saved:', exportData.shifts.length, 'shifts');
+            } catch (e) {
+                console.error('Error saving export data:', e);
+            }
+        }
+        
+        // Calculate changes between current shifts and last export
+        function calculateExportChanges(currentShifts) {
+            const lastExport = getLastExportData();
+            
+            if (!lastExport || !lastExport.shifts || lastExport.shifts.length === 0) {
+                // First export - all shifts are "new"
+                return {
+                    isFirstExport: true,
+                    newShifts: currentShifts,
+                    modifiedShifts: [],
+                    removedShifts: [],
+                    unchangedShifts: []
+                };
+            }
+            
+            const lastShiftMap = new Map();
+            lastExport.shifts.forEach(s => {
+                lastShiftMap.set(s.uid, s);
+            });
+            
+            const currentShiftMap = new Map();
+            currentShifts.forEach(s => {
+                const uid = generateShiftUID(s);
+                currentShiftMap.set(uid, {
+                    shift: s,
+                    hash: generateShiftHash(s)
+                });
+            });
+            
+            const newShifts = [];
+            const modifiedShifts = [];
+            const unchangedShifts = [];
+            const removedShifts = [];
+            
+            // Check current shifts against last export
+            currentShifts.forEach(shift => {
+                const uid = generateShiftUID(shift);
+                const hash = generateShiftHash(shift);
+                const lastShift = lastShiftMap.get(uid);
+                
+                if (!lastShift) {
+                    newShifts.push(shift);
+                } else if (lastShift.hash !== hash) {
+                    modifiedShifts.push(shift);
+                } else {
+                    unchangedShifts.push(shift);
+                }
+            });
+            
+            // Check for removed shifts (in last export but not in current)
+            lastExport.shifts.forEach(lastShift => {
+                if (!currentShiftMap.has(lastShift.uid)) {
+                    removedShifts.push({
+                        uid: lastShift.uid,
+                        date: lastShift.date,
+                        venue: lastShift.venue,
+                        role: lastShift.role,
+                        time: lastShift.time
+                    });
+                }
+            });
+            
+            return {
+                isFirstExport: false,
+                lastExportDate: lastExport.lastExportDate,
+                newShifts,
+                modifiedShifts,
+                removedShifts,
+                unchangedShifts
+            };
+        }
+        
+        // Get shifts filtered by "My Shifts" name
+        function getMyShifts() {
+            if (!myShiftsFilter) return [];
+            return allShifts.filter(shift => 
+                shift.name && shift.name.toLowerCase().includes(myShiftsFilter.toLowerCase())
+            );
+        }
+        
+        // Get currently displayed shifts (respects all active filters)
+        function getDisplayedShifts() {
+            // Re-apply all current filters to get what's displayed
+            let filtered = [...allShifts];
+            
+            // Tab filter
+            const dates = getCachedDates();
+            const { now, today, tomorrow, todayString, tomorrowString } = dates;
+            
+            switch(currentTab) {
+                case 'current':
+                    const currentHour = now.getHours();
+                    filtered = filtered.filter(shift => {
+                        if (!shift.dateString) return false;
+                        const isToday = shift.dateString === todayString;
+                        if (isToday && shift.shiftTimeCET) {
+                            const timeMatch = shift.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+                            if (timeMatch) {
+                                const startHour = parseInt(timeMatch[1]);
+                                const endHour = parseInt(timeMatch[3]);
+                                return currentHour >= startHour && currentHour < endHour;
+                            }
+                        }
+                        return false;
+                    });
+                    break;
+                case 'today':
+                    filtered = filtered.filter(shift => shift.dateString === todayString);
+                    break;
+                case 'tomorrow':
+                    filtered = filtered.filter(shift => shift.dateString === tomorrowString);
+                    break;
+                case 'upcoming':
+                    filtered = filtered.filter(shift => shift.date && shift.date >= today);
+                    break;
+            }
+            
+            // My Shifts filter (required for export)
+            if (myShiftsFilter) {
+                filtered = filtered.filter(shift => 
+                    shift.name && shift.name.toLowerCase().includes(myShiftsFilter.toLowerCase())
+                );
+            }
+            
+            return filtered;
+        }
+        
+        // Open export modal
+        function openExportModal() {
+            const modal = document.getElementById('exportModal');
+            if (!modal) return;
+            
+            // Calculate counts for displayed shifts only
+            const displayedShifts = getDisplayedShifts();
+            
+            document.getElementById('exportDisplayedCount').textContent = displayedShifts.length;
+            
+            // Calculate changes based on displayed shifts
+            const changes = calculateExportChanges(displayedShifts);
+            const summaryEl = document.getElementById('exportChangesSummary');
+            
+            if (changes.isFirstExport) {
+                summaryEl.style.display = 'none';
+            } else {
+                summaryEl.style.display = 'block';
+                document.getElementById('exportNewCount').textContent = changes.newShifts.length;
+                document.getElementById('exportModifiedCount').textContent = changes.modifiedShifts.length;
+                document.getElementById('exportRemovedCount').textContent = changes.removedShifts.length;
+                
+                // Show/hide removed shifts toggle
+                const toggleBtn = document.getElementById('exportToggleRemoved');
+                const removedList = document.getElementById('exportRemovedList');
+                
+                if (changes.removedShifts.length > 0) {
+                    toggleBtn.style.display = 'block';
+                    // Build removed shifts list
+                    removedList.innerHTML = changes.removedShifts.map(s => 
+                        `<div class="export-removed-item">• ${s.date}: ${s.role} @ ${s.venue} (${s.time})</div>`
+                    ).join('');
+                } else {
+                    toggleBtn.style.display = 'none';
+                    removedList.style.display = 'none';
+                }
+            }
+            
+            modal.classList.add('show');
+        }
+        
+        // Close export modal
+        function closeExportModal() {
+            const modal = document.getElementById('exportModal');
+            if (modal) {
+                modal.classList.remove('show');
+                // Reset removed list visibility
+                const removedList = document.getElementById('exportRemovedList');
+                if (removedList) removedList.style.display = 'none';
+                const toggleBtn = document.getElementById('exportToggleRemoved');
+                if (toggleBtn) toggleBtn.textContent = 'Show removed shifts...';
+            }
+        }
+        
+        // Toggle removed shifts list visibility
+        function toggleRemovedList() {
+            const removedList = document.getElementById('exportRemovedList');
+            const toggleBtn = document.getElementById('exportToggleRemoved');
+            
+            if (removedList.style.display === 'none') {
+                removedList.style.display = 'block';
+                toggleBtn.textContent = 'Hide removed shifts';
+            } else {
+                removedList.style.display = 'none';
+                toggleBtn.textContent = 'Show removed shifts...';
+            }
+        }
+        
+        // Export shifts to ICS file
+        function exportShifts() {
+            const shiftsToExport = getDisplayedShifts();
+            
+            if (shiftsToExport.length === 0) {
+                alert('No shifts to export.');
+                return;
+            }
+            
+            // Get the selected showAs value (BUSY or FREE)
+            const showAsRadio = document.querySelector('input[name="showAs"]:checked');
+            const showAsBusy = !showAsRadio || showAsRadio.value === 'BUSY';
+            
+            // Calculate changes to get removed shifts for cancellation events
+            const changes = calculateExportChanges(shiftsToExport);
+            const removedShifts = changes.removedShifts || [];
+            
+            // Generate ICS content with cancellation events for removed shifts
+            const icsContent = generateICSContent(shiftsToExport, showAsBusy, removedShifts);
+            
+            // Save export state for change tracking
+            saveExportData(shiftsToExport);
+            
+            // Create and download file
+            const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            
+            // Generate filename with date
+            const today = new Date();
+            const dateStr = today.getFullYear().toString() +
+                String(today.getMonth() + 1).padStart(2, '0') +
+                String(today.getDate()).padStart(2, '0');
+            link.download = `MyCO26Shifts_${dateStr}.ics`;
+            
+            link.href = url;
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+            
+            // Close modal
+            closeExportModal();
+            
+            debug.log('Exported', shiftsToExport.length, 'shifts to ICS file');
+        }
+        
+        // Update export button visibility based on My Shifts filter state
+        function updateExportButtonVisibility() {
+            const exportBtn = document.getElementById('exportCalendarBtn');
+            if (exportBtn) {
+                exportBtn.style.display = myShiftsFilter ? 'inline-flex' : 'none';
+            }
+        }
+        
+        // Close modal when clicking outside
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('exportModal');
+            if (modal && e.target === modal) {
+                closeExportModal();
+            }
+        });
+        
+        // Close modal on Escape key
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeExportModal();
+            }
+        });
         
         // ============================================
         // DOM ELEMENT REFERENCES
@@ -2134,10 +2871,17 @@
             const unassignedShifts = filtered.filter(s => !s.isAssigned).length;
             
             // Update stats display as compact inline badges
+            // Include export button if My Shifts filter is active
+            const exportButtonHtml = myShiftsFilter ? 
+                '<button id="exportCalendarBtn" class="export-calendar-btn" onclick="openExportModal()">' +
+                    '📅 Export Calendar' +
+                '</button>' : '';
+            
             statsElement.innerHTML = 
                 '<span class="stat-badge stat-badge-total">Total: ' + totalShifts + '</span>' +
                 '<span class="stat-badge stat-badge-assigned">Assigned: ' + assignedShifts + '</span>' +
-                '<span class="stat-badge stat-badge-unassigned">Unassigned: ' + unassignedShifts + '</span>';
+                '<span class="stat-badge stat-badge-unassigned">Unassigned: ' + unassignedShifts + '</span>' +
+                exportButtonHtml;
             
             // Debug logging
             debug.log('Render stats:');
