@@ -289,6 +289,43 @@
                     <em>Hover over the timestamp for detailed information about file age.</em>
                 </div>
             </div>
+            
+            <!-- OneDrive Sync & Version Freshness -->
+            <div class="section" id="onedrive-sync">
+                <h2>OneDrive Sync: Stay on the Latest Version (and skip the landing page)</h2>
+                
+                <div class="tip">
+                    <strong>Why sync?</strong><br>
+                    Syncing the SharePoint folder with OneDrive keeps the Excel file current automatically. You avoid manually pointing ShiftViewer to new downloads and reduce the risk of viewing an old version.
+                </div>
+                
+                <h3>How to configure OneDrive Sync</h3>
+                <ol>
+                    <li>Open the SharePoint page: <a href="https://dtpsso.sharepoint.com/sites/DTEC_COLE_MICO26/SitePages/Published-Shift-Schedule.aspx" target="_blank">DTEC COLE MICO26 - Published Shift Schedule</a></li>
+                    <li>Click <strong>Sync</strong> (OneDrive) for the Published Shift Schedule library.</li>
+                    <li>In File Explorer/Finder, wait for the library to finish syncing (you should see the Excel file locally with a green check).</li>
+                    <li>In ShiftViewer’s landing page, click <strong>Choose Excel File</strong> and select the synced copy in your OneDrive folder (not a manual download).</li>
+                </ol>
+                
+                <h3>Enable the bypass (skip landing next time)</h3>
+                <ol>
+                    <li>On the landing page, check <strong>"I will choose a synced OneDrive file now"</strong> <em>before</em> selecting the file.</li>
+                    <li>Pick the synced OneDrive file once. The app saves your data locally.</li>
+                    <li>On the next visit, ShiftViewer will try to load your saved data and skip the landing page.</li>
+                    <li>If the file or saved data can’t be loaded, ShiftViewer will fall back to the landing page and show an error.</li>
+                </ol>
+                
+                <h3>Reset if something looks wrong</h3>
+                <ol>
+                    <li>Inside ShiftViewer (main screen), open the top-right ☰ menu and click <strong>Reset OneDrive Sync preference</strong> to clear the bypass flag.</li>
+                    <li>Reload: you’ll return to the landing page and can pick the synced file again.</li>
+                </ol>
+                
+                <div class="warning">
+                    <strong>If you see outdated shifts:</strong><br>
+                    Uncheck the bypass, return to the landing page, and reselect the synced file. This will refresh the saved data and restore freshness.
+                </div>
+            </div>
 
             <!-- Search Features -->
             <div class="section" id="search">
