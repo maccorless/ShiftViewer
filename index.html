@@ -1737,11 +1737,13 @@
         const menuToggle = document.getElementById('menuToggle');
         const menuDropdown = document.getElementById('menuDropdown');
         if (menuToggle && menuDropdown) {
-            menuToggle.addEventListener('click', () => {
+            menuToggle.addEventListener('click', (e) => {
+                e.stopPropagation(); // Prevent document click from immediately closing
                 menuDropdown.style.display = menuDropdown.style.display === 'block' ? 'none' : 'block';
             });
             document.addEventListener('click', (e) => {
-                if (!menuDropdown.contains(e.target) && e.target !== menuToggle) {
+                // Use contains() to handle clicks on child elements (e.g., the ☰ span)
+                if (!menuDropdown.contains(e.target) && !menuToggle.contains(e.target)) {
                     menuDropdown.style.display = 'none';
                 }
             });
