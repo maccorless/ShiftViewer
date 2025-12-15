@@ -1328,7 +1328,7 @@
                 lines.push('SUMMARY:' + escapeICS(summary));
                 if (location) lines.push('LOCATION:' + escapeICS(location));
                 if (description) lines.push('DESCRIPTION:' + description);
-                lines.push('CATEGORIES:ShiftViewer');
+                lines.push('CATEGORIES:' + escapeICS('ShiftViewer'));
                 // Outlook-specific color category (X-MICROSOFT-CDO properties)
                 const busyStatus = showAsBusy ? 'BUSY' : 'FREE';
                 const transp = showAsBusy ? 'OPAQUE' : 'TRANSPARENT';
@@ -1339,10 +1339,20 @@
             });
             
             // Add cancellation events for removed shifts
-            // These request deletion of previously exported events
+            // Note: ICS cancellation via STATUS:CANCELLED is a best-effort approach.
+            // True calendar cancellation requires METHOD:CANCEL at the VCALENDAR level,
+            // but that would break new events in the same file. The "CANCELLED:" prefix
+            // in the summary helps users identify events to manually delete if needed.
             removedShifts.forEach(removed => {
                 const time = parseShiftTime(removed.time || '09:00-17:00');
-                const removedDate = new Date(removed.date);
+                // Parse date explicitly to avoid timezone issues with new Date(string)
+                let removedDate;
+                if (removed.date && typeof removed.date === 'string' && removed.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
+                    const [year, month, day] = removed.date.split('-').map(Number);
+                    removedDate = new Date(year, month - 1, day);
+                } else {
+                    removedDate = new Date(removed.date);
+                }
                 const summary = 'CANCELLED: ' + (removed.role || 'Shift') + ' @ ' + (removed.venue || 'TBD');
                 
                 lines.push('BEGIN:VEVENT');
@@ -1352,7 +1362,6 @@
                 lines.push('DTEND;TZID=Europe/Rome:' + formatICSDateTime(removedDate, time.endHour, time.endMin));
                 lines.push('SUMMARY:' + escapeICS(summary));
                 lines.push('STATUS:CANCELLED');
-                lines.push('METHOD:CANCEL');
                 lines.push('SEQUENCE:1');
                 lines.push('END:VEVENT');
             });
@@ -1633,14 +1642,6 @@
             closeExportModal();
             
             debug.log('Exported', shiftsToExport.length, 'shifts to ICS file');
-        }
-        
-        // Update export button visibility based on My Shifts filter state
-        function updateExportButtonVisibility() {
-            const exportBtn = document.getElementById('exportCalendarBtn');
-            if (exportBtn) {
-                exportBtn.style.display = myShiftsFilter ? 'inline-flex' : 'none';
-            }
         }
         
         // Close modal when clicking outside
@@ -2710,60 +2711,6 @@
         function updateFilters() {
             // Update person list
             allPeople = [...new Set(allShifts.map(s => s.name))].filter(Boolean).sort();
-        }
-        
-        // ============================================
-        // SEARCH & FILTERING (UNUSED - logic is inline in renderShifts)
-        // ============================================
-        
-        function applySearch(shifts, searchTerm) {
-            // Parse search parameters
-            const params = {};
-            const paramPattern = /(\w+):([^\s]+|"[^"]+")/g;
-            let match;
-            let hasParams = false;
-            
-            while ((match = paramPattern.exec(searchTerm)) !== null) {
-                hasParams = true;
-                const key = match[1].toLowerCase();
-                const value = match[2].replace(/"/g, '').toLowerCase();
-                params[key] = value;
-            }
-            
-            if (!hasParams) {
-                // Simple text search
-                return shifts.filter(shift => 
-                    shift.name.toLowerCase().includes(searchTerm) ||
-                    shift.role.toLowerCase().includes(searchTerm) ||
-                    shift.venue.toLowerCase().includes(searchTerm)
-                );
-            }
-            
-            // Parameter-based search
-            return shifts.filter(shift => {
-                for (const [key, value] of Object.entries(params)) {
-                    switch(key) {
-                        case 'name':
-                            if (!shift.name.toLowerCase().includes(value)) return false;
-                            break;
-                        case 'venue':
-                            if (!shift.venue.toLowerCase().includes(value)) return false;
-                            break;
-                        case 'role':
-                            if (!shift.role.toLowerCase().includes(value)) return false;
-                            break;
-                        case 'date':
-                            const targetDate = parseSearchDate(value);
-                            if (targetDate && shift.dateString) {
-                                if (shift.dateString !== targetDate.toDateString()) {
-                                    return false;
-                                }
-                            }
-                            break;
-                    }
-                }
-                return true;
-            });
         }
         
         // ============================================
