@@ -1869,6 +1869,26 @@
         if (resetOneDrivePreferenceBtn) {
             resetOneDrivePreferenceBtn.addEventListener('click', () => {
                 setOneDrivePreference(false);
+                
+                // Close the menu
+                if (menuDropdown) {
+                    menuDropdown.style.display = 'none';
+                }
+                
+                // Show visual confirmation toast
+                const toast = document.createElement('div');
+                toast.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #059669, #047857); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; display: flex; align-items: center; gap: 10px; animation: slideDown 0.3s ease;';
+                toast.innerHTML = '<span style="font-size: 1.2rem;">✓</span> OneDrive Sync preference reset. You will see the landing page on next reload.';
+                document.body.appendChild(toast);
+                
+                // Remove toast after 4 seconds
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transition = 'opacity 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 4000);
+                
+                // Also update savedDataInfo for landing page (in case visible)
                 if (savedDataInfo) {
                     savedDataInfo.textContent = 'OneDrive Sync preference cleared. You will see the landing page next time.';
                     savedDataInfo.style.color = '#111827';
