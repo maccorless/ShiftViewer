@@ -256,15 +256,14 @@
                 <div class="tip">
                     <strong>📍 Source File Location:</strong><br>
                     The official shift schedule is published on SharePoint:<br>
-                    <a href="https://dtpsso.sharepoint.com/sites/DTEC_COLE_MICO26/SitePages/Published-Shift-Schedule.aspx" target="_blank">DTEC COLE MICO26 - Published Shift Schedule</a><br>
-                    <em>💡 Tip: On the landing page, you can click the "COLE" link to go directly to SharePoint.</em>
+                    <a href="https://dtpsso.sharepoint.com/sites/DTEC_COLE_MICO26/SitePages/Published-Shift-Schedule.aspx" target="_blank">DTEC COLE MICO26 - Published Shift Schedule</a>
                 </div>
                 
                 <p><strong>Steps to upload:</strong></p>
                 <ol>
-                    <li><strong>Download from SharePoint:</strong> Click the "COLE" link on the landing page (or visit the SharePoint link above) and download the latest shift schedule Excel file to your local drive</li>
+                    <li><strong>Download from SharePoint:</strong> Visit the SharePoint link above and download the latest shift schedule Excel file to your local drive</li>
                     <li><strong>Open ShiftViewer:</strong> Navigate to the ShiftViewer application</li>
-                    <li><strong>Choose File:</strong> Click the <strong>"Choose Excel File"</strong> button on the landing page</li>
+                    <li><strong>Choose File:</strong> Click the <strong>"Choose/Refresh Excel File"</strong> button on the landing page</li>
                     <li><strong>Select File:</strong> Browse to your downloaded Excel file (.xlsx or .xls) and select it</li>
                     <li><strong>Automatic Processing:</strong> The app will automatically parse and display your shifts</li>
                     <li><strong>Auto-Save:</strong> Data is saved to your browser for future sessions</li>
@@ -282,21 +281,21 @@
                 </ol>
                 
                 <div class="tip">
-                    <strong>💡 File Freshness Indicator:</strong> The app displays when your data was last updated in the header with color-coded status:<br>
+                    <strong>💡 File Freshness Indicator:</strong> On the landing page, next to the "Load Saved Data" button, you'll see the file's date with color-coded status:<br>
                     • <strong style="color: #10b981;">✓ Green</strong> = Updated within 24 hours (file is current)<br>
-                    • <strong style="color: #fbbf24;">⚠️ Yellow</strong> = Updated 24-48 hours ago (consider checking for newer version)<br>
-                    • <strong style="color: #fb7185;">❌ Red</strong> = Over 48 hours old (check for more recent file)<br>
-                    <em>Hover over the timestamp for detailed information about file age.</em>
+                    • <strong style="color: #fbbf24;">⚠️ Yellow</strong> = Updated 24-48 hours ago (consider refreshing)<br>
+                    • <strong style="color: #fb7185;">❌ Red</strong> = Over 48 hours old (you should refresh the file)<br>
+                    <em>When the file is stale (yellow/red), the "Choose/Refresh Excel File" button will be highlighted to remind you to update.</em>
                 </div>
             </div>
             
             <!-- OneDrive Sync & Version Freshness -->
             <div class="section" id="onedrive-sync">
-                <h2>OneDrive Sync: Stay on the Latest Version (and skip the landing page)</h2>
+                <h2>OneDrive Sync: Stay on the Latest Version</h2>
                 
                 <div class="tip">
                     <strong>Why sync?</strong><br>
-                    Syncing the SharePoint folder with OneDrive keeps the Excel file current automatically. You avoid manually pointing ShiftViewer to new downloads and reduce the risk of viewing an old version.
+                    Syncing the SharePoint folder with OneDrive keeps the Excel file current automatically. You avoid manually downloading new files and always have the latest version ready to load.
                 </div>
                 
                 <h3>How to configure OneDrive Sync</h3>
@@ -304,26 +303,26 @@
                     <li>Open the SharePoint page: <a href="https://dtpsso.sharepoint.com/sites/DTEC_COLE_MICO26/SitePages/Published-Shift-Schedule.aspx" target="_blank">DTEC COLE MICO26 - Published Shift Schedule</a></li>
                     <li>Click <strong>Sync</strong> (OneDrive) for the Published Shift Schedule library.</li>
                     <li>In File Explorer/Finder, wait for the library to finish syncing (you should see the Excel file locally with a green check).</li>
-                    <li>In ShiftViewer’s landing page, click <strong>Choose Excel File</strong> and select the synced copy in your OneDrive folder (not a manual download).</li>
+                    <li>In ShiftViewer's landing page, click <strong>"Choose/Refresh Excel File"</strong> and select the synced copy in your OneDrive folder.</li>
                 </ol>
                 
-                <h3>Enable the bypass (skip landing next time)</h3>
+                <h3>Refreshing When the File Updates</h3>
+                <p>When the shift schedule is updated on SharePoint, OneDrive will sync the new file to your computer. To load the updated data into ShiftViewer:</p>
                 <ol>
-                    <li>On the landing page, check <strong>"I will choose a synced OneDrive file now"</strong> <em>before</em> selecting the file.</li>
-                    <li>Pick the synced OneDrive file once. The app saves your data locally.</li>
-                    <li>On the next visit, ShiftViewer will try to load your saved data and skip the landing page.</li>
-                    <li>If the file or saved data can’t be loaded, ShiftViewer will fall back to the landing page and show an error.</li>
+                    <li>Return to the ShiftViewer landing page (reload the page or close and reopen)</li>
+                    <li>Click <strong>"Choose/Refresh Excel File"</strong></li>
+                    <li>Select the synced file from your OneDrive folder</li>
+                    <li>The app will load the latest data</li>
                 </ol>
                 
-                <h3>Reset if something looks wrong</h3>
-                <ol>
-                    <li>Inside ShiftViewer (main screen), open the top-right ☰ menu and click <strong>Reset OneDrive Sync preference</strong> to clear the bypass flag.</li>
-                    <li>Reload: you’ll return to the landing page and can pick the synced file again.</li>
-                </ol>
+                <div class="tip">
+                    <strong>💡 Quick Workflow:</strong><br>
+                    Since the file is synced automatically by OneDrive, you just need to reload ShiftViewer and re-select the same file whenever you want the latest schedule. The browser remembers your last folder, making this a quick two-click process.
+                </div>
                 
                 <div class="warning">
-                    <strong>If you see outdated shifts:</strong><br>
-                    Uncheck the bypass, return to the landing page, and reselect the synced file. This will refresh the saved data and restore freshness.
+                    <strong>⚠️ Browser Limitation:</strong><br>
+                    Due to browser security restrictions, ShiftViewer cannot automatically detect when the synced file has been updated. You must manually select the file each time you want to refresh the data.
                 </div>
             </div>
 
@@ -856,10 +855,10 @@
         </div>
         
         <div class="footer">
-            <p><strong>Milano Cortina 2026 - Shift Viewer v1.07</strong></p>
+            <p><strong>Milano Cortina 2026 - Shift Viewer v1.09</strong></p>
             <p>For support or feature requests, visit: <a href="https://github.com/maccorless/ShiftViewer" target="_blank">GitHub Repository</a></p>
             <p style="margin-top: 15px; font-size: 0.9em;"><strong>💡 Developer Tip:</strong> Enable debug logging by opening browser console and running: <code>localStorage.setItem('DEBUG', 'true')</code> then refresh the page.</p>
-            <p style="margin-top: 5px; font-size: 0.9em;">Last Updated: December 10, 2025</p>
+            <p style="margin-top: 5px; font-size: 0.9em;">Last Updated: December 16, 2025</p>
         </div>
     </div>
 </body>

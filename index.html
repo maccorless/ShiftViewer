@@ -399,6 +399,15 @@
                 transform: translateY(0);
             }
         }
+        
+        @keyframes pulse {
+            0%, 100% {
+                box-shadow: 0 0 0 0 rgba(245, 158, 11, 0.7);
+            }
+            50% {
+                box-shadow: 0 0 0 8px rgba(245, 158, 11, 0);
+            }
+        }
 
         .last-update-flash {
             animation: criticalFlash 0.8s ease-in-out infinite;
@@ -855,22 +864,11 @@
 <body>
     <div class="container">
         <div class="header">
-            <div style="position: absolute; top: 20px; right: 24px; display: flex; align-items: center; gap: 12px; z-index: 12;">
-                <a href="USER_GUIDE.html#onedrive-sync" target="_blank" style="color: white; text-decoration: none; font-size: 0.9rem; padding: 8px 16px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 8px; transition: all 0.25s; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 500; border: 1px solid rgba(255,255,255,0.2);" onmouseover="this.style.background='rgba(255,255,255,0.25)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(0)'">
+            <div style="position: absolute; top: 20px; right: 24px; z-index: 12;">
+                <a href="USER_GUIDE.html" target="_blank" style="color: white; text-decoration: none; font-size: 0.9rem; padding: 8px 16px; background: rgba(255,255,255,0.15); backdrop-filter: blur(10px); border-radius: 8px; transition: all 0.25s; display: inline-flex; align-items: center; gap: 8px; white-space: nowrap; font-weight: 500; border: 1px solid rgba(255,255,255,0.2);" onmouseover="this.style.background='rgba(255,255,255,0.25)'; this.style.transform='translateY(-2px)'" onmouseout="this.style.background='rgba(255,255,255,0.15)'; this.style.transform='translateY(0)'">
                     <span>❓</span>
                     <span>Help / User Guide</span>
                 </a>
-                <div style="position: relative;">
-                    <button id="menuToggle" aria-label="Menu" style="background: rgba(255,255,255,0.18); border: 1px solid rgba(255,255,255,0.25); border-radius: 10px; padding: 10px 12px; color: white; cursor: pointer; font-size: 1rem; display: inline-flex; align-items: center; justify-content: center; gap: 6px; transition: all 0.2s;">
-                        <span style="font-size: 1.2rem;">☰</span>
-                    </button>
-                    <div id="menuDropdown" style="display: none; position: absolute; right: 0; margin-top: 6px; background: white; color: #111827; border-radius: 12px; box-shadow: 0 8px 30px rgba(0,0,0,0.15); min-width: 220px; overflow: hidden; border: 1px solid #e5e7eb;">
-                        <button id="resetOneDrivePreferenceMenuItem" style="width: 100%; text-align: left; padding: 12px 14px; border: none; background: white; color: #111827; cursor: pointer; display: flex; align-items: center; gap: 10px; font-size: 0.95rem;">
-                            <span>♻️</span>
-                            <span>Reset OneDrive Sync preference</span>
-                        </button>
-                    </div>
-                </div>
             </div>
             <h1>🏔️ Milano Cortina 2026 - Shift Viewer <span id="lastUpdateDisplay" style="font-size: 0.5em; font-weight: 400; opacity: 0.9;"></span></h1>
             <p>Olympic shift schedule viewing made simple</p>
@@ -878,29 +876,55 @@
         
         <div class="file-input-container" id="fileInputContainer">
             <h2>📊 Load Shift Schedule</h2>
-            <p>Obtain the latest file from <strong><a href="https://dtpsso.sharepoint.com/sites/DTEC_COLE_MICO26/SitePages/Published-Shift-Schedule.aspx" target="_blank" style="color: var(--olympic-blue); text-decoration: none; border-bottom: 2px solid var(--olympic-blue); transition: all 0.2s;" onmouseover="this.style.color='var(--deep-navy)'; this.style.borderBottomColor='var(--deep-navy)'" onmouseout="this.style.color='var(--olympic-blue)'; this.style.borderBottomColor='var(--olympic-blue)'">COLE</a></strong> • Upload Excel file or load previously saved data</p>
-            <div class="tip" style="margin-top: 12px; text-align: left;">
-                <strong>New:</strong> If you sync the SharePoint folder with OneDrive, you no longer
-                need to manually point ShiftViewer to new files—the synced copy stays current.
-                <a href="USER_GUIDE.html#onedrive-sync" target="_blank" style="color: var(--deep-navy); font-weight: 600; margin-left: 6px; text-decoration: underline;">OneDrive Sync guide</a>
-            </div>
-            <div style="display: flex; gap: 15px; justify-content: center; flex-wrap: wrap; margin-top: 12px;">
-                <button id="loadSavedDataBtn" class="file-label" style="display: none;">
-                    📂 Load Saved Data
-                </button>
-                <label for="fileInput" class="file-label">
-                    📁 Choose Excel File
-                </label>
-            </div>
-            <div style="margin-top: 16px; display: flex; gap: 8px; align-items: center; justify-content: center; flex-wrap: wrap;">
-                <label style="display: inline-flex; align-items: center; gap: 8px; cursor: pointer; color: #1f2937;">
-                    <input type="checkbox" id="oneDriveSyncCheckbox" style="accent-color: var(--olympic-blue);">
-                    <span id="oneDriveSyncLabel" style="font-size: 0.95rem;">I will choose a synced OneDrive file now</span>
-                </label>
+            
+            <!-- Buttons Container - centered on page -->
+            <div style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; width: 280px; margin-left: auto; margin-right: auto;">
+                <!-- Saved Data Row -->
+                <div id="savedDataRow" style="display: none; margin-bottom: 12px; position: relative; width: 100%;">
+                    <button id="loadSavedDataBtn" class="file-label" style="margin: 0; width: 100%;">
+                        📂 Load Saved Data
+                    </button>
+                    <span id="savedDataInfo" style="position: absolute; left: 100%; top: 50%; transform: translateY(-50%); font-size: 0.8rem; line-height: 1.4; text-align: left; padding-left: 16px; white-space: nowrap;"></span>
+                </div>
+                
+                <!-- Choose/Refresh Row -->
+                <div style="width: 100%;">
+                    <label id="chooseFileLabel" for="fileInput" class="file-label" style="margin: 0; width: 100%;">
+                        📁 Choose/Refresh Excel File
+                    </label>
+                </div>
             </div>
             <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm" style="display: none;">
-            <p id="fileName"></p>
-            <p id="savedDataInfo"></p>
+            <p id="fileName" style="margin-top: 12px;"></p>
+            
+            <!-- Initial Setup Tip -->
+            <div style="margin-top: 24px; padding: 16px; background: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 100%); border-radius: 8px; border: 1px solid #bae6fd; text-align: left;">
+                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                    <span style="font-size: 1.5rem;">💡</span>
+                    <div>
+                        <strong style="color: var(--deep-navy);">Two Ways to Get the Schedule File</strong>
+                        <p style="margin: 6px 0 0 0; font-size: 0.9rem; color: var(--slate); line-height: 1.6;">
+                            <strong>Option 1 - Manual Download:</strong> Click this <a href="https://dtpsso.sharepoint.com/sites/DTEC_COLE_MICO26/SitePages/Published-Shift-Schedule.aspx" target="_blank" style="color: var(--olympic-blue); font-weight: 500;">COLE link</a>, download the Excel file, then select it here. Repeat each time you want the latest schedule.
+                            <br><br>
+                            <strong>Option 2 - OneDrive Sync (Recommended):</strong> Set up OneDrive sync once, and the file stays current automatically on your computer. You'll still need to click "Choose/Refresh" to reload, but you won't need to download again.
+                            <a href="USER_GUIDE.html#onedrive-sync" target="_blank" style="color: var(--olympic-blue); font-weight: 500; margin-left: 4px;">Setup guide →</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- OneDrive Sync Warning -->
+            <div style="margin-top: 12px; padding: 16px; background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); border-radius: 8px; border: 1px solid #f59e0b; text-align: left;">
+                <div style="display: flex; align-items: flex-start; gap: 12px;">
+                    <span style="font-size: 1.5rem;">⚠️</span>
+                    <div>
+                        <strong style="color: #92400e;">Important: Manual Refresh Always Required</strong>
+                        <p style="margin: 6px 0 0 0; font-size: 0.9rem; color: #78350f; line-height: 1.5;">
+                            Even with OneDrive sync, <strong>you must click "Choose/Refresh Excel File"</strong> each time you want to load updated data. Browser security prevents automatic detection of file changes.
+                        </p>
+                    </div>
+                </div>
+            </div>
         </div>
         
         <div id="appContainer" style="display: none;">
@@ -1678,10 +1702,6 @@
         const myNameInput = document.getElementById('myNameInput');
         const myShiftsBtn = document.getElementById('myShiftsBtn');
         const stats = document.getElementById('stats');
-        const oneDriveSyncCheckbox = document.getElementById('oneDriveSyncCheckbox');
-        const oneDriveSyncLabel = document.getElementById('oneDriveSyncLabel');
-        const syncPreferenceBanner = null; // Banner removed; reset is now in menu
-        const resetOneDrivePreferenceBtn = document.getElementById('resetOneDrivePreferenceMenuItem');
         
         // ============================================
         // LOCAL STORAGE & DATA PERSISTENCE
@@ -1706,47 +1726,6 @@
                 console.error('Error reading from localStorage:', e);
                 return null;
             }
-        }
-        
-        const ONEDRIVE_PREF_KEY = 'oneDriveSyncPreferred';
-        
-        function setOneDriveLabel(preferred) {
-            if (!oneDriveSyncLabel) return;
-            oneDriveSyncLabel.textContent = preferred ? 'I have pointed at a synced OneDrive file' : 'I will choose a synced OneDrive file now';
-        }
-        
-        function setOneDrivePreference(preferred) {
-            saveToStorage(ONEDRIVE_PREF_KEY, preferred ? 'true' : 'false');
-            if (oneDriveSyncCheckbox) {
-                oneDriveSyncCheckbox.checked = preferred;
-            }
-            setOneDriveLabel(preferred);
-            // Banner removed; menu holds reset
-        }
-        
-        function showBypassError(message) {
-            if (savedDataInfo) {
-                savedDataInfo.textContent = message;
-                savedDataInfo.style.color = '#b91c1c';
-            }
-            fileInputContainer.style.display = 'block';
-            appContainer.style.display = 'none';
-        }
-        
-        // Hamburger menu toggle
-        const menuToggle = document.getElementById('menuToggle');
-        const menuDropdown = document.getElementById('menuDropdown');
-        if (menuToggle && menuDropdown) {
-            menuToggle.addEventListener('click', (e) => {
-                e.stopPropagation(); // Prevent document click from immediately closing
-                menuDropdown.style.display = menuDropdown.style.display === 'block' ? 'none' : 'block';
-            });
-            document.addEventListener('click', (e) => {
-                // Use contains() to handle clicks on child elements (e.g., the ☰ span)
-                if (!menuDropdown.contains(e.target) && !menuToggle.contains(e.target)) {
-                    menuDropdown.style.display = 'none';
-                }
-            });
         }
         
         // Load saved search from localStorage on page load
@@ -1778,14 +1757,10 @@
             }
         }
         
-        function loadShiftData(options = {}) {
-            const { showErrorOnFail = false, bypass = false } = options;
+        function loadShiftData() {
             try {
                 const savedData = getFromStorage('shiftData');
                 if (!savedData) {
-                    if (showErrorOnFail && bypass) {
-                        showBypassError('OneDrive sync bypass failed: saved data not found. Please choose the synced file again.');
-                    }
                     return false;
                 }
                 
@@ -1815,15 +1790,9 @@
                 fileInputContainer.style.display = 'none';
                 appContainer.style.display = 'block';
                 
-                // Show banner if bypass preference is set
-                // Banner removed; menu reset remains available
-                
                 return true;
             } catch (e) {
                 console.error('Error loading shift data:', e);
-                if (showErrorOnFail && bypass) {
-                    showBypassError('OneDrive sync bypass failed while loading data. Please choose the synced file again.');
-                }
                 return false;
             }
         }
@@ -1831,23 +1800,75 @@
         // Check for saved data on page load
         function checkSavedData() {
             const savedData = getFromStorage('shiftData');
+            const chooseFileLabel = document.getElementById('chooseFileLabel');
+            
             if (savedData) {
                 try {
                     const data = JSON.parse(savedData);
                     const shiftCount = data.shifts ? data.shifts.length : 0;
                     
-                    // Show the Excel file's last update time, not when we saved to localStorage
-                    let displayText = `Saved data available: ${shiftCount} shifts`;
+                    // Calculate file age and determine color
+                    let ageColor = '#059669'; // Green by default
+                    let ageIcon = '✓';
+                    let isStale = false;
+                    let ageText = '';
+                    
                     if (data.lastUpdate) {
-                        displayText += ` (file updated: ${data.lastUpdate})`;
+                        // Parse the CET time string (format: "07/11/2025 18:15 CET")
+                        const match = data.lastUpdate.match(/(\d{2})\/(\d{2})\/(\d{4})\s+(\d{2}):(\d{2})/);
+                        if (match) {
+                            const day = parseInt(match[1]);
+                            const month = parseInt(match[2]);
+                            const year = parseInt(match[3]);
+                            const hour = parseInt(match[4]);
+                            const minute = parseInt(match[5]);
+                            
+                            const isoString = `${year}-${String(month).padStart(2, '0')}-${String(day).padStart(2, '0')}T${String(hour).padStart(2, '0')}:${String(minute).padStart(2, '0')}:00+01:00`;
+                            const updateDateCET = new Date(isoString);
+                            const now = new Date();
+                            const hoursDiff = (now - updateDateCET) / (1000 * 60 * 60);
+                            
+                            if (hoursDiff < 24) {
+                                ageColor = '#059669'; // Green
+                                ageIcon = '✓';
+                                ageText = Math.floor(hoursDiff) + 'h ago';
+                                if (hoursDiff < 1) ageText = '< 1h ago';
+                            } else if (hoursDiff < 48) {
+                                ageColor = '#d97706'; // Yellow/Orange
+                                ageIcon = '⚠️';
+                                ageText = Math.floor(hoursDiff / 24) + ' day ago';
+                                isStale = true;
+                            } else {
+                                ageColor = '#dc2626'; // Red
+                                ageIcon = '❌';
+                                ageText = Math.floor(hoursDiff / 24) + ' days ago';
+                                isStale = true;
+                            }
+                        }
+                        
+                        // Build display with colored age - two lines
+                        savedDataInfo.innerHTML = `
+                            <div style="color: ${ageColor}; font-weight: 600;">${ageIcon} ${data.lastUpdate} (${ageText})</div>
+                            <div style="color: var(--slate);">${shiftCount} shifts</div>
+                        `;
                     } else {
                         // Fallback to savedAt if lastUpdate not available
                         const savedAt = new Date(data.savedAt);
-                        displayText += ` (saved ${savedAt.toLocaleString()})`;
+                        savedDataInfo.innerHTML = `
+                            <div>Saved: ${savedAt.toLocaleString()}</div>
+                            <div style="color: var(--slate);">${shiftCount} shifts</div>
+                        `;
                     }
                     
-                    savedDataInfo.textContent = displayText;
-                    loadSavedDataBtn.style.display = 'inline-block';
+                    // Show the saved data row
+                    const savedDataRow = document.getElementById('savedDataRow');
+                    if (savedDataRow) savedDataRow.style.display = 'block';
+                    
+                    // Highlight Choose/Refresh button if data is stale
+                    if (chooseFileLabel && isStale) {
+                        chooseFileLabel.style.background = 'linear-gradient(135deg, #f59e0b, #d97706)';
+                        chooseFileLabel.style.animation = 'pulse 2s infinite';
+                    }
                 } catch (e) {
                     console.error('Error checking saved data:', e);
                 }
@@ -1855,53 +1876,6 @@
         }
         
         checkSavedData();
-        
-        // OneDrive Sync preference setup
-        const bypassPreferred = getFromStorage(ONEDRIVE_PREF_KEY) === 'true';
-        setOneDriveLabel(bypassPreferred);
-        if (oneDriveSyncCheckbox) {
-            oneDriveSyncCheckbox.checked = bypassPreferred;
-            oneDriveSyncCheckbox.addEventListener('change', () => {
-                setOneDrivePreference(oneDriveSyncCheckbox.checked);
-            });
-        }
-        
-        if (resetOneDrivePreferenceBtn) {
-            resetOneDrivePreferenceBtn.addEventListener('click', () => {
-                setOneDrivePreference(false);
-                
-                // Close the menu
-                if (menuDropdown) {
-                    menuDropdown.style.display = 'none';
-                }
-                
-                // Show visual confirmation toast
-                const toast = document.createElement('div');
-                toast.style.cssText = 'position: fixed; top: 20px; left: 50%; transform: translateX(-50%); background: linear-gradient(135deg, #059669, #047857); color: white; padding: 12px 24px; border-radius: 8px; font-weight: 600; font-size: 0.95rem; box-shadow: 0 4px 20px rgba(0,0,0,0.2); z-index: 9999; display: flex; align-items: center; gap: 10px; animation: slideDown 0.3s ease;';
-                toast.innerHTML = '<span style="font-size: 1.2rem;">✓</span> OneDrive Sync preference reset. You will see the landing page on next reload.';
-                document.body.appendChild(toast);
-                
-                // Remove toast after 4 seconds
-                setTimeout(() => {
-                    toast.style.opacity = '0';
-                    toast.style.transition = 'opacity 0.3s ease';
-                    setTimeout(() => toast.remove(), 300);
-                }, 4000);
-                
-                // Also update savedDataInfo for landing page (in case visible)
-                if (savedDataInfo) {
-                    savedDataInfo.textContent = 'OneDrive Sync preference cleared. You will see the landing page next time.';
-                    savedDataInfo.style.color = '#111827';
-                }
-            });
-        }
-        
-        function attemptBypassIfPreferred() {
-            if (!bypassPreferred) return;
-            loadShiftData({ showErrorOnFail: true, bypass: true });
-        }
-        
-        attemptBypassIfPreferred();
         
         // ============================================
         // DATE PARSING UTILITIES
@@ -2848,6 +2822,16 @@
                             if (term.startsWith('-') && term.length > 1) {
                                 negativeTerms.push(term.substring(1)); // Remove the - prefix
                             } else {
+                                // Check if term looks like a date pattern (e.g., 12/18, 18/12, 12/18/25)
+                                const datePattern = /^\d{1,2}\/\d{1,2}(\/\d{2,4})?$/;
+                                if (datePattern.test(term) && !dateCriteria) {
+                                    const parsedDates = parseSearchDate(term);
+                                    if (parsedDates && parsedDates.length > 0) {
+                                        dateCriteria = parsedDates;
+                                        debug.log('Auto-detected date from general term:', term, '->', dateCriteria.map(d => d.toDateString()));
+                                        continue; // Don't add to positiveTerms
+                                    }
+                                }
                                 positiveTerms.push(term);
                             }
                         }
