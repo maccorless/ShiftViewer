@@ -126,6 +126,52 @@
             transition: all 0.25s ease;
         }
         
+        /* Loading Overlay */
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(13, 71, 161, 0.85);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            gap: var(--space-lg);
+        }
+        
+        .loading-overlay.active {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            width: 60px;
+            height: 60px;
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-top-color: var(--snow-white);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            color: var(--snow-white);
+            font-size: 1.25rem;
+            font-weight: 500;
+            text-align: center;
+        }
+        
+        .loading-subtext {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 0.95rem;
+            margin-top: -8px;
+        }
+        
         .file-input-container:hover {
             border-color: var(--olympic-blue);
             box-shadow: var(--shadow-lg);
@@ -582,6 +628,32 @@
             color: #6b7280;
         }
         
+        /* Export Buttons */
+        .export-excel-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: var(--snow-white);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .export-excel-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .export-excel-btn:active {
+            transform: translateY(0);
+        }
+        
         /* Calendar Export Button */
         .export-calendar-btn {
             display: inline-flex;
@@ -774,6 +846,203 @@
             text-decoration: underline;
         }
         
+        /* Calendar View Modal */
+        .calendar-modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.7);
+            z-index: 10000;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+        }
+        
+        .calendar-modal-overlay.show {
+            display: flex;
+        }
+        
+        .calendar-modal {
+            background: #f5f7fa;
+            border-radius: var(--radius-lg);
+            box-shadow: var(--shadow-xl);
+            width: 95%;
+            max-width: 1200px;
+            max-height: 90vh;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .calendar-modal-header {
+            padding: var(--space-md) var(--space-lg);
+            background: linear-gradient(135deg, var(--deep-navy) 0%, var(--olympic-blue) 100%);
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .calendar-modal-header h3 {
+            margin: 0;
+            font-size: 1.25rem;
+        }
+        
+        .calendar-modal-close {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: white;
+            cursor: pointer;
+            padding: 0;
+            line-height: 1;
+            opacity: 0.8;
+            transition: opacity 0.15s;
+        }
+        
+        .calendar-modal-close:hover {
+            opacity: 1;
+        }
+        
+        .calendar-modal-body {
+            padding: var(--space-lg);
+            overflow-y: auto;
+            flex: 1;
+        }
+        
+        .calendar-legend {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 20px;
+            padding: 15px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        .calendar-legend-item {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+        }
+        
+        .calendar-legend-color {
+            width: 20px;
+            height: 20px;
+            border-radius: 4px;
+            border: 1px solid rgba(0,0,0,0.1);
+        }
+        
+        .calendar-container {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .calendar-month-header {
+            background: var(--deep-navy);
+            color: white;
+            padding: 12px 20px;
+            font-size: 18px;
+            font-weight: 600;
+        }
+        
+        .calendar-grid {
+            display: grid;
+            grid-template-columns: repeat(7, 1fr);
+        }
+        
+        .calendar-day-header {
+            background: #e2e8f0;
+            padding: 10px;
+            text-align: center;
+            font-weight: 600;
+            font-size: 12px;
+            color: #475569;
+            border-bottom: 1px solid #cbd5e1;
+        }
+        
+        .calendar-day-cell {
+            min-height: 100px;
+            border: 1px solid #e2e8f0;
+            padding: 5px;
+            background: white;
+        }
+        
+        .calendar-day-cell.empty { background: #f8fafc; }
+        .calendar-day-cell.weekend { background: #fefce8; }
+        
+        .calendar-day-number {
+            font-size: 12px;
+            font-weight: 600;
+            color: #64748b;
+            margin-bottom: 5px;
+        }
+        
+        .calendar-day-cell.weekend .calendar-day-number { color: #b45309; }
+        
+        .calendar-shift {
+            font-size: 10px;
+            padding: 4px 6px;
+            margin-bottom: 3px;
+            border-radius: 3px;
+            display: flex;
+            flex-direction: column;
+            color: white;
+        }
+        
+        .calendar-shift-name { font-weight: 600; }
+        .calendar-shift-time { opacity: 0.9; font-size: 9px; }
+        .calendar-shift-role { font-size: 8px; opacity: 0.8; }
+        
+        .calendar-shift.shift-morning { border-left: 4px solid #fbbf24; }
+        .calendar-shift.shift-afternoon { border-left: 4px solid #f97316; }
+        .calendar-shift.shift-night { border-left: 4px solid #1e3a5a; }
+        
+        .calendar-shift.shift-off {
+            background: #e5e7eb !important;
+            color: #9ca3af;
+        }
+        
+        .calendar-shift.shift-short {
+            background-image: repeating-linear-gradient(
+                45deg,
+                transparent,
+                transparent 3px,
+                rgba(255,255,255,0.4) 3px,
+                rgba(255,255,255,0.4) 6px
+            ) !important;
+        }
+        
+        .calendar-view-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: var(--space-sm);
+            padding: var(--space-sm) var(--space-md);
+            background: linear-gradient(135deg, var(--olympic-blue), var(--deep-navy));
+            color: var(--snow-white);
+            border: none;
+            border-radius: var(--radius-sm);
+            cursor: pointer;
+            font-size: 0.9rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .calendar-view-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: var(--shadow-md);
+        }
+        
         .export-modal-footer {
             padding: var(--space-md) var(--space-lg);
             border-top: 1px solid var(--silver);
@@ -874,24 +1143,30 @@
             <p>Olympic shift schedule viewing made simple</p>
         </div>
         
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Loading Excel File...</div>
+            <div class="loading-subtext">This may take a few seconds</div>
+        </div>
+        
         <div class="file-input-container" id="fileInputContainer">
             <h2>📊 Load Shift Schedule</h2>
             
             <!-- Buttons Container - centered on page -->
-            <div style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; width: 320px; margin-left: auto; margin-right: auto;">
-                <!-- Saved Data Row -->
-                <div id="savedDataRow" style="display: none; margin-bottom: 12px; position: relative; width: 100%;">
-                    <button id="loadSavedDataBtn" class="file-label" style="margin: 0; width: 100%; text-align: center; justify-content: center;">
-                        📂 Load Saved Data
-                    </button>
-                    <span id="savedDataInfo" style="position: absolute; left: 100%; top: 50%; transform: translateY(-50%); font-size: 0.8rem; line-height: 1.4; text-align: left; padding-left: 16px; white-space: nowrap;"></span>
-                </div>
-                
-                <!-- Choose/Refresh Row -->
+            <div style="margin-top: 20px; display: flex; flex-direction: column; align-items: center; width: 400px; margin-left: auto; margin-right: auto;">
+                <!-- Single File Selection Button -->
                 <div style="width: 100%;">
                     <label id="chooseFileLabel" for="fileInput" class="file-label" style="margin: 0; width: 100%; text-align: center; justify-content: center;">
-                        📁 Choose/Refresh Excel File
+                        📁 Select Excel File
                     </label>
+                </div>
+                
+                <!-- Last File Info (shown if available) -->
+                <div id="savedFileRow" style="display: none; margin-top: 12px; text-align: center;">
+                    <span style="font-size: 0.8rem; color: var(--slate);">Last file: </span>
+                    <span id="savedFileName" style="font-size: 0.8rem; color: var(--olympic-blue);"></span>
+                    <span id="savedFileInfo" style="font-size: 0.75rem; color: var(--slate); margin-left: 8px;"></span>
                 </div>
             </div>
             <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm" style="display: none;">
@@ -976,7 +1251,7 @@
                         <input 
                             type="text" 
                             id="myNameInput" 
-                            placeholder="My name"
+                            placeholder="Name or role"
                             class="search-input"
                             style="width: 150px; color: #9ca3af;"
                         >
@@ -992,8 +1267,8 @@
                             i
                         </button>
                         <div id="myNameTooltip" style="display: none; position: absolute; background: var(--charcoal); color: white; padding: var(--space-md); border-radius: var(--radius-md); font-size: 0.85rem; z-index: 1000; max-width: 300px; box-shadow: var(--shadow-xl); top: 45px; right: 0;">
-                            <strong style="color: var(--sky-blue);">My Name Filter:</strong><br>
-                            Enter your name and click "My Shifts" to filter shifts assigned to you. Your name is saved across sessions but the filter is deactivated by default. Works with tab filters (e.g., "Upcoming" + "My Shifts" = your upcoming shifts).
+                            <strong style="color: var(--sky-blue);">My Shifts Filter:</strong><br>
+                            Enter your name or role and click "My Shifts" to filter matching shifts. Your filter is saved across sessions but deactivated by default. Works with tab filters (e.g., "Upcoming" + "My Shifts" = your upcoming shifts).
                         </div>
                     </div>
                     
@@ -1035,12 +1310,12 @@
     <div id="exportModal" class="export-modal-overlay">
         <div class="export-modal">
             <div class="export-modal-header">
-                <h3>📅 Export Shifts to Calendar</h3>
+                <h3>📤 Export Shifts</h3>
                 <button class="export-modal-close" onclick="closeExportModal()">&times;</button>
             </div>
             <div class="export-modal-body">
                 <p style="margin-bottom: var(--space-md); color: var(--slate);">
-                    Export <strong><span id="exportDisplayedCount">0</span> displayed shifts</strong> to an ICS calendar file.
+                    Export <strong><span id="exportDisplayedCount">0</span> displayed shifts</strong> to Excel or Calendar format.
                 </p>
                 
                 <!-- Show As Option -->
@@ -1073,7 +1348,22 @@
             </div>
             <div class="export-modal-footer">
                 <button class="export-cancel-btn" onclick="closeExportModal()">Cancel</button>
-                <button class="export-calendar-btn" onclick="exportShifts()" style="margin-left: var(--space-sm);">📅 Export</button>
+                <button class="export-excel-btn" onclick="exportToExcel()" style="margin-left: var(--space-sm);">📊 Excel</button>
+                <button class="export-calendar-btn" onclick="exportShifts()" style="margin-left: var(--space-sm);">📅 Calendar</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Calendar View Modal -->
+    <div id="calendarModal" class="calendar-modal-overlay">
+        <div class="calendar-modal">
+            <div class="calendar-modal-header">
+                <h3>📅 Calendar View</h3>
+                <button class="calendar-modal-close" onclick="closeCalendarModal()">&times;</button>
+            </div>
+            <div class="calendar-modal-body">
+                <div id="calendarLegend" class="calendar-legend"></div>
+                <div id="calendarContent"></div>
             </div>
         </div>
     </div>
@@ -1128,6 +1418,7 @@
         let selectedPerson = '';
         let lastUpdateTime = null;
         let myShiftsFilter = ''; // Name filter for "My Shifts"
+        let includeUnassigned = false; // Whether to show unassigned shifts
         let lastUpdateFlashTimeout = null;
         
         // ============================================
@@ -1498,11 +1789,13 @@
             };
         }
         
-        // Get shifts filtered by "My Shifts" name
+        // Get shifts filtered by "My Shifts" (matches name or role)
         function getMyShifts() {
             if (!myShiftsFilter) return [];
+            const filterLower = myShiftsFilter.toLowerCase();
             return allShifts.filter(shift => 
-                shift.name && shift.name.toLowerCase().includes(myShiftsFilter.toLowerCase())
+                (shift.name && shift.name.toLowerCase().includes(filterLower)) ||
+                (shift.role && shift.role.toLowerCase().includes(filterLower))
             );
         }
         
@@ -1510,6 +1803,11 @@
         function getDisplayedShifts() {
             // Re-apply all current filters to get what's displayed
             let filtered = [...allShifts];
+            
+            // Exclude unassigned shifts by default
+            if (!includeUnassigned) {
+                filtered = filtered.filter(shift => shift.isAssigned);
+            }
             
             // Tab filter
             const dates = getCachedDates();
@@ -1543,10 +1841,121 @@
                     break;
             }
             
-            // My Shifts filter (required for export)
+            // Search filter (same logic as renderShifts)
+            if (searchInput && searchInput.value) {
+                const searchTerm = searchInput.value.trim();
+                if (searchTerm) {
+                    const fieldMatches = searchTerm.matchAll(/(name|role|venue|date):\s*([^\s]+)/gi);
+                    const fieldCriteria = {};
+                    let dateCriteria = null;
+                    let processedIndices = [];
+                    
+                    for (const match of fieldMatches) {
+                        const field = match[1].toLowerCase();
+                        const value = match[2];
+                        if (field === 'date') {
+                            const parsedDates = parseSearchDate(value);
+                            if (parsedDates && parsedDates.length > 0) {
+                                dateCriteria = parsedDates;
+                            }
+                        } else {
+                            fieldCriteria[field] = value.toLowerCase();
+                        }
+                        processedIndices.push({ start: match.index, end: match.index + match[0].length });
+                    }
+                    
+                    let generalTerms = searchTerm;
+                    processedIndices.sort((a, b) => b.start - a.start);
+                    processedIndices.forEach(range => {
+                        generalTerms = generalTerms.substring(0, range.start) + generalTerms.substring(range.end);
+                    });
+                    generalTerms = generalTerms.trim().toLowerCase();
+                    
+                    if (generalTerms && /^(name|role|venue|date):\s*$/i.test(generalTerms)) {
+                        generalTerms = '';
+                    }
+                    
+                    let positiveTerms = [];
+                    let negativeTerms = [];
+                    if (generalTerms) {
+                        const regex = /"([^"]+)"|([^\s]+)/g;
+                        let match;
+                        while ((match = regex.exec(generalTerms)) !== null) {
+                            let term = (match[1] || match[2]).toLowerCase();
+                            if (term.startsWith('-') && term.length > 1) {
+                                negativeTerms.push(term.substring(1));
+                            } else {
+                                const datePattern = /^\d{1,2}\/\d{1,2}(\/\d{2,4})?$/;
+                                if (datePattern.test(term) && !dateCriteria) {
+                                    const parsedDates = parseSearchDate(term);
+                                    if (parsedDates && parsedDates.length > 0) {
+                                        dateCriteria = parsedDates;
+                                        continue;
+                                    }
+                                }
+                                positiveTerms.push(term);
+                            }
+                        }
+                    }
+                    
+                    filtered = filtered.filter(shift => {
+                        if (dateCriteria && dateCriteria.length > 0) {
+                            if (!shift.dateString) return false;
+                            const matchesDate = dateCriteria.some(searchDate => 
+                                searchDate.toDateString() === shift.dateString
+                            );
+                            if (!matchesDate) return false;
+                        }
+                        
+                        for (const [field, value] of Object.entries(fieldCriteria)) {
+                            if (field === 'name') {
+                                if (!shift.name || !shift.name.toLowerCase().includes(value)) return false;
+                            } else if (field === 'role') {
+                                if (!shift.role || !shift.role.toLowerCase().includes(value)) return false;
+                            } else if (field === 'venue') {
+                                if (!shift.venue || !shift.venue.toLowerCase().includes(value)) return false;
+                            }
+                        }
+                        
+                        if (positiveTerms.length > 0 || negativeTerms.length > 0) {
+                            for (const term of negativeTerms) {
+                                const matchesTerm = 
+                                    (shift.name && shift.name.toLowerCase().includes(term)) ||
+                                    (shift.role && shift.role.toLowerCase().includes(term)) ||
+                                    (shift.venue && shift.venue.toLowerCase().includes(term)) ||
+                                    (shift.shiftType && shift.shiftType.toLowerCase().includes(term));
+                                if (matchesTerm) return false;
+                            }
+                            
+                            for (const term of positiveTerms) {
+                                if (term === 'assigned') {
+                                    if (!shift.isAssigned) return false;
+                                    continue;
+                                }
+                                if (term === 'unassigned') {
+                                    if (shift.isAssigned) return false;
+                                    continue;
+                                }
+                                const matchesTerm = 
+                                    (shift.name && shift.name.toLowerCase().includes(term)) ||
+                                    (shift.role && shift.role.toLowerCase().includes(term)) ||
+                                    (shift.venue && shift.venue.toLowerCase().includes(term)) ||
+                                    (shift.shiftType && shift.shiftType.toLowerCase().includes(term));
+                                if (!matchesTerm) return false;
+                            }
+                        }
+                        
+                        return true;
+                    });
+                }
+            }
+            
+            // My Shifts filter (matches name or role)
             if (myShiftsFilter) {
+                const filterLower = myShiftsFilter.toLowerCase();
                 filtered = filtered.filter(shift => 
-                    shift.name && shift.name.toLowerCase().includes(myShiftsFilter.toLowerCase())
+                    (shift.name && shift.name.toLowerCase().includes(filterLower)) ||
+                    (shift.role && shift.role.toLowerCase().includes(filterLower))
                 );
             }
             
@@ -1621,6 +2030,270 @@
             }
         }
         
+        // ============================================
+        // CALENDAR VIEW
+        // ============================================
+        
+        // Color palette for people (will be assigned dynamically)
+        const personColorPalette = [
+            '#3b82f6', '#10b981', '#f59e0b', '#8b5cf6', '#ef4444', 
+            '#06b6d4', '#ec4899', '#14b8a6', '#f97316', '#6366f1'
+        ];
+        let personColorMap = {};
+        
+        function getPersonColor(name) {
+            if (!name) return '#9ca3af';
+            if (!personColorMap[name]) {
+                const colorIndex = Object.keys(personColorMap).length % personColorPalette.length;
+                personColorMap[name] = personColorPalette[colorIndex];
+            }
+            return personColorMap[name];
+        }
+        
+        function getShiftType(time) {
+            if (!time) return { type: 'day', label: 'Day', class: '' };
+            const startHour = parseInt(time.split(':')[0]);
+            if (startHour >= 5 && startHour < 12) return { type: 'morning', label: 'AM', class: 'shift-morning' };
+            if (startHour >= 12 && startHour < 20) return { type: 'afternoon', label: 'PM', class: 'shift-afternoon' };
+            return { type: 'night', label: 'Night', class: 'shift-night' };
+        }
+        
+        function openCalendarModal() {
+            const shifts = getDisplayedShifts();
+            if (shifts.length === 0) {
+                alert('No shifts to display.');
+                return;
+            }
+            
+            // Reset color map for fresh assignment
+            personColorMap = {};
+            
+            // Group shifts by date, handling overnight shifts that span two days
+            const shiftsByDate = {};
+            shifts.forEach(s => {
+                if (!s.date) return;
+                const dateStr = s.date.toISOString().split('T')[0];
+                if (!shiftsByDate[dateStr]) shiftsByDate[dateStr] = [];
+                
+                // Check if this is an overnight shift (end time < start time, but not ending at 00:00)
+                let isOvernight = false;
+                let startHour = 0, startMin = 0, endHour = 24, endMin = 0;
+                if (s.shiftTimeCET) {
+                    const timeMatch = s.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+                    if (timeMatch) {
+                        startHour = parseInt(timeMatch[1]);
+                        startMin = parseInt(timeMatch[2]);
+                        endHour = parseInt(timeMatch[3]);
+                        endMin = parseInt(timeMatch[4]);
+                        // Overnight if end < start, but NOT if shift simply ends at midnight (00:00)
+                        const endsAtMidnight = endHour === 0 && endMin === 0;
+                        isOvernight = endHour < startHour && !endsAtMidnight;
+                    }
+                }
+                
+                if (isOvernight) {
+                    // Add first part to start date (e.g., 23:45-00:00)
+                    shiftsByDate[dateStr].push({
+                        ...s,
+                        shiftTimeCET: s.shiftTimeCET.split('-')[0].trim() + '-00:00',
+                        isOvernightStart: true
+                    });
+                    
+                    // Add second part to next date (e.g., 00:00-07:15)
+                    const nextDate = new Date(s.date);
+                    nextDate.setDate(nextDate.getDate() + 1);
+                    const nextDateStr = nextDate.toISOString().split('T')[0];
+                    if (!shiftsByDate[nextDateStr]) shiftsByDate[nextDateStr] = [];
+                    shiftsByDate[nextDateStr].push({
+                        ...s,
+                        shiftTimeCET: '00:00-' + s.shiftTimeCET.split('-')[1].trim(),
+                        isOvernightEnd: true
+                    });
+                } else {
+                    shiftsByDate[dateStr].push(s);
+                }
+            });
+            
+            // Find date range
+            const dates = Object.keys(shiftsByDate).sort();
+            if (dates.length === 0) {
+                alert('No shifts with valid dates to display.');
+                return;
+            }
+            
+            const startDate = new Date(dates[0]);
+            const endDate = new Date(dates[dates.length - 1]);
+            
+            // Get unique people for legend
+            const uniquePeople = [...new Set(shifts.map(s => s.name).filter(Boolean))];
+            uniquePeople.forEach(name => getPersonColor(name)); // Assign colors
+            
+            // Calculate first appearance date for each person (for OFF logic)
+            const personFirstAppearance = {};
+            shifts.forEach(s => {
+                if (s.name && s.date) {
+                    const dateStr = s.date.toISOString().split('T')[0];
+                    if (!personFirstAppearance[s.name] || dateStr < personFirstAppearance[s.name]) {
+                        personFirstAppearance[s.name] = dateStr;
+                    }
+                }
+            });
+            
+            // Render legend
+            const legendHtml = uniquePeople.map(name => 
+                `<div class="calendar-legend-item">
+                    <div class="calendar-legend-color" style="background: ${getPersonColor(name)};"></div>
+                    ${name}
+                </div>`
+            ).join('');
+            document.getElementById('calendarLegend').innerHTML = legendHtml;
+            
+            // Group by month
+            const months = {};
+            for (let d = new Date(startDate); d <= endDate; d.setDate(d.getDate() + 1)) {
+                const monthKey = `${d.getFullYear()}-${d.getMonth()}`;
+                if (!months[monthKey]) {
+                    months[monthKey] = {
+                        year: d.getFullYear(),
+                        month: d.getMonth(),
+                        name: d.toLocaleDateString('en-US', { month: 'long', year: 'numeric' })
+                    };
+                }
+            }
+            
+            // Render calendar
+            let calendarHtml = '';
+            
+            Object.values(months).forEach(m => {
+                calendarHtml += `<div class="calendar-container">
+                    <div class="calendar-month-header">${m.name}</div>
+                    <div class="calendar-grid">
+                        <div class="calendar-day-header">Mon</div>
+                        <div class="calendar-day-header">Tue</div>
+                        <div class="calendar-day-header">Wed</div>
+                        <div class="calendar-day-header">Thu</div>
+                        <div class="calendar-day-header">Fri</div>
+                        <div class="calendar-day-header">Sat</div>
+                        <div class="calendar-day-header">Sun</div>`;
+                
+                const firstDay = new Date(m.year, m.month, 1);
+                const lastDay = new Date(m.year, m.month + 1, 0);
+                let startDow = firstDay.getDay();
+                startDow = startDow === 0 ? 6 : startDow - 1; // Adjust for Monday start
+                
+                // Empty cells before first day
+                for (let i = 0; i < startDow; i++) {
+                    calendarHtml += `<div class="calendar-day-cell empty"></div>`;
+                }
+                
+                // Days of month
+                for (let d = 1; d <= lastDay.getDate(); d++) {
+                    const dateStr = `${m.year}-${String(m.month + 1).padStart(2, '0')}-${String(d).padStart(2, '0')}`;
+                    const dayOfWeek = new Date(m.year, m.month, d).getDay();
+                    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                    const dayShifts = shiftsByDate[dateStr] || [];
+                    
+                    calendarHtml += `<div class="calendar-day-cell ${isWeekend ? 'weekend' : ''}">
+                        <div class="calendar-day-number">${d}</div>`;
+                    
+                    // Sort shifts by time, with overnight continuations first and overnight starts last
+                    dayShifts.sort((a, b) => {
+                        // Overnight end shifts (00:00-XX:XX continuation from previous day) come first
+                        if (a.isOvernightEnd && !b.isOvernightEnd) return -1;
+                        if (b.isOvernightEnd && !a.isOvernightEnd) return 1;
+                        
+                        // Overnight start shifts (XX:XX-00:00 going into next day) come last
+                        if (a.isOvernightStart && !b.isOvernightStart) return 1;
+                        if (b.isOvernightStart && !a.isOvernightStart) return -1;
+                        
+                        // Otherwise sort by start time
+                        const aTime = a.shiftTimeCET || '00:00';
+                        const bTime = b.shiftTimeCET || '00:00';
+                        const aStart = parseInt(aTime.split(':')[0]);
+                        const bStart = parseInt(bTime.split(':')[0]);
+                        return aStart - bStart;
+                    });
+                    
+                    dayShifts.forEach(s => {
+                        const shiftInfo = getShiftType(s.shiftTimeCET);
+                        const bgColor = getPersonColor(s.name);
+                        const displayName = s.name ? s.name.split(' ')[0] : '(Unassigned)';
+                        
+                        // Check if shift is 1 hour or less
+                        let isShortShift = false;
+                        if (s.shiftTimeCET) {
+                            const timeMatch = s.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+                            if (timeMatch) {
+                                const startMins = parseInt(timeMatch[1]) * 60 + parseInt(timeMatch[2]);
+                                let endMins = parseInt(timeMatch[3]) * 60 + parseInt(timeMatch[4]);
+                                // Handle overnight (end < start means next day)
+                                if (endMins < startMins) endMins += 24 * 60;
+                                const durationMins = endMins - startMins;
+                                isShortShift = durationMins <= 60;
+                            }
+                        }
+                        const shortClass = isShortShift ? ' shift-short' : '';
+                        
+                        calendarHtml += `<div class="calendar-shift ${shiftInfo.class}${shortClass}" style="background: ${bgColor};">
+                            <span class="calendar-shift-name">${displayName}</span>
+                            <span class="calendar-shift-time">${s.shiftTimeCET || ''}</span>
+                            ${s.role ? `<span class="calendar-shift-role">${s.role}</span>` : ''}
+                        </div>`;
+                    });
+                    
+                    // Show OFF for people not scheduled on this day (starting 4 days before first appearance)
+                    if (dayShifts.length > 0) {
+                        const scheduledPeople = dayShifts.map(s => s.name).filter(Boolean);
+                        uniquePeople.forEach(person => {
+                            if (!scheduledPeople.includes(person)) {
+                                // Only show OFF if within 4 days before or after first appearance
+                                const firstAppearance = personFirstAppearance[person];
+                                if (firstAppearance) {
+                                    const firstDate = new Date(firstAppearance);
+                                    const currentDate = new Date(dateStr);
+                                    const daysDiff = Math.floor((currentDate - firstDate) / (1000 * 60 * 60 * 24));
+                                    // Show OFF if current date is >= 4 days before first appearance
+                                    if (daysDiff >= -4) {
+                                        const displayName = person.split(' ')[0];
+                                        calendarHtml += `<div class="calendar-shift shift-off">
+                                            <span class="calendar-shift-name">${displayName}</span>
+                                            <span class="calendar-shift-time">OFF</span>
+                                        </div>`;
+                                    }
+                                }
+                            }
+                        });
+                    }
+                    
+                    calendarHtml += `</div>`;
+                }
+                
+                // Fill remaining cells
+                const totalCells = startDow + lastDay.getDate();
+                const remaining = (7 - (totalCells % 7)) % 7;
+                for (let i = 0; i < remaining; i++) {
+                    calendarHtml += `<div class="calendar-day-cell empty"></div>`;
+                }
+                
+                calendarHtml += `</div></div>`;
+            });
+            
+            document.getElementById('calendarContent').innerHTML = calendarHtml;
+            document.getElementById('calendarModal').classList.add('show');
+        }
+        
+        function closeCalendarModal() {
+            document.getElementById('calendarModal').classList.remove('show');
+        }
+        
+        // Close calendar modal when clicking outside
+        document.addEventListener('click', function(e) {
+            const modal = document.getElementById('calendarModal');
+            if (modal && e.target === modal) {
+                closeCalendarModal();
+            }
+        });
+        
         // Export shifts to ICS file
         function exportShifts() {
             const shiftsToExport = getDisplayedShifts();
@@ -1666,6 +2339,65 @@
             closeExportModal();
             
             debug.log('Exported', shiftsToExport.length, 'shifts to ICS file');
+        }
+        
+        // Export shifts to Excel file
+        function exportToExcel() {
+            const shiftsToExport = getDisplayedShifts();
+            
+            if (shiftsToExport.length === 0) {
+                alert('No shifts to export.');
+                return;
+            }
+            
+            // Format data for Excel - simple readable format
+            const excelData = shiftsToExport.map(shift => {
+                // Format date as readable string
+                const dateStr = shift.date ? 
+                    shift.date.toLocaleDateString('en-GB', { weekday: 'short', day: '2-digit', month: 'short', year: 'numeric' }) : '';
+                
+                return {
+                    'Date': dateStr,
+                    'Time (CET)': shift.shiftTimeCET || '',
+                    'Name': shift.name || '(Unassigned)',
+                    'Venue': shift.venue || '',
+                    'Location': shift.location || '',
+                    'Role': shift.role || '',
+                    'Type': shift.shiftType || ''
+                };
+            });
+            
+            // Create worksheet and workbook
+            const worksheet = XLSX.utils.json_to_sheet(excelData);
+            
+            // Set column widths for better readability
+            worksheet['!cols'] = [
+                { wch: 18 },  // Date
+                { wch: 12 },  // Time
+                { wch: 25 },  // Name
+                { wch: 20 },  // Venue
+                { wch: 25 },  // Location
+                { wch: 25 },  // Role
+                { wch: 15 }   // Type
+            ];
+            
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, 'My Shifts');
+            
+            // Generate filename with date
+            const today = new Date();
+            const dateStr = today.getFullYear().toString() +
+                String(today.getMonth() + 1).padStart(2, '0') +
+                String(today.getDate()).padStart(2, '0');
+            const filename = `MyCO26Shifts_${dateStr}.xlsx`;
+            
+            // Write and download
+            XLSX.writeFile(workbook, filename);
+            
+            // Close modal
+            closeExportModal();
+            
+            debug.log('Exported', shiftsToExport.length, 'shifts to Excel file');
         }
         
         // Close modal when clicking outside
@@ -1741,6 +2473,63 @@
         if (savedSearchImmediate && savedSearchInput) {
             savedSearchInput.value = savedSearchImmediate;
         }
+        
+        // Track current file name for saving
+        let currentFileName = '';
+        
+        // Save last file info to localStorage
+        function saveLastFileInfo() {
+            if (currentFileName && lastUpdateTime) {
+                const fileInfo = {
+                    fileName: currentFileName,
+                    lastUpdate: lastUpdateTime,
+                    savedAt: new Date().toISOString()
+                };
+                saveToStorage('lastFileInfo', JSON.stringify(fileInfo));
+                debug.log('Saved file info:', fileInfo);
+            }
+        }
+        
+        // Check for saved file info and show button on page load
+        function checkSavedFileInfo() {
+            const savedInfo = getFromStorage('lastFileInfo');
+            if (savedInfo) {
+                try {
+                    const info = JSON.parse(savedInfo);
+                    const savedFileRow = document.getElementById('savedFileRow');
+                    const savedFileName = document.getElementById('savedFileName');
+                    const savedFileInfo = document.getElementById('savedFileInfo');
+                    
+                    if (savedFileRow && info.fileName) {
+                        savedFileRow.style.display = 'block';
+                        savedFileName.textContent = info.fileName;
+                        
+                        // Format last update time
+                        if (info.lastUpdate) {
+                            const updateDate = new Date(info.lastUpdate);
+                            const now = new Date();
+                            const diffHours = Math.floor((now - updateDate) / (1000 * 60 * 60));
+                            const diffDays = Math.floor(diffHours / 24);
+                            
+                            let ageText = '';
+                            if (diffDays > 0) {
+                                ageText = diffDays === 1 ? '1 day ago' : `${diffDays} days ago`;
+                            } else if (diffHours > 0) {
+                                ageText = diffHours === 1 ? '1 hour ago' : `${diffHours} hours ago`;
+                            } else {
+                                ageText = 'Just now';
+                            }
+                            savedFileInfo.textContent = `Updated: ${ageText}`;
+                        }
+                    }
+                } catch (e) {
+                    console.error('Error parsing saved file info:', e);
+                }
+            }
+        }
+        
+        // Initialize saved file info display
+        checkSavedFileInfo();
         
         // Functions to save and load shift data
         function saveShiftData() {
@@ -2052,12 +2841,6 @@
         
         fileInput.addEventListener('change', handleFileSelect);
         
-        if (loadSavedDataBtn) {
-            loadSavedDataBtn.addEventListener('click', () => {
-                loadShiftData();
-            });
-        }
-        
         // Debounced search input (200ms delay)
         let searchTimeout;
         searchInput.addEventListener('input', () => {
@@ -2239,9 +3022,16 @@
             
             debug.log('File selected:', file.name);
             fileName.textContent = file.name;
+            currentFileName = file.name; // Save for localStorage
+            
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            loadingOverlay.classList.add('active');
             
             const reader = new FileReader();
             reader.onload = function(e) {
+                // Use setTimeout to allow the loading overlay to render before blocking XLSX parsing
+                setTimeout(() => {
                 try {
                     debug.log('File read successfully, size:', e.total, 'bytes');
                     const data = new Uint8Array(e.target.result);
@@ -2358,7 +3148,11 @@
                     console.error('Error reading file:', error);
                     console.error('Error stack:', error.stack);
                     fileName.textContent = `Error: ${error.message}`;
+                } finally {
+                    // Hide loading overlay
+                    loadingOverlay.classList.remove('active');
                 }
+                }, 50); // End setTimeout - delay allows overlay to render
             };
             reader.readAsArrayBuffer(file);
         }
@@ -2479,11 +3273,11 @@
             debug.log('Processed', allShifts.length, 'shifts from COLE format');
             debug.log('Sample shifts:', allShifts.slice(0, 3));
             
+            // Save file info to localStorage
+            saveLastFileInfo();
+            
             updateFilters();
             renderShifts();
-            
-            // Save data to localStorage
-            saveShiftData();
         }
         
         function processData(data) {
@@ -2725,6 +3519,11 @@
             // Apply filters
             let filtered = [...allShifts];
             
+            // Exclude unassigned shifts by default
+            if (!includeUnassigned) {
+                filtered = filtered.filter(shift => shift.isAssigned);
+            }
+            
             // Tab filter - use cached dates for performance
             const dates = getCachedDates();
             const { now, today, tomorrow, todayString, tomorrowString } = dates;
@@ -2906,10 +3705,12 @@
             
 
             
-            // My Shifts filter (AND condition with tab filters)
+            // My Shifts filter (AND condition with tab filters, matches name or role)
             if (myShiftsFilter) {
+                const filterLower = myShiftsFilter.toLowerCase();
                 filtered = filtered.filter(shift => 
-                    shift.name && shift.name.toLowerCase().includes(myShiftsFilter.toLowerCase())
+                    (shift.name && shift.name.toLowerCase().includes(filterLower)) ||
+                    (shift.role && shift.role.toLowerCase().includes(filterLower))
                 );
             }
             
@@ -2930,17 +3731,42 @@
             const unassignedShifts = filtered.filter(s => !s.isAssigned).length;
             
             // Update stats display as compact inline badges
-            // Include export button if My Shifts filter is active
-            const exportButtonHtml = myShiftsFilter ? 
-                '<button id="exportCalendarBtn" class="export-calendar-btn" onclick="openExportModal()">' +
-                    '📅 Export Calendar' +
-                '</button>' : '';
+            // View Calendar button is only active when My Shifts filter is on
+            const calendarBtnHtml = myShiftsFilter ?
+                '<button class="calendar-view-btn" onclick="openCalendarModal()">' +
+                    '📅 View Calendar' +
+                '</button>' :
+                '<button class="calendar-view-btn" style="background: #9ca3af; cursor: not-allowed;" disabled title="Activate My Shifts filter to view calendar">' +
+                    '📅 View Calendar' +
+                '</button>';
+            
+            const exportButtonHtml = 
+                '<button id="exportCalendarBtn" class="export-calendar-btn" onclick="openExportModal()" style="margin-left: 8px;">' +
+                    '📤 Export Shifts' +
+                '</button>';
+            
+            const unassignedBadgeHtml = includeUnassigned ?
+                '<label class="stat-badge stat-badge-unassigned" style="cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">' +
+                    '<input type="checkbox" checked style="width: 14px; height: 14px; accent-color: var(--olympic-blue); cursor: pointer;" onchange="includeUnassigned=false; renderShifts()">' +
+                    'Unassigned: ' + unassignedShifts +
+                '</label>' :
+                '<label class="stat-badge" style="background: #f3f4f6; color: #6b7280; cursor: pointer; display: inline-flex; align-items: center; gap: 4px;">' +
+                    '<input type="checkbox" style="width: 14px; height: 14px; accent-color: var(--olympic-blue); cursor: pointer;" onchange="includeUnassigned=true; renderShifts()">' +
+                    'Include Unassigned' +
+                '</label>';
             
             statsElement.innerHTML = 
-                '<span class="stat-badge stat-badge-total">Total: ' + totalShifts + '</span>' +
-                '<span class="stat-badge stat-badge-assigned">Assigned: ' + assignedShifts + '</span>' +
-                '<span class="stat-badge stat-badge-unassigned">Unassigned: ' + unassignedShifts + '</span>' +
-                exportButtonHtml;
+                '<div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">' +
+                    '<div>' +
+                        '<span class="stat-badge stat-badge-total">Total: ' + totalShifts + '</span>' +
+                        '<span class="stat-badge stat-badge-assigned">Assigned: ' + assignedShifts + '</span>' +
+                        unassignedBadgeHtml +
+                    '</div>' +
+                    '<div>' +
+                        calendarBtnHtml +
+                        exportButtonHtml +
+                    '</div>' +
+                '</div>';
             
             // Debug logging
             debug.log('Render stats:');

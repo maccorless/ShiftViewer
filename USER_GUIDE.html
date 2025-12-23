@@ -237,10 +237,11 @@
                     <li><a href="#getting-started">1. Getting Started</a></li>
                     <li><a href="#search">2. Search Features</a></li>
                     <li><a href="#filters">3. Filters & Views</a></li>
-                    <li><a href="#calendar-export">4. Calendar Export</a></li>
-                    <li><a href="#ui">5. Understanding the Interface</a></li>
-                    <li><a href="#tips">6. Tips & Tricks</a></li>
-                    <li><a href="#troubleshooting">7. Troubleshooting</a></li>
+                    <li><a href="#calendar-view">4. Calendar View</a></li>
+                    <li><a href="#calendar-export">5. Export Features</a></li>
+                    <li><a href="#ui">6. Understanding the Interface</a></li>
+                    <li><a href="#tips">7. Tips & Tricks</a></li>
+                    <li><a href="#troubleshooting">8. Troubleshooting</a></li>
                 </ul>
             </div>
 
@@ -263,30 +264,21 @@
                 <ol>
                     <li><strong>Download from SharePoint:</strong> Visit the SharePoint link above and download the latest shift schedule Excel file to your local drive</li>
                     <li><strong>Open ShiftViewer:</strong> Navigate to the ShiftViewer application</li>
-                    <li><strong>Choose File:</strong> Click the <strong>"Choose/Refresh Excel File"</strong> button on the landing page</li>
-                    <li><strong>Select File:</strong> Browse to your downloaded Excel file (.xlsx or .xls) and select it</li>
+                    <li><strong>Select File:</strong> Click the <strong>"Select Excel File"</strong> button on the landing page</li>
+                    <li><strong>Browse:</strong> Navigate to your downloaded Excel file (.xlsx or .xls) and select it</li>
                     <li><strong>Automatic Processing:</strong> The app will automatically parse and display your shifts</li>
-                    <li><strong>Auto-Save:</strong> Data is saved to your browser for future sessions</li>
                 </ol>
+                
+                <div class="tip">
+                    <strong>💡 Last File Reminder:</strong> If you've previously loaded a file, the landing page shows the last file name and when it was updated, helping you remember which file to select.
+                </div>
                 
                 <div class="warning">
                     <strong>⚠️ Important:</strong> Always download the Excel file to your local drive first. Do not try to open it directly from SharePoint.
                 </div>
                 
-                <h4>Option 2: Load Saved Data</h4>
-                <ol>
-                    <li>If you've previously uploaded a file, you'll see <strong>"Load Saved Data"</strong> button</li>
-                    <li>Click it to instantly load your last uploaded shift schedule</li>
-                    <li>No need to re-upload the Excel file</li>
-                </ol>
-                
-                <div class="tip">
-                    <strong>💡 File Freshness Indicator:</strong> On the landing page, next to the "Load Saved Data" button, you'll see the file's date with color-coded status:<br>
-                    • <strong style="color: #10b981;">✓ Green</strong> = Updated within 24 hours (file is current)<br>
-                    • <strong style="color: #fbbf24;">⚠️ Yellow</strong> = Updated 24-48 hours ago (consider refreshing)<br>
-                    • <strong style="color: #fb7185;">❌ Red</strong> = Over 48 hours old (you should refresh the file)<br>
-                    <em>When the file is stale (yellow/red), the "Choose/Refresh Excel File" button will be highlighted to remind you to update.</em>
-                </div>
+                <h4>Option 2: OneDrive Sync (Recommended)</h4>
+                <p>For the best experience, set up OneDrive sync so your Excel file stays current automatically. See the <a href="#onedrive-sync">OneDrive Sync section</a> below for setup instructions.</p>
             </div>
             
             <!-- OneDrive Sync & Version Freshness -->
@@ -486,15 +478,19 @@
                 </table>
                 
                 <h3>My Shifts Filter <span class="badge badge-tip">PERSONAL</span></h3>
-                <p>Filter to see only your assigned shifts.</p>
+                <p>Filter to see only your assigned shifts by name or role.</p>
                 
                 <h4>How to Use:</h4>
                 <ol>
-                    <li>Enter your name in the <strong>"My name"</strong> text box</li>
+                    <li>Enter your name <strong>or role</strong> in the <strong>"Name or role"</strong> text box</li>
                     <li>Click <strong>"👤 My Shifts"</strong> button</li>
                     <li>Button turns purple - filter is active</li>
                     <li>Click again to turn off filter</li>
                 </ol>
+                
+                <div class="tip">
+                    <strong>💡 Filter by Role:</strong> You can enter a role name (e.g., "TSI Director" or "Critical Situations Manager") to see all shifts for that role. This is especially useful when combined with the Calendar View to see shift handovers.
+                </div>
                 
                 <h4>Behavior:</h4>
                 <ul>
@@ -529,21 +525,91 @@
                 </ul>
             </div>
 
+            <!-- Calendar View -->
+            <div class="section" id="calendar-view">
+                <h2>4. Calendar View <span class="badge badge-new">NEW</span></h2>
+                
+                <p>View your filtered shifts in a visual calendar format, color-coded by person with shift handover visibility.</p>
+                
+                <h3>How to Use</h3>
+                <ol>
+                    <li>Filter shifts using <strong>"My Shifts"</strong> with a name or role</li>
+                    <li>The <strong>"📅 View Calendar"</strong> button becomes active in the stats bar</li>
+                    <li>Click the button to open the calendar popup</li>
+                    <li>View your shifts organized by month and day</li>
+                </ol>
+                
+                <div class="tip">
+                    <strong>💡 Best Use Case - Role Handovers:</strong><br>
+                    Enter a role name (e.g., "TSI Director") in My Shifts, then click View Calendar. You'll see everyone working that role, color-coded by person, making it easy to visualize shift handovers and coverage patterns.
+                </div>
+                
+                <h3>Calendar Features</h3>
+                
+                <h4>Color-Coded by Person</h4>
+                <ul>
+                    <li>Each person is assigned a unique color</li>
+                    <li>A legend at the top shows the color mapping</li>
+                    <li>Quickly identify who is working each shift</li>
+                </ul>
+                
+                <h4>Shift Time Indicators</h4>
+                <ul>
+                    <li><strong>Yellow border:</strong> Morning shifts</li>
+                    <li><strong>Orange border:</strong> Afternoon shifts</li>
+                    <li><strong>Dark blue border:</strong> Night shifts</li>
+                </ul>
+                
+                <h4>Overnight Shifts</h4>
+                <p>Shifts that span midnight are automatically split across two days:</p>
+                <ul>
+                    <li>First day shows the start portion (e.g., 23:45-00:00)</li>
+                    <li>Next day shows the continuation (e.g., 00:00-07:15)</li>
+                    <li>This creates visual continuity - the last person on day N appears first on day N+1</li>
+                </ul>
+                
+                <h4>Short Shifts</h4>
+                <p>Shifts of 1 hour or less display with diagonal hatched shading to indicate partial coverage.</p>
+                
+                <h4>OFF Days</h4>
+                <p>When viewing a role, people who are not scheduled on a particular day (but appear elsewhere in the schedule) are shown as "OFF" in gray. This helps identify gaps in coverage.</p>
+                
+                <div class="warning">
+                    <strong>⚠️ Note:</strong> The Calendar View button is only active when the "My Shifts" filter is enabled. This ensures the calendar shows a focused, meaningful set of shifts rather than thousands of entries.
+                </div>
+            </div>
+
             <!-- Calendar Export -->
             <div class="section" id="calendar-export">
-                <h2>4. Calendar Export <span class="badge badge-new">NEW</span></h2>
+                <h2>5. Export Features</h2>
                 
-                <p>Export your shifts to an ICS calendar file for import into Outlook, Google Calendar, or other calendar applications.</p>
+                <p>Export your shifts to various formats for use in other applications.</p>
                 
-                <h3>How to Export</h3>
+                <h3>Export to Outlook/Calendar (ICS)</h3>
+                <p>Export shifts to an ICS calendar file for import into Outlook, Google Calendar, or other calendar applications.</p>
+                
+                <h4>How to Export to Calendar</h4>
                 <ol>
-                    <li>Enter your name in the <strong>"My name"</strong> text box</li>
-                    <li>Click <strong>"👤 My Shifts"</strong> to filter to your shifts</li>
-                    <li>The <strong>"📅 Export Calendar"</strong> button appears in the stats bar</li>
-                    <li>Click the button to open the export dialog</li>
-                    <li>Choose whether to show shifts as <strong>Busy</strong> (default) or <strong>Free</strong></li>
+                    <li>Filter your shifts using search or "My Shifts"</li>
+                    <li>Click the <strong>"📤 Export Shifts"</strong> button in the stats bar</li>
+                    <li>In the export dialog, choose whether to show shifts as <strong>Busy</strong> (default) or <strong>Free</strong></li>
                     <li>Click <strong>"📅 Export"</strong> to download the ICS file</li>
                 </ol>
+                
+                <h3>Export to Excel</h3>
+                <p>Export the currently displayed shifts to an Excel spreadsheet for reporting or analysis.</p>
+                
+                <h4>How to Export to Excel</h4>
+                <ol>
+                    <li>Filter your shifts using search, tabs, or "My Shifts"</li>
+                    <li>Click the <strong>"📤 Export Shifts"</strong> button in the stats bar</li>
+                    <li>In the export dialog, click <strong>"📊 Excel"</strong></li>
+                    <li>The spreadsheet downloads with columns: Date, Time, Venue, Location, Role, Type, and Name</li>
+                </ol>
+                
+                <div class="tip">
+                    <strong>💡 Export Respects Filters:</strong> Both export options export exactly what you see on screen. If you've filtered by search, tab, or My Shifts, only those shifts are exported.
+                </div>
                 
                 <div class="tip">
                     <strong>💡 Busy vs Free:</strong><br>
@@ -608,7 +674,7 @@
 
             <!-- Understanding the Interface -->
             <div class="section" id="ui">
-                <h2>5. Understanding the Interface</h2>
+                <h2>6. Understanding the Interface</h2>
                 
                 <h3>Shift Cards</h3>
                 <p>Each shift is displayed as a compact card with all relevant information.</p>
@@ -676,7 +742,7 @@
 
             <!-- Tips & Tricks -->
             <div class="section" id="tips">
-                <h2>6. Tips & Tricks</h2>
+                <h2>7. Tips & Tricks</h2>
                 
                 <h3>Search Efficiency</h3>
                 <ul>
@@ -734,7 +800,7 @@
 
             <!-- Troubleshooting -->
             <div class="section" id="troubleshooting">
-                <h2>7. Troubleshooting</h2>
+                <h2>8. Troubleshooting</h2>
                 
                 <h3>No Shifts Showing</h3>
                 <ul>
@@ -855,10 +921,10 @@
         </div>
         
         <div class="footer">
-            <p><strong>Milano Cortina 2026 - Shift Viewer v1.09</strong></p>
+            <p><strong>Milano Cortina 2026 - Shift Viewer v1.10</strong></p>
             <p>For support or feature requests, visit: <a href="https://github.com/maccorless/ShiftViewer" target="_blank">GitHub Repository</a></p>
             <p style="margin-top: 15px; font-size: 0.9em;"><strong>💡 Developer Tip:</strong> Enable debug logging by opening browser console and running: <code>localStorage.setItem('DEBUG', 'true')</code> then refresh the page.</p>
-            <p style="margin-top: 5px; font-size: 0.9em;">Last Updated: December 16, 2025</p>
+            <p style="margin-top: 5px; font-size: 0.9em;">Last Updated: December 23, 2025</p>
         </div>
     </div>
 </body>
