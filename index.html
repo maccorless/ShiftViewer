@@ -1638,8 +1638,18 @@
                 lines.push('BEGIN:VEVENT');
                 lines.push('UID:' + uid);
                 lines.push('DTSTAMP:' + dtstamp);
+                
+                // Handle overnight shifts (end time <= start time means shift crosses midnight)
+                const isOvernight = (time.endHour < time.startHour) || 
+                                    (time.endHour === time.startHour && time.endMin <= time.startMin);
+                let endDate = shift.date;
+                if (isOvernight) {
+                    endDate = new Date(shift.date);
+                    endDate.setDate(endDate.getDate() + 1);
+                }
+                
                 lines.push('DTSTART;TZID=Europe/Rome:' + formatICSDateTime(shift.date, time.startHour, time.startMin));
-                lines.push('DTEND;TZID=Europe/Rome:' + formatICSDateTime(shift.date, time.endHour, time.endMin));
+                lines.push('DTEND;TZID=Europe/Rome:' + formatICSDateTime(endDate, time.endHour, time.endMin));
                 lines.push('SUMMARY:' + escapeICS(summary));
                 if (location) lines.push('LOCATION:' + escapeICS(location));
                 if (description) lines.push('DESCRIPTION:' + description);
@@ -1670,11 +1680,20 @@
                 }
                 const summary = 'CANCELLED: ' + (removed.role || 'Shift') + ' @ ' + (removed.venue || 'TBD');
                 
+                // Handle overnight shifts (end time <= start time means shift crosses midnight)
+                const isOvernight = (time.endHour < time.startHour) || 
+                                    (time.endHour === time.startHour && time.endMin <= time.startMin);
+                let removedEndDate = removedDate;
+                if (isOvernight) {
+                    removedEndDate = new Date(removedDate);
+                    removedEndDate.setDate(removedEndDate.getDate() + 1);
+                }
+                
                 lines.push('BEGIN:VEVENT');
                 lines.push('UID:' + removed.uid);
                 lines.push('DTSTAMP:' + dtstamp);
                 lines.push('DTSTART;TZID=Europe/Rome:' + formatICSDateTime(removedDate, time.startHour, time.startMin));
-                lines.push('DTEND;TZID=Europe/Rome:' + formatICSDateTime(removedDate, time.endHour, time.endMin));
+                lines.push('DTEND;TZID=Europe/Rome:' + formatICSDateTime(removedEndDate, time.endHour, time.endMin));
                 lines.push('SUMMARY:' + escapeICS(summary));
                 lines.push('STATUS:CANCELLED');
                 lines.push('SEQUENCE:1');
@@ -1816,18 +1835,28 @@
             switch(currentTab) {
                 case 'current':
                     const currentHour = now.getHours();
+                    const yesterdayForExport = new Date(now.getTime() - 86400000).toDateString();
                     filtered = filtered.filter(shift => {
-                        if (!shift.dateString) return false;
+                        if (!shift.dateString || !shift.shiftTimeCET) return false;
+                        const timeMatch = shift.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+                        if (!timeMatch) return false;
+                        
+                        const startHour = parseInt(timeMatch[1]);
+                        const endHour = parseInt(timeMatch[3]);
+                        const isOvernight = endHour <= startHour;
                         const isToday = shift.dateString === todayString;
-                        if (isToday && shift.shiftTimeCET) {
-                            const timeMatch = shift.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
-                            if (timeMatch) {
-                                const startHour = parseInt(timeMatch[1]);
-                                const endHour = parseInt(timeMatch[3]);
-                                return currentHour >= startHour && currentHour < endHour;
-                            }
+                        const isYesterday = shift.dateString === yesterdayForExport;
+                        
+                        if (isOvernight) {
+                            // Evening portion: shift started today, currently in evening hours
+                            if (isToday && currentHour >= startHour) return true;
+                            // Morning portion: shift started yesterday, currently before end time
+                            if (isYesterday && currentHour < endHour) return true;
+                            return false;
+                        } else {
+                            // Normal shift: must be today and within hours
+                            return isToday && currentHour >= startHour && currentHour < endHour;
                         }
-                        return false;
                     });
                     break;
                 case 'today':
@@ -3531,18 +3560,28 @@
             switch(currentTab) {
                 case 'current':
                     const currentHour = now.getHours();
+                    const yesterdayForRender = new Date(now.getTime() - 86400000).toDateString();
                     filtered = filtered.filter(shift => {
-                        if (!shift.dateString) return false;
+                        if (!shift.dateString || !shift.shiftTimeCET) return false;
+                        const timeMatch = shift.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
+                        if (!timeMatch) return false;
+                        
+                        const startHour = parseInt(timeMatch[1]);
+                        const endHour = parseInt(timeMatch[3]);
+                        const isOvernight = endHour <= startHour;
                         const isToday = shift.dateString === todayString;
-                        if (isToday && shift.shiftTimeCET) {
-                            const timeMatch = shift.shiftTimeCET.match(/(\d{1,2}):(\d{2})\s*-\s*(\d{1,2}):(\d{2})/);
-                            if (timeMatch) {
-                                const startHour = parseInt(timeMatch[1]);
-                                const endHour = parseInt(timeMatch[3]);
-                                return currentHour >= startHour && currentHour < endHour;
-                            }
+                        const isYesterday = shift.dateString === yesterdayForRender;
+                        
+                        if (isOvernight) {
+                            // Evening portion: shift started today, currently in evening hours
+                            if (isToday && currentHour >= startHour) return true;
+                            // Morning portion: shift started yesterday, currently before end time
+                            if (isYesterday && currentHour < endHour) return true;
+                            return false;
+                        } else {
+                            // Normal shift: must be today and within hours
+                            return isToday && currentHour >= startHour && currentHour < endHour;
                         }
-                        return false;
                     });
                     break;
                 case 'today':
