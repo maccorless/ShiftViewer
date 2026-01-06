@@ -1169,7 +1169,7 @@
                     <span id="savedFileInfo" style="font-size: 0.75rem; color: var(--slate); margin-left: 8px;"></span>
                 </div>
             </div>
-            <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm" style="display: none;">
+            <input type="file" id="fileInput" accept=".xlsx,.xls,.xlsm,application/vnd.openxmlformats-officedocument.spreadsheetml.sheet,application/vnd.ms-excel,application/vnd.ms-excel.sheet.macroEnabled.12" style="display: none;">
             <p id="fileName" style="margin-top: 12px;"></p>
             
             <!-- Initial Setup Tip -->
@@ -1229,7 +1229,7 @@
                             <strong style="color: var(--sky-blue);">Search Tips:</strong><br>
                             • <strong>General:</strong> John (searches name, role, venue, type)<br>
                             • <strong>Multiple terms (AND):</strong> wmr olena<br>
-                            • <strong>OR search:</strong> "TSI D" OR "Critical" or wmr OR toc<br>
+                            • <strong>OR search:</strong> corless OR nadal OR nasr (multiple ORs supported)<br>
                             • <strong>Quoted phrase:</strong> "duty manager"<br>
                             • <strong>Exclude terms:</strong> -RTOC or venue:TOC -RTOC<br>
                             • <strong>Assignment status:</strong> assigned or unassigned<br>
@@ -1907,47 +1907,26 @@
                     
                     let positiveTerms = [];
                     let negativeTerms = [];
-                    let orGroups = [];
+                    let orTerms = [];
                     if (generalTerms) {
-                        // First, extract OR expressions
-                        const orRegex = /"([^"]+)"\s+OR\s+"([^"]+)"|"([^"]+)"\s+OR\s+(\S+)|(\S+)\s+OR\s+"([^"]+)"|(\S+)\s+OR\s+(\S+)/gi;
-                        let orMatch;
-                        let orProcessedRanges = [];
-                        
-                        while ((orMatch = orRegex.exec(generalTerms)) !== null) {
-                            let term1, term2;
-                            if (orMatch[1] && orMatch[2]) {
-                                term1 = orMatch[1].toLowerCase();
-                                term2 = orMatch[2].toLowerCase();
-                            } else if (orMatch[3] && orMatch[4]) {
-                                term1 = orMatch[3].toLowerCase();
-                                term2 = orMatch[4].toLowerCase();
-                            } else if (orMatch[5] && orMatch[6]) {
-                                term1 = orMatch[5].toLowerCase();
-                                term2 = orMatch[6].toLowerCase();
-                            } else if (orMatch[7] && orMatch[8]) {
-                                term1 = orMatch[7].toLowerCase();
-                                term2 = orMatch[8].toLowerCase();
+                        // Check if the search contains OR logic
+                        if (/\sOR\s/i.test(generalTerms)) {
+                            const orParts = generalTerms.split(/\s+OR\s+/i);
+                            for (const part of orParts) {
+                                const trimmed = part.trim();
+                                if (!trimmed) continue;
+                                const quoteMatch = trimmed.match(/^"([^"]+)"$/);
+                                if (quoteMatch) {
+                                    orTerms.push(quoteMatch[1].toLowerCase());
+                                } else {
+                                    orTerms.push(trimmed.toLowerCase());
+                                }
                             }
-                            if (term1 && term2) {
-                                orGroups.push([term1, term2]);
-                                orProcessedRanges.push({ start: orMatch.index, end: orMatch.index + orMatch[0].length });
-                            }
-                        }
-                        
-                        let remainingTerms = generalTerms;
-                        orProcessedRanges.sort((a, b) => b.start - a.start);
-                        orProcessedRanges.forEach(range => {
-                            remainingTerms = remainingTerms.substring(0, range.start) + remainingTerms.substring(range.end);
-                        });
-                        remainingTerms = remainingTerms.trim();
-                        
-                        if (remainingTerms) {
+                        } else {
                             const regex = /"([^"]+)"|([^\s]+)/g;
                             let match;
-                            while ((match = regex.exec(remainingTerms)) !== null) {
+                            while ((match = regex.exec(generalTerms)) !== null) {
                                 let term = (match[1] || match[2]).toLowerCase();
-                                if (term === 'or') continue;
                                 if (term.startsWith('-') && term.length > 1) {
                                     negativeTerms.push(term.substring(1));
                                 } else {
@@ -1984,7 +1963,7 @@
                             }
                         }
                         
-                        if (positiveTerms.length > 0 || negativeTerms.length > 0 || orGroups.length > 0) {
+                        if (positiveTerms.length > 0 || negativeTerms.length > 0 || orTerms.length > 0) {
                             for (const term of negativeTerms) {
                                 const matchesTerm = 
                                     (shift.name && shift.name.toLowerCase().includes(term)) ||
@@ -1994,18 +1973,14 @@
                                 if (matchesTerm) return false;
                             }
                             
-                            for (const [term1, term2] of orGroups) {
-                                const matchesTerm1 = 
-                                    (shift.name && shift.name.toLowerCase().includes(term1)) ||
-                                    (shift.role && shift.role.toLowerCase().includes(term1)) ||
-                                    (shift.venue && shift.venue.toLowerCase().includes(term1)) ||
-                                    (shift.shiftType && shift.shiftType.toLowerCase().includes(term1));
-                                const matchesTerm2 = 
-                                    (shift.name && shift.name.toLowerCase().includes(term2)) ||
-                                    (shift.role && shift.role.toLowerCase().includes(term2)) ||
-                                    (shift.venue && shift.venue.toLowerCase().includes(term2)) ||
-                                    (shift.shiftType && shift.shiftType.toLowerCase().includes(term2));
-                                if (!matchesTerm1 && !matchesTerm2) return false;
+                            if (orTerms.length > 0) {
+                                const matchesAnyOrTerm = orTerms.some(term => {
+                                    return (shift.name && shift.name.toLowerCase().includes(term)) ||
+                                        (shift.role && shift.role.toLowerCase().includes(term)) ||
+                                        (shift.venue && shift.venue.toLowerCase().includes(term)) ||
+                                        (shift.shiftType && shift.shiftType.toLowerCase().includes(term));
+                                });
+                                if (!matchesAnyOrTerm) return false;
                             }
                             
                             for (const term of positiveTerms) {
@@ -2031,35 +2006,33 @@
                 }
             }
             
-            // My Shifts filter (matches name or role, supports OR logic)
+            // My Shifts filter (matches name or role, supports multiple OR logic)
             if (myShiftsFilter) {
                 const filterTerm = myShiftsFilter.trim();
                 
                 // Check if this contains OR logic
-                const orRegex = /"([^"]+)"\s+OR\s+"([^"]+)"|"([^"]+)"\s+OR\s+(\S+)|(\S+)\s+OR\s+"([^"]+)"|(\S+)\s+OR\s+(\S+)/gi;
-                const orMatch = orRegex.exec(filterTerm);
-                
-                if (orMatch) {
-                    let term1, term2;
-                    if (orMatch[1] && orMatch[2]) {
-                        term1 = orMatch[1].toLowerCase();
-                        term2 = orMatch[2].toLowerCase();
-                    } else if (orMatch[3] && orMatch[4]) {
-                        term1 = orMatch[3].toLowerCase();
-                        term2 = orMatch[4].toLowerCase();
-                    } else if (orMatch[5] && orMatch[6]) {
-                        term1 = orMatch[5].toLowerCase();
-                        term2 = orMatch[6].toLowerCase();
-                    } else if (orMatch[7] && orMatch[8]) {
-                        term1 = orMatch[7].toLowerCase();
-                        term2 = orMatch[8].toLowerCase();
+                if (/\sOR\s/i.test(filterTerm)) {
+                    // Split by OR and collect all terms
+                    const orParts = filterTerm.split(/\s+OR\s+/i);
+                    const orTerms = [];
+                    for (const part of orParts) {
+                        const trimmed = part.trim();
+                        if (!trimmed) continue;
+                        const quoteMatch = trimmed.match(/^"([^"]+)"$/);
+                        if (quoteMatch) {
+                            orTerms.push(quoteMatch[1].toLowerCase());
+                        } else {
+                            orTerms.push(trimmed.toLowerCase());
+                        }
                     }
                     
-                    if (term1 && term2) {
-                        filtered = filtered.filter(shift => 
-                            (shift.name && (shift.name.toLowerCase().includes(term1) || shift.name.toLowerCase().includes(term2))) ||
-                            (shift.role && (shift.role.toLowerCase().includes(term1) || shift.role.toLowerCase().includes(term2)))
-                        );
+                    if (orTerms.length > 0) {
+                        filtered = filtered.filter(shift => {
+                            return orTerms.some(term => 
+                                (shift.name && shift.name.toLowerCase().includes(term)) ||
+                                (shift.role && shift.role.toLowerCase().includes(term))
+                            );
+                        });
                     }
                 } else {
                     // Simple single term filter
@@ -3745,56 +3718,33 @@
                     // Parse general terms into positive, negative, and OR terms (do this once, not per shift)
                     let positiveTerms = [];
                     let negativeTerms = [];
-                    let orGroups = []; // Array of [term1, term2] pairs for OR logic
+                    let orTerms = []; // Array of terms for OR logic (any must match)
                     if (generalTerms) {
-                        // First, extract OR expressions: "term1" OR "term2" or term1 OR term2
-                        // This regex captures: "quoted" OR "quoted", "quoted" OR unquoted, unquoted OR "quoted", unquoted OR unquoted
-                        const orRegex = /"([^"]+)"\s+OR\s+"([^"]+)"|"([^"]+)"\s+OR\s+(\S+)|(\S+)\s+OR\s+"([^"]+)"|(\S+)\s+OR\s+(\S+)/gi;
-                        let orMatch;
-                        let orProcessedRanges = [];
-                        
-                        while ((orMatch = orRegex.exec(generalTerms)) !== null) {
-                            let term1, term2;
-                            // Find which capture groups matched
-                            if (orMatch[1] && orMatch[2]) {
-                                term1 = orMatch[1].toLowerCase();
-                                term2 = orMatch[2].toLowerCase();
-                            } else if (orMatch[3] && orMatch[4]) {
-                                term1 = orMatch[3].toLowerCase();
-                                term2 = orMatch[4].toLowerCase();
-                            } else if (orMatch[5] && orMatch[6]) {
-                                term1 = orMatch[5].toLowerCase();
-                                term2 = orMatch[6].toLowerCase();
-                            } else if (orMatch[7] && orMatch[8]) {
-                                term1 = orMatch[7].toLowerCase();
-                                term2 = orMatch[8].toLowerCase();
+                        // Check if the search contains OR logic (case insensitive)
+                        // Split by " OR " to handle chains like "term1 OR term2 OR term3"
+                        if (/\sOR\s/i.test(generalTerms)) {
+                            // This is an OR search - split by OR and collect all terms
+                            const orParts = generalTerms.split(/\s+OR\s+/i);
+                            for (const part of orParts) {
+                                const trimmed = part.trim();
+                                if (!trimmed) continue;
+                                
+                                // Handle quoted phrases
+                                const quoteMatch = trimmed.match(/^"([^"]+)"$/);
+                                if (quoteMatch) {
+                                    orTerms.push(quoteMatch[1].toLowerCase());
+                                } else {
+                                    orTerms.push(trimmed.toLowerCase());
+                                }
                             }
-                            
-                            if (term1 && term2) {
-                                orGroups.push([term1, term2]);
-                                orProcessedRanges.push({ start: orMatch.index, end: orMatch.index + orMatch[0].length });
-                                debug.log('OR group found:', term1, 'OR', term2);
-                            }
-                        }
-                        
-                        // Remove OR expressions from generalTerms before parsing remaining terms
-                        let remainingTerms = generalTerms;
-                        orProcessedRanges.sort((a, b) => b.start - a.start);
-                        orProcessedRanges.forEach(range => {
-                            remainingTerms = remainingTerms.substring(0, range.start) + remainingTerms.substring(range.end);
-                        });
-                        remainingTerms = remainingTerms.trim();
-                        
-                        // Now parse remaining terms (non-OR)
-                        if (remainingTerms) {
+                            debug.log('OR terms:', orTerms);
+                        } else {
+                            // No OR logic - parse normally
                             const regex = /"([^"]+)"|([^\s]+)/g;
                             let match;
-                            while ((match = regex.exec(remainingTerms)) !== null) {
+                            while ((match = regex.exec(generalTerms)) !== null) {
                                 // match[1] is quoted content, match[2] is unquoted word
                                 let term = (match[1] || match[2]).toLowerCase();
-                                
-                                // Skip if it's just "OR" by itself
-                                if (term === 'or') continue;
                                 
                                 // Check if term starts with - (negative search)
                                 if (term.startsWith('-') && term.length > 1) {
@@ -3816,7 +3766,7 @@
                         }
                         debug.log('Positive terms:', positiveTerms);
                         debug.log('Negative terms:', negativeTerms);
-                        debug.log('OR groups:', orGroups);
+                        debug.log('OR terms:', orTerms);
                     }
                     
                     // Apply filters
@@ -3844,8 +3794,8 @@
                             }
                         }
                         
-                        // Check general terms (positive, negative, and OR groups)
-                        if (positiveTerms.length > 0 || negativeTerms.length > 0 || orGroups.length > 0) {
+                        // Check general terms (positive, negative, and OR terms)
+                        if (positiveTerms.length > 0 || negativeTerms.length > 0 || orTerms.length > 0) {
                             
                             // First check negative terms - if any match, exclude this shift
                             for (const term of negativeTerms) {
@@ -3857,19 +3807,15 @@
                                 if (matchesTerm) return false; // Exclude if negative term matches
                             }
                             
-                            // Check OR groups - each group must have at least one term match
-                            for (const [term1, term2] of orGroups) {
-                                const matchesTerm1 = 
-                                    (shift.name && shift.name.toLowerCase().includes(term1)) ||
-                                    (shift.role && shift.role.toLowerCase().includes(term1)) ||
-                                    (shift.venue && shift.venue.toLowerCase().includes(term1)) ||
-                                    (shift.shiftType && shift.shiftType.toLowerCase().includes(term1));
-                                const matchesTerm2 = 
-                                    (shift.name && shift.name.toLowerCase().includes(term2)) ||
-                                    (shift.role && shift.role.toLowerCase().includes(term2)) ||
-                                    (shift.venue && shift.venue.toLowerCase().includes(term2)) ||
-                                    (shift.shiftType && shift.shiftType.toLowerCase().includes(term2));
-                                if (!matchesTerm1 && !matchesTerm2) return false; // Neither OR term matched
+                            // Check OR terms - at least one must match
+                            if (orTerms.length > 0) {
+                                const matchesAnyOrTerm = orTerms.some(term => {
+                                    return (shift.name && shift.name.toLowerCase().includes(term)) ||
+                                        (shift.role && shift.role.toLowerCase().includes(term)) ||
+                                        (shift.venue && shift.venue.toLowerCase().includes(term)) ||
+                                        (shift.shiftType && shift.shiftType.toLowerCase().includes(term));
+                                });
+                                if (!matchesAnyOrTerm) return false; // None of the OR terms matched
                             }
                             
                             // Each positive term must match at least one field (AND across terms)
@@ -3901,35 +3847,33 @@
             
 
             
-            // My Shifts filter (AND condition with tab filters, matches name or role, supports OR logic)
+            // My Shifts filter (AND condition with tab filters, matches name or role, supports multiple OR logic)
             if (myShiftsFilter) {
                 const filterTerm = myShiftsFilter.trim();
                 
                 // Check if this contains OR logic
-                const orRegex = /"([^"]+)"\s+OR\s+"([^"]+)"|"([^"]+)"\s+OR\s+(\S+)|(\S+)\s+OR\s+"([^"]+)"|(\S+)\s+OR\s+(\S+)/gi;
-                const orMatch = orRegex.exec(filterTerm);
-                
-                if (orMatch) {
-                    let term1, term2;
-                    if (orMatch[1] && orMatch[2]) {
-                        term1 = orMatch[1].toLowerCase();
-                        term2 = orMatch[2].toLowerCase();
-                    } else if (orMatch[3] && orMatch[4]) {
-                        term1 = orMatch[3].toLowerCase();
-                        term2 = orMatch[4].toLowerCase();
-                    } else if (orMatch[5] && orMatch[6]) {
-                        term1 = orMatch[5].toLowerCase();
-                        term2 = orMatch[6].toLowerCase();
-                    } else if (orMatch[7] && orMatch[8]) {
-                        term1 = orMatch[7].toLowerCase();
-                        term2 = orMatch[8].toLowerCase();
+                if (/\sOR\s/i.test(filterTerm)) {
+                    // Split by OR and collect all terms
+                    const orParts = filterTerm.split(/\s+OR\s+/i);
+                    const orTerms = [];
+                    for (const part of orParts) {
+                        const trimmed = part.trim();
+                        if (!trimmed) continue;
+                        const quoteMatch = trimmed.match(/^"([^"]+)"$/);
+                        if (quoteMatch) {
+                            orTerms.push(quoteMatch[1].toLowerCase());
+                        } else {
+                            orTerms.push(trimmed.toLowerCase());
+                        }
                     }
                     
-                    if (term1 && term2) {
-                        filtered = filtered.filter(shift => 
-                            (shift.name && (shift.name.toLowerCase().includes(term1) || shift.name.toLowerCase().includes(term2))) ||
-                            (shift.role && (shift.role.toLowerCase().includes(term1) || shift.role.toLowerCase().includes(term2)))
-                        );
+                    if (orTerms.length > 0) {
+                        filtered = filtered.filter(shift => {
+                            return orTerms.some(term => 
+                                (shift.name && shift.name.toLowerCase().includes(term)) ||
+                                (shift.role && shift.role.toLowerCase().includes(term))
+                            );
+                        });
                     }
                 } else {
                     // Simple single term filter
