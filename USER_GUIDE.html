@@ -338,6 +338,20 @@
                     Finds shifts containing BOTH "wmr" AND "olena"
                 </div>
                 
+                <h3>OR Search <span class="badge badge-new">NEW</span></h3>
+                <p>Use the <code>OR</code> keyword (uppercase) between terms to match shifts containing EITHER term.</p>
+                
+                <div class="example">
+                    <strong>Examples:</strong><br>
+                    <code>wmr OR toc</code> - Finds shifts containing "wmr" OR "toc"<br>
+                    <code>"TSI D" OR "Critical"</code> - Finds shifts with "TSI D" OR "Critical" (quoted phrases supported)<br>
+                    <code>"TSI Director" OR "CSM"</code> - Finds shifts for TSI Director OR CSM roles
+                </div>
+                
+                <div class="tip">
+                    <strong>💡 My Shifts with OR:</strong> You can also use OR logic in the My Shifts filter. For example, enter <code>John OR Jane</code> to see shifts for either person.
+                </div>
+                
                 <h3>Quoted Phrase Search</h3>
                 <p>Use quotes to search for exact phrases with spaces.</p>
                 
@@ -439,7 +453,8 @@
                     <code>unassigned wmr virtual</code> - Unassigned virtual WMR shifts<br>
                     <code>role:WMR date:15/11 virtual</code> - Virtual WMR shifts on Nov 15<br>
                     <code>venue:TOC -RTOC unassigned</code> - Unassigned TOC shifts (excluding RTOC)<br>
-                    <code>wmr -virtual -john</code> - WMR shifts, excluding virtual and John
+                    <code>wmr -virtual -john</code> - WMR shifts, excluding virtual and John<br>
+                    <code>"TSI D" OR "Critical" venue:RTOC</code> - TSI D or Critical roles at RTOC
                 </div>
             </div>
 
