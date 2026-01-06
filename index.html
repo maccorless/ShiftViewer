@@ -3890,10 +3890,37 @@
                 filtered = filtered.filter(shift => shift.name === selectedPerson);
             }
             
-            // Sort by date
+            // Sort by date, then start time, then role, then venue
             filtered.sort((a, b) => {
+                // Primary: sort by date
                 if (!a.date || !b.date) return 0;
-                return a.date - b.date;
+                if (a.date.getTime() !== b.date.getTime()) {
+                    return a.date - b.date;
+                }
+                
+                // Secondary: sort by start time (extract from shiftTimeCET like "08:00 - 16:00")
+                const getStartHour = (shift) => {
+                    if (!shift.shiftTimeCET) return 0;
+                    const match = shift.shiftTimeCET.match(/^(\d{1,2}):(\d{2})/);
+                    return match ? parseInt(match[1]) * 60 + parseInt(match[2]) : 0;
+                };
+                const timeA = getStartHour(a);
+                const timeB = getStartHour(b);
+                if (timeA !== timeB) {
+                    return timeA - timeB;
+                }
+                
+                // Tertiary: sort by role name
+                const roleA = (a.role || '').toLowerCase();
+                const roleB = (b.role || '').toLowerCase();
+                if (roleA !== roleB) {
+                    return roleA.localeCompare(roleB);
+                }
+                
+                // Quaternary: sort by venue
+                const venueA = (a.venue || '').toLowerCase();
+                const venueB = (b.venue || '').toLowerCase();
+                return venueA.localeCompare(venueB);
             });
             
             // Update stats
@@ -3947,7 +3974,7 @@
             debug.log('  Unassigned:', unassignedShifts);
             debug.log('  Total shifts loaded:', allShifts.length);
             
-            // Render shifts
+            // Render shifts using DocumentFragment for better performance
             shiftsContainer.innerHTML = '';
             
             if (filtered.length === 0) {
@@ -3955,7 +3982,17 @@
                 return;
             }
             
-            filtered.forEach(shift => {
+            // Limit initial render for performance (show first 300, with "Show more" option)
+            const RENDER_LIMIT = 300;
+            const showAll = window.showAllShiftsFlag === true;
+            const shiftsToRender = showAll ? filtered : filtered.slice(0, RENDER_LIMIT);
+            const hasMore = !showAll && filtered.length > RENDER_LIMIT;
+            
+            // Reset the flag after use (so next filter change goes back to limited view)
+            if (showAll) window.showAllShiftsFlag = false;
+            
+            const fragment = document.createDocumentFragment();
+            shiftsToRender.forEach(shift => {
                 const shiftElement = document.createElement('div');
                 shiftElement.className = 'shift-card';
                 
@@ -4040,8 +4077,23 @@
                             contactSection +
                         '</div>' : '');
                 
-                shiftsContainer.appendChild(shiftElement);
+                fragment.appendChild(shiftElement);
             });
+            shiftsContainer.appendChild(fragment);
+            
+            // Add "Show more" button if there are more shifts
+            if (hasMore) {
+                const showMoreDiv = document.createElement('div');
+                showMoreDiv.className = 'show-more-container';
+                showMoreDiv.style.cssText = 'text-align: center; padding: 20px; margin-top: 10px;';
+                const remainingCount = filtered.length - RENDER_LIMIT;
+                showMoreDiv.innerHTML = 
+                    '<button onclick="window.showAllShiftsFlag=true; renderShifts();" style="background: var(--olympic-blue); color: white; border: none; padding: 12px 24px; border-radius: 8px; cursor: pointer; font-size: 1rem;">' +
+                        '📋 Show all ' + filtered.length + ' shifts (' + remainingCount + ' more)' +
+                    '</button>' +
+                    '<p style="color: var(--slate); font-size: 0.85rem; margin-top: 8px;">Showing first 300 shifts for faster loading</p>';
+                shiftsContainer.appendChild(showMoreDiv);
+            }
         }
     </script>
 </body>
