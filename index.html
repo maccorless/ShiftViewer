@@ -1334,17 +1334,8 @@
                     </div>
                 </div>
                 
-                <div id="exportChangesSummary" class="export-changes-summary" style="display: none;">
-                    <div class="export-changes-title">Changes since last export:</div>
-                    <div class="export-changes-stats">
-                        <span class="export-change-new">🆕 <span id="exportNewCount">0</span> new</span>
-                        <span class="export-change-modified">✏️ <span id="exportModifiedCount">0</span> modified</span>
-                        <span class="export-change-removed">⚠️ <span id="exportRemovedCount">0</span> removed</span>
-                    </div>
-                    <button id="exportToggleRemoved" class="export-toggle-removed" onclick="toggleRemovedList()" style="display: none;">
-                        Show removed shifts...
-                    </button>
-                    <div id="exportRemovedList" class="export-removed-list" style="display: none;"></div>
+                <div class="tip" style="margin-top: var(--space-md); font-size: 0.85rem;">
+                    <strong>💡 Tip:</strong> To update your calendar, search <code>category:ShiftViewer</code> in Outlook, delete all results, then import the new file.
                 </div>
             </div>
             <div class="export-modal-footer">
@@ -1580,8 +1571,7 @@
         }
         
         // Generate ICS file content for shifts
-        // removedShifts: array of {uid, date, venue, role, time} for cancelled events
-        function generateICSContent(shifts, showAsBusy = true, removedShifts = []) {
+        function generateICSContent(shifts, showAsBusy = true) {
             const lines = [
                 'BEGIN:VCALENDAR',
                 'VERSION:2.0',
@@ -1664,150 +1654,10 @@
                 lines.push('END:VEVENT');
             });
             
-            // Add cancellation events for removed shifts
-            // Note: ICS cancellation via STATUS:CANCELLED is a best-effort approach.
-            // True calendar cancellation requires METHOD:CANCEL at the VCALENDAR level,
-            // but that would break new events in the same file. The "CANCELLED:" prefix
-            // in the summary helps users identify events to manually delete if needed.
-            removedShifts.forEach(removed => {
-                const time = parseShiftTime(removed.time || '09:00-17:00');
-                // Parse date explicitly to avoid timezone issues with new Date(string)
-                let removedDate;
-                if (removed.date && typeof removed.date === 'string' && removed.date.match(/^\d{4}-\d{2}-\d{2}$/)) {
-                    const [year, month, day] = removed.date.split('-').map(Number);
-                    removedDate = new Date(year, month - 1, day);
-                } else {
-                    removedDate = new Date(removed.date);
-                }
-                const summary = 'CANCELLED: ' + (removed.role || 'Shift') + ' @ ' + (removed.venue || 'TBD');
-                
-                // Handle overnight shifts (end time <= start time means shift crosses midnight)
-                const isOvernight = (time.endHour < time.startHour) || 
-                                    (time.endHour === time.startHour && time.endMin <= time.startMin);
-                let removedEndDate = removedDate;
-                if (isOvernight) {
-                    removedEndDate = new Date(removedDate);
-                    removedEndDate.setDate(removedEndDate.getDate() + 1);
-                }
-                
-                lines.push('BEGIN:VEVENT');
-                lines.push('UID:' + removed.uid);
-                lines.push('DTSTAMP:' + dtstamp);
-                lines.push('DTSTART;TZID=Europe/Rome:' + formatICSDateTime(removedDate, time.startHour, time.startMin));
-                lines.push('DTEND;TZID=Europe/Rome:' + formatICSDateTime(removedEndDate, time.endHour, time.endMin));
-                lines.push('SUMMARY:' + escapeICS(summary));
-                lines.push('STATUS:CANCELLED');
-                lines.push('SEQUENCE:1');
-                lines.push('END:VEVENT');
-            });
-            
             lines.push('END:VCALENDAR');
             return lines.join('\r\n');
         }
         
-        // Get last export data from localStorage
-        function getLastExportData() {
-            try {
-                const data = localStorage.getItem('shiftExport');
-                return data ? JSON.parse(data) : null;
-            } catch (e) {
-                console.error('Error reading export data:', e);
-                return null;
-            }
-        }
-        
-        // Save export data to localStorage
-        function saveExportData(shifts) {
-            try {
-                const exportData = {
-                    lastExportDate: new Date().toISOString(),
-                    shifts: shifts.map(s => ({
-                        uid: generateShiftUID(s),
-                        hash: generateShiftHash(s),
-                        date: s.date ? s.date.toISOString().split('T')[0] : '',
-                        venue: s.venue || '',
-                        role: s.role || '',
-                        time: s.shiftTimeCET || ''
-                    }))
-                };
-                localStorage.setItem('shiftExport', JSON.stringify(exportData));
-                debug.log('Export data saved:', exportData.shifts.length, 'shifts');
-            } catch (e) {
-                console.error('Error saving export data:', e);
-            }
-        }
-        
-        // Calculate changes between current shifts and last export
-        function calculateExportChanges(currentShifts) {
-            const lastExport = getLastExportData();
-            
-            if (!lastExport || !lastExport.shifts || lastExport.shifts.length === 0) {
-                // First export - all shifts are "new"
-                return {
-                    isFirstExport: true,
-                    newShifts: currentShifts,
-                    modifiedShifts: [],
-                    removedShifts: [],
-                    unchangedShifts: []
-                };
-            }
-            
-            const lastShiftMap = new Map();
-            lastExport.shifts.forEach(s => {
-                lastShiftMap.set(s.uid, s);
-            });
-            
-            const currentShiftMap = new Map();
-            currentShifts.forEach(s => {
-                const uid = generateShiftUID(s);
-                currentShiftMap.set(uid, {
-                    shift: s,
-                    hash: generateShiftHash(s)
-                });
-            });
-            
-            const newShifts = [];
-            const modifiedShifts = [];
-            const unchangedShifts = [];
-            const removedShifts = [];
-            
-            // Check current shifts against last export
-            currentShifts.forEach(shift => {
-                const uid = generateShiftUID(shift);
-                const hash = generateShiftHash(shift);
-                const lastShift = lastShiftMap.get(uid);
-                
-                if (!lastShift) {
-                    newShifts.push(shift);
-                } else if (lastShift.hash !== hash) {
-                    modifiedShifts.push(shift);
-                } else {
-                    unchangedShifts.push(shift);
-                }
-            });
-            
-            // Check for removed shifts (in last export but not in current)
-            lastExport.shifts.forEach(lastShift => {
-                if (!currentShiftMap.has(lastShift.uid)) {
-                    removedShifts.push({
-                        uid: lastShift.uid,
-                        date: lastShift.date,
-                        venue: lastShift.venue,
-                        role: lastShift.role,
-                        time: lastShift.time
-                    });
-                }
-            });
-            
-            return {
-                isFirstExport: false,
-                lastExportDate: lastExport.lastExportDate,
-                newShifts,
-                modifiedShifts,
-                removedShifts,
-                unchangedShifts
-            };
-        }
         
         // Get shifts filtered by "My Shifts" (matches name or role)
         function getMyShifts() {
@@ -2054,36 +1904,7 @@
             
             // Calculate counts for displayed shifts only
             const displayedShifts = getDisplayedShifts();
-            
             document.getElementById('exportDisplayedCount').textContent = displayedShifts.length;
-            
-            // Calculate changes based on displayed shifts
-            const changes = calculateExportChanges(displayedShifts);
-            const summaryEl = document.getElementById('exportChangesSummary');
-            
-            if (changes.isFirstExport) {
-                summaryEl.style.display = 'none';
-            } else {
-                summaryEl.style.display = 'block';
-                document.getElementById('exportNewCount').textContent = changes.newShifts.length;
-                document.getElementById('exportModifiedCount').textContent = changes.modifiedShifts.length;
-                document.getElementById('exportRemovedCount').textContent = changes.removedShifts.length;
-                
-                // Show/hide removed shifts toggle
-                const toggleBtn = document.getElementById('exportToggleRemoved');
-                const removedList = document.getElementById('exportRemovedList');
-                
-                if (changes.removedShifts.length > 0) {
-                    toggleBtn.style.display = 'block';
-                    // Build removed shifts list
-                    removedList.innerHTML = changes.removedShifts.map(s => 
-                        `<div class="export-removed-item">• ${s.date}: ${s.role} @ ${s.venue} (${s.time})</div>`
-                    ).join('');
-                } else {
-                    toggleBtn.style.display = 'none';
-                    removedList.style.display = 'none';
-                }
-            }
             
             modal.classList.add('show');
         }
@@ -2093,25 +1914,6 @@
             const modal = document.getElementById('exportModal');
             if (modal) {
                 modal.classList.remove('show');
-                // Reset removed list visibility
-                const removedList = document.getElementById('exportRemovedList');
-                if (removedList) removedList.style.display = 'none';
-                const toggleBtn = document.getElementById('exportToggleRemoved');
-                if (toggleBtn) toggleBtn.textContent = 'Show removed shifts...';
-            }
-        }
-        
-        // Toggle removed shifts list visibility
-        function toggleRemovedList() {
-            const removedList = document.getElementById('exportRemovedList');
-            const toggleBtn = document.getElementById('exportToggleRemoved');
-            
-            if (removedList.style.display === 'none') {
-                removedList.style.display = 'block';
-                toggleBtn.textContent = 'Hide removed shifts';
-            } else {
-                removedList.style.display = 'none';
-                toggleBtn.textContent = 'Show removed shifts...';
             }
         }
         
@@ -2392,15 +2194,8 @@
             const showAsRadio = document.querySelector('input[name="showAs"]:checked');
             const showAsBusy = !showAsRadio || showAsRadio.value === 'BUSY';
             
-            // Calculate changes to get removed shifts for cancellation events
-            const changes = calculateExportChanges(shiftsToExport);
-            const removedShifts = changes.removedShifts || [];
-            
-            // Generate ICS content with cancellation events for removed shifts
-            const icsContent = generateICSContent(shiftsToExport, showAsBusy, removedShifts);
-            
-            // Save export state for change tracking
-            saveExportData(shiftsToExport);
+            // Generate ICS content
+            const icsContent = generateICSContent(shiftsToExport, showAsBusy);
             
             // Create and download file
             const blob = new Blob([icsContent], { type: 'text/calendar;charset=utf-8' });

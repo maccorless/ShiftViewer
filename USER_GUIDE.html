@@ -650,18 +650,20 @@
                     <li>Choose to add to your calendar</li>
                 </ol>
                 
-                <h3>Change Tracking</h3>
-                <p>ShiftViewer tracks changes between exports:</p>
-                <ul>
-                    <li><strong>🆕 New:</strong> Shifts added since your last export</li>
-                    <li><strong>✏️ Modified:</strong> Shifts with changed details</li>
-                    <li><strong>⚠️ Removed:</strong> Shifts that no longer exist in the schedule</li>
-                </ul>
+                <h3>Updating Your Calendar <span class="badge badge-tip">RECOMMENDED</span></h3>
+                <p>All imported shifts are tagged with the category <strong>"ShiftViewer"</strong>. This makes it easy to find and manage them:</p>
                 
-                <div class="warning">
-                    <strong>⚠️ Handling Removed Shifts:</strong><br>
-                    When shifts are removed from the schedule, the export includes cancellation events that attempt to remove them from your calendar. However, this may not work in all calendar applications.<br><br>
-                    The cancelled events will appear with <strong>"CANCELLED:"</strong> prepended to the title. If automatic deletion doesn't work, you may need to manually delete these events from your calendar.
+                <h4>To Update Your Calendar with New Shifts:</h4>
+                <ol>
+                    <li>In Outlook, search for <code>category:ShiftViewer</code></li>
+                    <li>Select all results (Ctrl+A or Cmd+A)</li>
+                    <li>Delete the selected events</li>
+                    <li>Export fresh shifts from ShiftViewer</li>
+                    <li>Import the new ICS file</li>
+                </ol>
+                
+                <div class="tip">
+                    <strong>💡 Why This Approach?</strong> This "delete all and reimport" method ensures your calendar always matches the latest schedule exactly, avoiding duplicate or outdated entries.
                 </div>
                 
                 <h3>Color-Coding Your Shifts in Outlook <span class="badge badge-tip">RECOMMENDED</span></h3>
