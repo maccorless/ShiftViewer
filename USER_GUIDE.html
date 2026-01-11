@@ -290,31 +290,52 @@
                     Syncing the SharePoint folder with OneDrive keeps the Excel file current automatically. You avoid manually downloading new files and always have the latest version ready to load.
                 </div>
                 
-                <h3>How to configure OneDrive Sync</h3>
+                <h3>How to Configure OneDrive Sync</h3>
+                
+                <h4>On Windows:</h4>
                 <ol>
                     <li>Open the SharePoint page: <a href="https://dtpsso.sharepoint.com/sites/DTEC_COLE_MICO26/SitePages/Published-Shift-Schedule.aspx" target="_blank">DTEC COLE MICO26 - Published Shift Schedule</a></li>
-                    <li>Click <strong>Sync</strong> (OneDrive) for the Published Shift Schedule library.</li>
-                    <li>In File Explorer/Finder, wait for the library to finish syncing (you should see the Excel file locally with a green check).</li>
-                    <li>In ShiftViewer's landing page, click <strong>"Choose/Refresh Excel File"</strong> and select the synced copy in your OneDrive folder.</li>
+                    <li>Click <strong>Sync</strong> (OneDrive) for the Published Shift Schedule library</li>
+                    <li>OneDrive will open and begin syncing the folder</li>
+                    <li>In <strong>File Explorer</strong>, navigate to your OneDrive folder and wait for the sync to complete (look for a green checkmark ✓ on the Excel file)</li>
+                    <li>The synced file will typically be at: <code>OneDrive - [Organization]\DTEC_COLE_MICO26\...</code></li>
                 </ol>
                 
-                <h3>Refreshing When the File Updates</h3>
-                <p>When the shift schedule is updated on SharePoint, OneDrive will sync the new file to your computer. To load the updated data into ShiftViewer:</p>
+                <h4>On Mac:</h4>
                 <ol>
-                    <li>Return to the ShiftViewer landing page (reload the page or close and reopen)</li>
-                    <li>Click <strong>"Choose/Refresh Excel File"</strong></li>
-                    <li>Select the synced file from your OneDrive folder</li>
-                    <li>The app will load the latest data</li>
+                    <li>Open the SharePoint page: <a href="https://dtpsso.sharepoint.com/sites/DTEC_COLE_MICO26/SitePages/Published-Shift-Schedule.aspx" target="_blank">DTEC COLE MICO26 - Published Shift Schedule</a></li>
+                    <li>Click <strong>Sync</strong> (OneDrive) for the Published Shift Schedule library</li>
+                    <li>If prompted, allow OneDrive to open</li>
+                    <li>In <strong>Finder</strong>, look for the OneDrive folder in your sidebar (or navigate to <code>~/Library/CloudStorage/OneDrive-[Organization]/</code>)</li>
+                    <li>Wait for the sync to complete - the file will show a green checkmark ✓ or cloud icon when ready</li>
                 </ol>
                 
                 <div class="tip">
-                    <strong>💡 Quick Workflow:</strong><br>
-                    Since the file is synced automatically by OneDrive, you just need to reload ShiftViewer and re-select the same file whenever you want the latest schedule. The browser remembers your last folder, making this a quick two-click process.
+                    <strong>💡 First-Time Setup:</strong> The initial sync may take a few minutes. Once set up, OneDrive will automatically keep the file updated whenever changes are published to SharePoint.
                 </div>
                 
+                <h3>Refreshing When the File Updates</h3>
+                <p>When the shift schedule is updated on SharePoint, OneDrive will sync the new file to your computer. However, <strong>ShiftViewer cannot detect file changes automatically</strong>. To load the updated data:</p>
+                
+                <ol>
+                    <li><strong>Ensure OneDrive has synced:</strong> Check that the file in your OneDrive folder shows a green checkmark (not a sync-in-progress icon)</li>
+                    <li><strong>Refresh your browser:</strong> Press <code>F5</code> (Windows) or <code>Cmd+R</code> (Mac) to reload ShiftViewer</li>
+                    <li><strong>Select the file again:</strong> Click <strong>"Choose/Refresh Excel File"</strong> and navigate to the synced file</li>
+                    <li><strong>Confirm selection:</strong> The app will load the latest data from the file</li>
+                </ol>
+                
                 <div class="warning">
-                    <strong>⚠️ Browser Limitation:</strong><br>
-                    Due to browser security restrictions, ShiftViewer cannot automatically detect when the synced file has been updated. You must manually select the file each time you want to refresh the data.
+                    <strong>⚠️ Important - Browser Refresh Required:</strong><br>
+                    Simply re-selecting the file is <strong>not enough</strong> if ShiftViewer is already open. You must <strong>refresh the browser first</strong> to clear the cached data, then select the file again. This is a browser security limitation - web apps cannot monitor local files for changes.
+                </div>
+                
+                <div class="tip">
+                    <strong>💡 Quick Refresh Workflow:</strong><br>
+                    <ol>
+                        <li>Press <code>F5</code> (Windows) or <code>Cmd+R</code> (Mac) to refresh the browser</li>
+                        <li>Click <strong>"Choose/Refresh Excel File"</strong></li>
+                        <li>Select the same file from your OneDrive folder (browser remembers your last location)</li>
+                    </ol>
                 </div>
             </div>
 
