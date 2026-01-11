@@ -3124,7 +3124,7 @@
                     
                     switch(columnName) {
                         case 'NAME':
-                            if (value && !value.includes('Unassigned')) {
+                            if (value && !value.toLowerCase().includes('unassigned')) {
                                 shift.name = value;
                                 shift.isAssigned = true;
                             }
@@ -3795,7 +3795,7 @@
                 
                 // Build contact section (horizontal) - escape all user data for XSS protection
                 let contactItems = [];
-                if (shift.email && !shift.email.includes('Unassigned')) {
+                if (shift.email && !shift.email.toLowerCase().includes('unassigned')) {
                     const safeEmail = escapeHtml(shift.email);
                     const safeEmailAttr = escapeAttr(shift.email);
                     const safeEmailUrl = encodeURIComponent(shift.email);
