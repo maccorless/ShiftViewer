@@ -990,7 +990,9 @@
         .calendar-day-cell.weekend .calendar-day-number { color: #b45309; }
         
         .calendar-shift {
-            font-size: 10px;
+            font-size: 11.5px;
+            line-height: 1.35;
+            letter-spacing: 0.01em;
             padding: 4px 6px;
             margin-bottom: 3px;
             border-radius: 3px;
@@ -998,10 +1000,25 @@
             flex-direction: column;
             color: white;
         }
-        
-        .calendar-shift-name { font-weight: 600; }
-        .calendar-shift-time { opacity: 0.9; font-size: 9px; }
-        .calendar-shift-role { font-size: 8px; opacity: 0.8; }
+
+        .calendar-shift-name {
+            font-size: 13px;
+            font-weight: 600;
+            color: inherit;
+        }
+
+        .calendar-shift-time {
+            font-size: 12px;
+            font-weight: 600;
+            opacity: 0.95;
+            color: inherit;
+        }
+
+        .calendar-shift-role {
+            font-size: 10px;
+            opacity: 0.85;
+            color: inherit;
+        }
         
         .calendar-shift.shift-morning { border-left: 4px solid #fbbf24; }
         .calendar-shift.shift-afternoon { border-left: 4px solid #f97316; }
@@ -1946,7 +1963,30 @@
             }
             return personColorMap[name];
         }
-        
+
+        function getContrastColor(hexColor) {
+            if (!hexColor) return '#ffffff';
+            const normalized = hexColor.replace('#', '');
+            if (normalized.length !== 6) return '#ffffff';
+
+            const r = parseInt(normalized.substring(0, 2), 16) / 255;
+            const g = parseInt(normalized.substring(2, 4), 16) / 255;
+            const b = parseInt(normalized.substring(4, 6), 16) / 255;
+
+            const toLinear = channel => (
+                channel <= 0.03928
+                    ? channel / 12.92
+                    : Math.pow((channel + 0.055) / 1.055, 2.4)
+            );
+
+            const luminance =
+                0.2126 * toLinear(r) +
+                0.7152 * toLinear(g) +
+                0.0722 * toLinear(b);
+
+            return luminance > 0.3 ? '#0f172a' : '#ffffff';
+        }
+
         function getShiftType(time) {
             if (!time) return { type: 'day', label: 'Day', class: '' };
             const startHour = parseInt(time.split(':')[0]);
@@ -2114,6 +2154,7 @@
                     dayShifts.forEach(s => {
                         const shiftInfo = getShiftType(s.shiftTimeCET);
                         const bgColor = getPersonColor(s.name);
+                        const textColor = getContrastColor(bgColor);
                         const displayName = s.name ? s.name.split(' ')[0] : '(Unassigned)';
                         
                         // Check if shift is 1 hour or less
@@ -2131,7 +2172,7 @@
                         }
                         const shortClass = isShortShift ? ' shift-short' : '';
                         
-                        calendarHtml += `<div class="calendar-shift ${shiftInfo.class}${shortClass}" style="background: ${bgColor};">
+                        calendarHtml += `<div class="calendar-shift ${shiftInfo.class}${shortClass}" style="background: ${bgColor}; color: ${textColor};">
                             <span class="calendar-shift-name">${displayName}</span>
                             <span class="calendar-shift-time">${s.shiftTimeCET || ''}</span>
                             ${s.role ? `<span class="calendar-shift-role">${s.role}</span>` : ''}
